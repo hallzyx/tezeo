@@ -1,0 +1,3 @@
+Chain and coin logos in this folder come from Web3Icons (@web3icons/core), https://github.com/0xa3k5/web3icons,
+distributed under the MIT License. The logos themselves are trademarks of their respective owners and are shown
+only to identify the network or coin a fan can pay with.

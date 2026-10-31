@@ -95,12 +95,12 @@ export const LANDING_HTML = `<a class="tzl-skip" href="#main">Skip to content</a
         <path class="tzl-eye-rombo" d="M420 208 432 220 420 232 408 220Z"/>
         <text class="tzl-art-label" x="420" y="272" text-anchor="middle">the loom</text>
         <g class="tzl-chain-pill" aria-hidden="true">
-          <g transform="translate(0 24)"><rect width="132" height="32" rx="16"/><circle cx="16" cy="16" r="11" fill="#627EEA"/><text class="g" x="16" y="19.5" text-anchor="middle">ETH</text><text x="34" y="20.5">Ethereum</text></g>
-          <g transform="translate(0 84)"><rect width="132" height="32" rx="16"/><circle cx="16" cy="16" r="11" fill="#0052FF"/><text class="g" x="16" y="19.5" text-anchor="middle">B</text><text x="34" y="20.5">Base</text></g>
-          <g transform="translate(0 144)"><rect width="132" height="32" rx="16"/><circle cx="16" cy="16" r="11" fill="#28A0F0"/><text class="g" x="16" y="19.5" text-anchor="middle">ARB</text><text x="34" y="20.5">Arbitrum</text></g>
+          <g transform="translate(0 24)"><rect width="132" height="32" rx="16"/><image href="/icons/chains/eth.svg" x="5.00" y="5.00" width="22.00" height="22.00"/><text x="34" y="20.5">Ethereum</text></g>
+          <g transform="translate(0 84)"><rect width="132" height="32" rx="16"/><image href="/icons/chains/base.svg" x="5.00" y="5.00" width="22.00" height="22.00"/><text x="34" y="20.5">Base</text></g>
+          <g transform="translate(0 144)"><rect width="132" height="32" rx="16"/><image href="/icons/chains/arb.svg" x="5.00" y="5.00" width="22.00" height="22.00"/><text x="34" y="20.5">Arbitrum</text></g>
           <g transform="translate(0 204)"><rect width="132" height="32" rx="16"/><circle cx="16" cy="16" r="11" fill="#F7931A"/><text class="g g--ink" x="16" y="19.5" text-anchor="middle">BTC</text><text x="34" y="20.5">Bitcoin</text></g>
-          <g transform="translate(0 264)"><rect width="132" height="32" rx="16"/><circle cx="16" cy="16" r="11" fill="#8247E5"/><text class="g" x="16" y="19.5" text-anchor="middle">POL</text><text x="34" y="20.5">Polygon</text></g>
-          <g transform="translate(0 324)"><rect width="132" height="32" rx="16"/><circle cx="16" cy="16" r="11" fill="#0098EA"/><text class="g" x="16" y="19.5" text-anchor="middle">TON</text><text x="34" y="20.5">TON</text></g>
+          <g transform="translate(0 264)"><rect width="132" height="32" rx="16"/><image href="/icons/chains/pol.svg" x="5.00" y="5.00" width="22.00" height="22.00"/><text x="34" y="20.5">Polygon</text></g>
+          <g transform="translate(0 324)"><rect width="132" height="32" rx="16"/><image href="/icons/chains/ton.svg" x="5.00" y="5.00" width="22.00" height="22.00"/><text x="34" y="20.5">TON</text></g>
           <g transform="translate(0 384)"><rect width="132" height="32" rx="16"/><circle cx="16" cy="16" r="11" fill="#4DA2FF"/><text class="g g--ink" x="16" y="19.5" text-anchor="middle">SUI</text><text x="34" y="20.5">Sui</text></g>
         </g>
       </svg>
@@ -118,11 +118,11 @@ export const LANDING_HTML = `<a class="tzl-skip" href="#main">Skip to content</a
         <circle class="tzl-eye" cx="180" cy="190" r="22"/>
         <path class="tzl-eye-rombo" d="M180 180 190 190 180 200 170 190Z"/>
         <g class="tzl-chain-pill" aria-hidden="true">
-          <g transform="translate(4 6)"><rect width="64" height="30" rx="15"/><circle cx="15" cy="15" r="10" fill="#627EEA"/><text class="g" x="15" y="18.3" text-anchor="middle" style="font-size:7.5px">ETH</text><text x="29" y="19.5" style="font-size:11px">Eth</text></g>
-          <g transform="translate(76 6)"><rect width="64" height="30" rx="15"/><circle cx="15" cy="15" r="10" fill="#0052FF"/><text class="g" x="15" y="18.3" text-anchor="middle">B</text><text x="29" y="19.5" style="font-size:11px">Base</text></g>
+          <g transform="translate(4 6)"><rect width="64" height="30" rx="15"/><image href="/icons/chains/eth.svg" x="5.00" y="5.00" width="20.00" height="20.00"/><text x="29" y="19.5" style="font-size:11px">Eth</text></g>
+          <g transform="translate(76 6)"><rect width="64" height="30" rx="15"/><image href="/icons/chains/base.svg" x="5.00" y="5.00" width="20.00" height="20.00"/><text x="29" y="19.5" style="font-size:11px">Base</text></g>
           <g transform="translate(148 6)"><rect width="64" height="30" rx="15"/><circle cx="15" cy="15" r="10" fill="#F7931A"/><text class="g g--ink" x="15" y="18.3" text-anchor="middle" style="font-size:7.5px">BTC</text><text x="29" y="19.5" style="font-size:11px">BTC</text></g>
-          <g transform="translate(220 6)"><rect width="64" height="30" rx="15"/><circle cx="15" cy="15" r="10" fill="#28A0F0"/><text class="g" x="15" y="18.3" text-anchor="middle" style="font-size:7.5px">ARB</text><text x="29" y="19.5" style="font-size:11px">Arb</text></g>
-          <g transform="translate(292 6)"><rect width="64" height="30" rx="15"/><circle cx="15" cy="15" r="10" fill="#0098EA"/><text class="g" x="15" y="18.3" text-anchor="middle" style="font-size:7.5px">TON</text><text x="29" y="19.5" style="font-size:11px">TON</text></g>
+          <g transform="translate(220 6)"><rect width="64" height="30" rx="15"/><image href="/icons/chains/arb.svg" x="5.00" y="5.00" width="20.00" height="20.00"/><text x="29" y="19.5" style="font-size:11px">Arb</text></g>
+          <g transform="translate(292 6)"><rect width="64" height="30" rx="15"/><image href="/icons/chains/ton.svg" x="5.00" y="5.00" width="20.00" height="20.00"/><text x="29" y="19.5" style="font-size:11px">TON</text></g>
         </g>
       </svg>
 
@@ -182,10 +182,10 @@ export const LANDING_HTML = `<a class="tzl-skip" href="#main">Skip to content</a
             <div class="tzl-mini-chips">
               <span class="tz-h3">Where's your money?</span>
               <div class="tz-chips">
-                <span class="tz-chip" style="--chip-color:#627EEA"><span class="tz-chip__coin">ETH</span>Ethereum</span>
-                <span class="tz-chip" aria-pressed="true" style="--chip-color:#0052FF"><span class="tz-chip__coin">B</span>Base</span>
-                <span class="tz-chip" style="--chip-color:#0098EA"><span class="tz-chip__coin">TON</span>TON</span>
-                <span class="tz-chip" style="--chip-color:#EB0029"><span class="tz-chip__coin">TRX</span>Tron</span>
+                <span class="tz-chip" style="--chip-color:#627EEA"><span class="tz-chip__coin tz-chip__coin--img"><img src="/icons/chains/eth.svg" alt="" width="28" height="28" loading="lazy" decoding="async"></span>Ethereum</span>
+                <span class="tz-chip" aria-pressed="true" style="--chip-color:#0052FF"><span class="tz-chip__coin tz-chip__coin--img"><img src="/icons/chains/base.svg" alt="" width="28" height="28" loading="lazy" decoding="async"></span>Base</span>
+                <span class="tz-chip" style="--chip-color:#0098EA"><span class="tz-chip__coin tz-chip__coin--img"><img src="/icons/chains/ton.svg" alt="" width="28" height="28" loading="lazy" decoding="async"></span>TON</span>
+                <span class="tz-chip" style="--chip-color:#EB0029"><span class="tz-chip__coin tz-chip__coin--img"><img src="/icons/chains/tron.svg" alt="" width="28" height="28" loading="lazy" decoding="async"></span>Tron</span>
               </div>
             </div>
           </div>
@@ -254,84 +254,84 @@ export const LANDING_HTML = `<a class="tzl-skip" href="#main">Skip to content</a
     <div class="tzl-marquee" style="--_dur:70s;--_thread:var(--tz-anil-300)">
       <div class="tzl-marquee__track">
         <ul class="tzl-marquee__set" role="list" aria-label="Some of the networks fans can pay from" style="list-style:none;margin:0;padding:0">
-          <li class="tzl-chain"><span class="tzl-chain__g" style="--_c:#627EEA">ETH</span>Ethereum</li>
-          <li class="tzl-chain"><span class="tzl-chain__g" style="--_c:#0052FF">B</span>Base</li>
-          <li class="tzl-chain"><span class="tzl-chain__g" style="--_c:#28A0F0">ARB</span>Arbitrum</li>
-          <li class="tzl-chain"><span class="tzl-chain__g" style="--_c:#FF0420">OP</span>Optimism</li>
-          <li class="tzl-chain"><span class="tzl-chain__g" style="--_c:#8247E5">POL</span>Polygon</li>
-          <li class="tzl-chain"><span class="tzl-chain__g tzl-chain__g--ink" style="--_c:#F0B90B">BNB</span>BNB Chain</li>
-          <li class="tzl-chain"><span class="tzl-chain__g" style="--_c:#E84142">AV</span>Avalanche</li>
-          <li class="tzl-chain"><span class="tzl-chain__g tzl-chain__g--ink" style="--_c:#00EC97">N</span>NEAR</li>
-          <li class="tzl-chain"><span class="tzl-chain__g tzl-chain__g--ink" style="--_c:#F7931A">BTC</span>Bitcoin</li>
+          <li class="tzl-chain"><span class="tzl-chain__g tzl-chain__g--img" style="--_c:#627EEA"><img src="/icons/chains/eth.svg" alt="" width="36" height="36" loading="lazy" decoding="async"></span>Ethereum</li>
+          <li class="tzl-chain"><span class="tzl-chain__g tzl-chain__g--img" style="--_c:#0052FF"><img src="/icons/chains/base.svg" alt="" width="36" height="36" loading="lazy" decoding="async"></span>Base</li>
+          <li class="tzl-chain"><span class="tzl-chain__g tzl-chain__g--img" style="--_c:#28A0F0"><img src="/icons/chains/arb.svg" alt="" width="36" height="36" loading="lazy" decoding="async"></span>Arbitrum</li>
+          <li class="tzl-chain"><span class="tzl-chain__g tzl-chain__g--img" style="--_c:#FF0420"><img src="/icons/chains/op.svg" alt="" width="36" height="36" loading="lazy" decoding="async"></span>Optimism</li>
+          <li class="tzl-chain"><span class="tzl-chain__g tzl-chain__g--img" style="--_c:#8247E5"><img src="/icons/chains/pol.svg" alt="" width="36" height="36" loading="lazy" decoding="async"></span>Polygon</li>
+          <li class="tzl-chain"><span class="tzl-chain__g tzl-chain__g--ink tzl-chain__g--img" style="--_c:#F0B90B"><img src="/icons/chains/bsc.svg" alt="" width="36" height="36" loading="lazy" decoding="async"></span>BNB Chain</li>
+          <li class="tzl-chain"><span class="tzl-chain__g tzl-chain__g--img" style="--_c:#E84142"><img src="/icons/chains/avax.svg" alt="" width="36" height="36" loading="lazy" decoding="async"></span>Avalanche</li>
+          <li class="tzl-chain"><span class="tzl-chain__g tzl-chain__g--ink tzl-chain__g--img" style="--_c:#00EC97"><img src="/icons/chains/near.svg" alt="" width="36" height="36" loading="lazy" decoding="async"></span>NEAR</li>
+          <li class="tzl-chain"><span class="tzl-chain__g tzl-chain__g--ink tzl-chain__g--img" style="--_c:#F7931A"><img src="/icons/chains/btc.svg" alt="" width="36" height="36" loading="lazy" decoding="async"></span>Bitcoin</li>
         </ul>
         <ul class="tzl-marquee__set" aria-hidden="true" style="list-style:none;margin:0;padding:0">
-          <li class="tzl-chain"><span class="tzl-chain__g" style="--_c:#627EEA">ETH</span>Ethereum</li>
-          <li class="tzl-chain"><span class="tzl-chain__g" style="--_c:#0052FF">B</span>Base</li>
-          <li class="tzl-chain"><span class="tzl-chain__g" style="--_c:#28A0F0">ARB</span>Arbitrum</li>
-          <li class="tzl-chain"><span class="tzl-chain__g" style="--_c:#FF0420">OP</span>Optimism</li>
-          <li class="tzl-chain"><span class="tzl-chain__g" style="--_c:#8247E5">POL</span>Polygon</li>
-          <li class="tzl-chain"><span class="tzl-chain__g tzl-chain__g--ink" style="--_c:#F0B90B">BNB</span>BNB Chain</li>
-          <li class="tzl-chain"><span class="tzl-chain__g" style="--_c:#E84142">AV</span>Avalanche</li>
-          <li class="tzl-chain"><span class="tzl-chain__g tzl-chain__g--ink" style="--_c:#00EC97">N</span>NEAR</li>
-          <li class="tzl-chain"><span class="tzl-chain__g tzl-chain__g--ink" style="--_c:#F7931A">BTC</span>Bitcoin</li>
+          <li class="tzl-chain"><span class="tzl-chain__g tzl-chain__g--img" style="--_c:#627EEA"><img src="/icons/chains/eth.svg" alt="" width="36" height="36" loading="lazy" decoding="async"></span>Ethereum</li>
+          <li class="tzl-chain"><span class="tzl-chain__g tzl-chain__g--img" style="--_c:#0052FF"><img src="/icons/chains/base.svg" alt="" width="36" height="36" loading="lazy" decoding="async"></span>Base</li>
+          <li class="tzl-chain"><span class="tzl-chain__g tzl-chain__g--img" style="--_c:#28A0F0"><img src="/icons/chains/arb.svg" alt="" width="36" height="36" loading="lazy" decoding="async"></span>Arbitrum</li>
+          <li class="tzl-chain"><span class="tzl-chain__g tzl-chain__g--img" style="--_c:#FF0420"><img src="/icons/chains/op.svg" alt="" width="36" height="36" loading="lazy" decoding="async"></span>Optimism</li>
+          <li class="tzl-chain"><span class="tzl-chain__g tzl-chain__g--img" style="--_c:#8247E5"><img src="/icons/chains/pol.svg" alt="" width="36" height="36" loading="lazy" decoding="async"></span>Polygon</li>
+          <li class="tzl-chain"><span class="tzl-chain__g tzl-chain__g--ink tzl-chain__g--img" style="--_c:#F0B90B"><img src="/icons/chains/bsc.svg" alt="" width="36" height="36" loading="lazy" decoding="async"></span>BNB Chain</li>
+          <li class="tzl-chain"><span class="tzl-chain__g tzl-chain__g--img" style="--_c:#E84142"><img src="/icons/chains/avax.svg" alt="" width="36" height="36" loading="lazy" decoding="async"></span>Avalanche</li>
+          <li class="tzl-chain"><span class="tzl-chain__g tzl-chain__g--ink tzl-chain__g--img" style="--_c:#00EC97"><img src="/icons/chains/near.svg" alt="" width="36" height="36" loading="lazy" decoding="async"></span>NEAR</li>
+          <li class="tzl-chain"><span class="tzl-chain__g tzl-chain__g--ink tzl-chain__g--img" style="--_c:#F7931A"><img src="/icons/chains/btc.svg" alt="" width="36" height="36" loading="lazy" decoding="async"></span>Bitcoin</li>
         </ul>
       </div>
     </div>
     <div class="tzl-marquee" style="--_dur:85s;--_thread:var(--tz-cochinilla-400)">
       <div class="tzl-marquee__track">
         <ul class="tzl-marquee__set" aria-label="More networks" style="list-style:none;margin:0;padding:0">
-          <li class="tzl-chain"><span class="tzl-chain__g tzl-chain__g--ink" style="--_c:#4DA2FF">SUI</span>Sui</li>
-          <li class="tzl-chain"><span class="tzl-chain__g" style="--_c:#0098EA">TON</span>TON</li>
-          <li class="tzl-chain"><span class="tzl-chain__g" style="--_c:#EB0029">TRX</span>Tron</li>
-          <li class="tzl-chain"><span class="tzl-chain__g" style="--_c:#3A2E44">APT</span>Aptos</li>
-          <li class="tzl-chain"><span class="tzl-chain__g" style="--_c:#5E5266">XLM</span>Stellar</li>
-          <li class="tzl-chain"><span class="tzl-chain__g" style="--_c:#836EF9">MON</span>Monad</li>
-          <li class="tzl-chain"><span class="tzl-chain__g" style="--_c:#261D2E">X</span>X Layer</li>
-          <li class="tzl-chain"><span class="tzl-chain__g" style="--_c:#04795B">GNO</span>Gnosis</li>
-          <li class="tzl-chain"><span class="tzl-chain__g" style="--_c:#9945FF">SOL</span>Solana</li>
+          <li class="tzl-chain"><span class="tzl-chain__g tzl-chain__g--ink tzl-chain__g--img" style="--_c:#4DA2FF"><img src="/icons/chains/sui.svg" alt="" width="36" height="36" loading="lazy" decoding="async"></span>Sui</li>
+          <li class="tzl-chain"><span class="tzl-chain__g tzl-chain__g--img" style="--_c:#0098EA"><img src="/icons/chains/ton.svg" alt="" width="36" height="36" loading="lazy" decoding="async"></span>TON</li>
+          <li class="tzl-chain"><span class="tzl-chain__g tzl-chain__g--img" style="--_c:#EB0029"><img src="/icons/chains/tron.svg" alt="" width="36" height="36" loading="lazy" decoding="async"></span>Tron</li>
+          <li class="tzl-chain"><span class="tzl-chain__g tzl-chain__g--img" style="--_c:#3A2E44"><img src="/icons/chains/aptos.svg" alt="" width="36" height="36" loading="lazy" decoding="async"></span>Aptos</li>
+          <li class="tzl-chain"><span class="tzl-chain__g tzl-chain__g--img" style="--_c:#5E5266"><img src="/icons/chains/stellar.svg" alt="" width="36" height="36" loading="lazy" decoding="async"></span>Stellar</li>
+          <li class="tzl-chain"><span class="tzl-chain__g tzl-chain__g--img" style="--_c:#836EF9"><img src="/icons/chains/monad.svg" alt="" width="36" height="36" loading="lazy" decoding="async"></span>Monad</li>
+          <li class="tzl-chain"><span class="tzl-chain__g tzl-chain__g--img" style="--_c:#261D2E"><img src="/icons/chains/xlayer.svg" alt="" width="36" height="36" loading="lazy" decoding="async"></span>X Layer</li>
+          <li class="tzl-chain"><span class="tzl-chain__g tzl-chain__g--img" style="--_c:#04795B"><img src="/icons/chains/gnosis.svg" alt="" width="36" height="36" loading="lazy" decoding="async"></span>Gnosis</li>
+          <li class="tzl-chain"><span class="tzl-chain__g tzl-chain__g--img" style="--_c:#9945FF"><img src="/icons/chains/sol.svg" alt="" width="36" height="36" loading="lazy" decoding="async"></span>Solana</li>
         </ul>
         <ul class="tzl-marquee__set" aria-hidden="true" style="list-style:none;margin:0;padding:0">
-          <li class="tzl-chain"><span class="tzl-chain__g tzl-chain__g--ink" style="--_c:#4DA2FF">SUI</span>Sui</li>
-          <li class="tzl-chain"><span class="tzl-chain__g" style="--_c:#0098EA">TON</span>TON</li>
-          <li class="tzl-chain"><span class="tzl-chain__g" style="--_c:#EB0029">TRX</span>Tron</li>
-          <li class="tzl-chain"><span class="tzl-chain__g" style="--_c:#3A2E44">APT</span>Aptos</li>
-          <li class="tzl-chain"><span class="tzl-chain__g" style="--_c:#5E5266">XLM</span>Stellar</li>
-          <li class="tzl-chain"><span class="tzl-chain__g" style="--_c:#836EF9">MON</span>Monad</li>
-          <li class="tzl-chain"><span class="tzl-chain__g" style="--_c:#261D2E">X</span>X Layer</li>
-          <li class="tzl-chain"><span class="tzl-chain__g" style="--_c:#04795B">GNO</span>Gnosis</li>
-          <li class="tzl-chain"><span class="tzl-chain__g" style="--_c:#9945FF">SOL</span>Solana</li>
+          <li class="tzl-chain"><span class="tzl-chain__g tzl-chain__g--ink tzl-chain__g--img" style="--_c:#4DA2FF"><img src="/icons/chains/sui.svg" alt="" width="36" height="36" loading="lazy" decoding="async"></span>Sui</li>
+          <li class="tzl-chain"><span class="tzl-chain__g tzl-chain__g--img" style="--_c:#0098EA"><img src="/icons/chains/ton.svg" alt="" width="36" height="36" loading="lazy" decoding="async"></span>TON</li>
+          <li class="tzl-chain"><span class="tzl-chain__g tzl-chain__g--img" style="--_c:#EB0029"><img src="/icons/chains/tron.svg" alt="" width="36" height="36" loading="lazy" decoding="async"></span>Tron</li>
+          <li class="tzl-chain"><span class="tzl-chain__g tzl-chain__g--img" style="--_c:#3A2E44"><img src="/icons/chains/aptos.svg" alt="" width="36" height="36" loading="lazy" decoding="async"></span>Aptos</li>
+          <li class="tzl-chain"><span class="tzl-chain__g tzl-chain__g--img" style="--_c:#5E5266"><img src="/icons/chains/stellar.svg" alt="" width="36" height="36" loading="lazy" decoding="async"></span>Stellar</li>
+          <li class="tzl-chain"><span class="tzl-chain__g tzl-chain__g--img" style="--_c:#836EF9"><img src="/icons/chains/monad.svg" alt="" width="36" height="36" loading="lazy" decoding="async"></span>Monad</li>
+          <li class="tzl-chain"><span class="tzl-chain__g tzl-chain__g--img" style="--_c:#261D2E"><img src="/icons/chains/xlayer.svg" alt="" width="36" height="36" loading="lazy" decoding="async"></span>X Layer</li>
+          <li class="tzl-chain"><span class="tzl-chain__g tzl-chain__g--img" style="--_c:#04795B"><img src="/icons/chains/gnosis.svg" alt="" width="36" height="36" loading="lazy" decoding="async"></span>Gnosis</li>
+          <li class="tzl-chain"><span class="tzl-chain__g tzl-chain__g--img" style="--_c:#9945FF"><img src="/icons/chains/sol.svg" alt="" width="36" height="36" loading="lazy" decoding="async"></span>Solana</li>
         </ul>
       </div>
     </div>
     <div class="tzl-marquee" style="--_dur:60s;--_thread:var(--tz-maiz-400)">
       <div class="tzl-marquee__track">
         <ul class="tzl-marquee__set" aria-label="Some of the coins fans can pay with" style="list-style:none;margin:0;padding:0">
-          <li class="tzl-chain tzl-chain--coin"><span class="tzl-chain__g" style="--_c:#627EEA">Ξ</span>ETH</li>
-          <li class="tzl-chain tzl-chain--coin"><span class="tzl-chain__g" style="--_c:#2775CA">$</span>USDC</li>
-          <li class="tzl-chain tzl-chain--coin"><span class="tzl-chain__g" style="--_c:#26A17B">₮</span>USDT</li>
-          <li class="tzl-chain tzl-chain--coin"><span class="tzl-chain__g tzl-chain__g--ink" style="--_c:#F7931A">₿</span>BTC</li>
-          <li class="tzl-chain tzl-chain--coin"><span class="tzl-chain__g tzl-chain__g--ink" style="--_c:#F0B90B">B</span>BNB</li>
-          <li class="tzl-chain tzl-chain--coin"><span class="tzl-chain__g" style="--_c:#8247E5">P</span>POL</li>
-          <li class="tzl-chain tzl-chain--coin"><span class="tzl-chain__g" style="--_c:#E84142">A</span>AVAX</li>
-          <li class="tzl-chain tzl-chain--coin"><span class="tzl-chain__g" style="--_c:#0098EA">T</span>TON</li>
-          <li class="tzl-chain tzl-chain--coin"><span class="tzl-chain__g tzl-chain__g--ink" style="--_c:#4DA2FF">S</span>SUI</li>
-          <li class="tzl-chain tzl-chain--coin"><span class="tzl-chain__g" style="--_c:#9945FF">◎</span>SOL</li>
-          <li class="tzl-chain tzl-chain--coin"><span class="tzl-chain__g tzl-chain__g--ink" style="--_c:#00EC97">N</span>NEAR</li>
-          <li class="tzl-chain tzl-chain--coin"><span class="tzl-chain__g tzl-chain__g--ink" style="--_c:#F4B728">D</span>DAI</li>
+          <li class="tzl-chain tzl-chain--coin"><span class="tzl-chain__g tzl-chain__g--img" style="--_c:#627EEA"><img src="/icons/coins/eth.svg" alt="" width="36" height="36" loading="lazy" decoding="async"></span>ETH</li>
+          <li class="tzl-chain tzl-chain--coin"><span class="tzl-chain__g tzl-chain__g--img" style="--_c:#2775CA"><img src="/icons/coins/usdc.svg" alt="" width="36" height="36" loading="lazy" decoding="async"></span>USDC</li>
+          <li class="tzl-chain tzl-chain--coin"><span class="tzl-chain__g tzl-chain__g--img" style="--_c:#26A17B"><img src="/icons/coins/usdt.svg" alt="" width="36" height="36" loading="lazy" decoding="async"></span>USDT</li>
+          <li class="tzl-chain tzl-chain--coin"><span class="tzl-chain__g tzl-chain__g--ink tzl-chain__g--img" style="--_c:#F7931A"><img src="/icons/coins/btc.svg" alt="" width="36" height="36" loading="lazy" decoding="async"></span>BTC</li>
+          <li class="tzl-chain tzl-chain--coin"><span class="tzl-chain__g tzl-chain__g--ink tzl-chain__g--img" style="--_c:#F0B90B"><img src="/icons/coins/bnb.svg" alt="" width="36" height="36" loading="lazy" decoding="async"></span>BNB</li>
+          <li class="tzl-chain tzl-chain--coin"><span class="tzl-chain__g tzl-chain__g--img" style="--_c:#8247E5"><img src="/icons/coins/pol.svg" alt="" width="36" height="36" loading="lazy" decoding="async"></span>POL</li>
+          <li class="tzl-chain tzl-chain--coin"><span class="tzl-chain__g tzl-chain__g--img" style="--_c:#E84142"><img src="/icons/coins/avax.svg" alt="" width="36" height="36" loading="lazy" decoding="async"></span>AVAX</li>
+          <li class="tzl-chain tzl-chain--coin"><span class="tzl-chain__g tzl-chain__g--img" style="--_c:#0098EA"><img src="/icons/chains/ton.svg" alt="" width="36" height="36" loading="lazy" decoding="async"></span>TON</li>
+          <li class="tzl-chain tzl-chain--coin"><span class="tzl-chain__g tzl-chain__g--ink tzl-chain__g--img" style="--_c:#4DA2FF"><img src="/icons/coins/sui.svg" alt="" width="36" height="36" loading="lazy" decoding="async"></span>SUI</li>
+          <li class="tzl-chain tzl-chain--coin"><span class="tzl-chain__g tzl-chain__g--img" style="--_c:#9945FF"><img src="/icons/coins/sol.svg" alt="" width="36" height="36" loading="lazy" decoding="async"></span>SOL</li>
+          <li class="tzl-chain tzl-chain--coin"><span class="tzl-chain__g tzl-chain__g--ink tzl-chain__g--img" style="--_c:#00EC97"><img src="/icons/coins/near.svg" alt="" width="36" height="36" loading="lazy" decoding="async"></span>NEAR</li>
+          <li class="tzl-chain tzl-chain--coin"><span class="tzl-chain__g tzl-chain__g--ink tzl-chain__g--img" style="--_c:#F4B728"><img src="/icons/coins/dai.svg" alt="" width="36" height="36" loading="lazy" decoding="async"></span>DAI</li>
         </ul>
         <ul class="tzl-marquee__set" aria-hidden="true" style="list-style:none;margin:0;padding:0">
-          <li class="tzl-chain tzl-chain--coin"><span class="tzl-chain__g" style="--_c:#627EEA">Ξ</span>ETH</li>
-          <li class="tzl-chain tzl-chain--coin"><span class="tzl-chain__g" style="--_c:#2775CA">$</span>USDC</li>
-          <li class="tzl-chain tzl-chain--coin"><span class="tzl-chain__g" style="--_c:#26A17B">₮</span>USDT</li>
-          <li class="tzl-chain tzl-chain--coin"><span class="tzl-chain__g tzl-chain__g--ink" style="--_c:#F7931A">₿</span>BTC</li>
-          <li class="tzl-chain tzl-chain--coin"><span class="tzl-chain__g tzl-chain__g--ink" style="--_c:#F0B90B">B</span>BNB</li>
-          <li class="tzl-chain tzl-chain--coin"><span class="tzl-chain__g" style="--_c:#8247E5">P</span>POL</li>
-          <li class="tzl-chain tzl-chain--coin"><span class="tzl-chain__g" style="--_c:#E84142">A</span>AVAX</li>
-          <li class="tzl-chain tzl-chain--coin"><span class="tzl-chain__g" style="--_c:#0098EA">T</span>TON</li>
-          <li class="tzl-chain tzl-chain--coin"><span class="tzl-chain__g tzl-chain__g--ink" style="--_c:#4DA2FF">S</span>SUI</li>
-          <li class="tzl-chain tzl-chain--coin"><span class="tzl-chain__g" style="--_c:#9945FF">◎</span>SOL</li>
-          <li class="tzl-chain tzl-chain--coin"><span class="tzl-chain__g tzl-chain__g--ink" style="--_c:#00EC97">N</span>NEAR</li>
-          <li class="tzl-chain tzl-chain--coin"><span class="tzl-chain__g tzl-chain__g--ink" style="--_c:#F4B728">D</span>DAI</li>
+          <li class="tzl-chain tzl-chain--coin"><span class="tzl-chain__g tzl-chain__g--img" style="--_c:#627EEA"><img src="/icons/coins/eth.svg" alt="" width="36" height="36" loading="lazy" decoding="async"></span>ETH</li>
+          <li class="tzl-chain tzl-chain--coin"><span class="tzl-chain__g tzl-chain__g--img" style="--_c:#2775CA"><img src="/icons/coins/usdc.svg" alt="" width="36" height="36" loading="lazy" decoding="async"></span>USDC</li>
+          <li class="tzl-chain tzl-chain--coin"><span class="tzl-chain__g tzl-chain__g--img" style="--_c:#26A17B"><img src="/icons/coins/usdt.svg" alt="" width="36" height="36" loading="lazy" decoding="async"></span>USDT</li>
+          <li class="tzl-chain tzl-chain--coin"><span class="tzl-chain__g tzl-chain__g--ink tzl-chain__g--img" style="--_c:#F7931A"><img src="/icons/coins/btc.svg" alt="" width="36" height="36" loading="lazy" decoding="async"></span>BTC</li>
+          <li class="tzl-chain tzl-chain--coin"><span class="tzl-chain__g tzl-chain__g--ink tzl-chain__g--img" style="--_c:#F0B90B"><img src="/icons/coins/bnb.svg" alt="" width="36" height="36" loading="lazy" decoding="async"></span>BNB</li>
+          <li class="tzl-chain tzl-chain--coin"><span class="tzl-chain__g tzl-chain__g--img" style="--_c:#8247E5"><img src="/icons/coins/pol.svg" alt="" width="36" height="36" loading="lazy" decoding="async"></span>POL</li>
+          <li class="tzl-chain tzl-chain--coin"><span class="tzl-chain__g tzl-chain__g--img" style="--_c:#E84142"><img src="/icons/coins/avax.svg" alt="" width="36" height="36" loading="lazy" decoding="async"></span>AVAX</li>
+          <li class="tzl-chain tzl-chain--coin"><span class="tzl-chain__g tzl-chain__g--img" style="--_c:#0098EA"><img src="/icons/chains/ton.svg" alt="" width="36" height="36" loading="lazy" decoding="async"></span>TON</li>
+          <li class="tzl-chain tzl-chain--coin"><span class="tzl-chain__g tzl-chain__g--ink tzl-chain__g--img" style="--_c:#4DA2FF"><img src="/icons/coins/sui.svg" alt="" width="36" height="36" loading="lazy" decoding="async"></span>SUI</li>
+          <li class="tzl-chain tzl-chain--coin"><span class="tzl-chain__g tzl-chain__g--img" style="--_c:#9945FF"><img src="/icons/coins/sol.svg" alt="" width="36" height="36" loading="lazy" decoding="async"></span>SOL</li>
+          <li class="tzl-chain tzl-chain--coin"><span class="tzl-chain__g tzl-chain__g--ink tzl-chain__g--img" style="--_c:#00EC97"><img src="/icons/coins/near.svg" alt="" width="36" height="36" loading="lazy" decoding="async"></span>NEAR</li>
+          <li class="tzl-chain tzl-chain--coin"><span class="tzl-chain__g tzl-chain__g--ink tzl-chain__g--img" style="--_c:#F4B728"><img src="/icons/coins/dai.svg" alt="" width="36" height="36" loading="lazy" decoding="async"></span>DAI</li>
         </ul>
       </div>
     </div>

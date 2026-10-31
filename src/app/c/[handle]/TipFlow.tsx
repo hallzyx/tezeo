@@ -5,6 +5,7 @@ import { Avatar, CopyBox, ErrorNote, Icon, Mark, ThemeToggle, TopBar, Weave } fr
 import { breakdown, clock, coin, shortAddr, usd, usdc } from "@/lib/money";
 import { PassCard } from "@/components/PassCard";
 import { walletTx } from "@/lib/evm";
+import { chainIcon, coinIcon } from "@/lib/icons";
 import { WalletPay, type WalletState } from "./WalletPay";
 
 export interface PublicCreator {
@@ -261,16 +262,16 @@ export function TipFlow({ creator, qrSvg, pageUrl, passMode = false, goal = null
         <div className="tz-stack" style={{ ["--tz-stack-gap" as string]: "10px" }}>
           <span className="tz-overline" id="net-l">Network</span>
           <div className="tz-chips" role="group" aria-labelledby="net-l">
-            {topChains.map((c) => <Chip key={c.id} on={chain === c.id} color={CHAIN_COLOR[c.id]} glyph={c.label.slice(0, 3).toUpperCase()} label={c.label} onClick={() => pickChain(c.id)} />)}
-            {chain && !topChains.some((c) => c.id === chain) && cur && <Chip on color={CHAIN_COLOR[chain]} glyph={cur.label.slice(0, 3).toUpperCase()} label={cur.label} onClick={() => {}} />}
+            {topChains.map((c) => <Chip key={c.id} on={chain === c.id} color={CHAIN_COLOR[c.id]} glyph={c.label.slice(0, 3).toUpperCase()} icon={chainIcon(c.id)} label={c.label} onClick={() => pickChain(c.id)} />)}
+            {chain && !topChains.some((c) => c.id === chain) && cur && <Chip on color={CHAIN_COLOR[chain]} glyph={cur.label.slice(0, 3).toUpperCase()} icon={chainIcon(chain)} label={cur.label} onClick={() => {}} />}
             {moreChains.length > 0 && <Chip color="#5E5266" glyph={`+${moreChains.length}`} label="More" onClick={() => setSheet("chain")} />}
           </div>
         </div>
         <div className="tz-stack" style={{ ["--tz-stack-gap" as string]: "10px" }}>
           <span className="tz-overline" id="coin-l">Coin</span>
           <div className="tz-chips" role="group" aria-labelledby="coin-l">
-            {topCoins.map((c) => <Chip key={c.assetId} on={assetId === c.assetId} color={c.stable ? "#2775CA" : CHAIN_COLOR[c.chain] ?? "#5E5266"} glyph={c.symbol.slice(0, 3)} label={c.symbol} onClick={() => setAssetId(c.assetId)} />)}
-            {assetId && !topCoins.some((c) => c.assetId === assetId) && <Chip on color="#5E5266" glyph="•" label={coins.find((c) => c.assetId === assetId)?.symbol ?? ""} onClick={() => {}} />}
+            {topCoins.map((c) => <Chip key={c.assetId} on={assetId === c.assetId} color={c.stable ? "#2775CA" : CHAIN_COLOR[c.chain] ?? "#5E5266"} glyph={c.symbol.slice(0, 3)} icon={coinIcon(c.symbol)} label={c.symbol} onClick={() => setAssetId(c.assetId)} />)}
+            {assetId && !topCoins.some((c) => c.assetId === assetId) && <Chip on color="#5E5266" glyph="•" icon={coinIcon(coins.find((c) => c.assetId === assetId)?.symbol ?? "")} label={coins.find((c) => c.assetId === assetId)?.symbol ?? ""} onClick={() => {}} />}
             {moreCoins.length > 0 && <Chip color="#5E5266" glyph={`+${moreCoins.length}`} label="More" onClick={() => setSheet("coin")} />}
           </div>
         </div>
@@ -335,8 +336,8 @@ export function TipFlow({ creator, qrSvg, pageUrl, passMode = false, goal = null
           <CopyBox value={pageUrl} label="Copy page link" toast="Link copied" />
         </Sheet>
       )}
-      {sheet === "chain" && <PickerSheet title="All networks" items={chains.map((c) => ({ id: c.id, label: c.label }))} onPick={(id) => { pickChain(id); setSheet(null); }} onClose={() => setSheet(null)} />}
-      {sheet === "coin" && <PickerSheet title={`Coins on ${chains.find((c) => c.id === chain)?.label ?? ""}`} items={coins.map((c) => ({ id: c.assetId, label: c.symbol }))} onPick={(id) => { setAssetId(id); setSheet(null); }} onClose={() => setSheet(null)} />}
+      {sheet === "chain" && <PickerSheet title="All networks" items={chains.map((c) => ({ id: c.id, label: c.label, icon: chainIcon(c.id) }))} onPick={(id) => { pickChain(id); setSheet(null); }} onClose={() => setSheet(null)} />}
+      {sheet === "coin" && <PickerSheet title={`Coins on ${chains.find((c) => c.id === chain)?.label ?? ""}`} items={coins.map((c) => ({ id: c.assetId, label: c.symbol, icon: coinIcon(c.symbol) }))} onPick={(id) => { setAssetId(id); setSheet(null); }} onClose={() => setSheet(null)} />}
     </div>
   );
 }
@@ -348,10 +349,13 @@ function friendly(e?: string) {
   return e.startsWith("Aurora") ? "We couldn't get a quote right now. Try again in a moment." : e;
 }
 
-function Chip({ on, color, glyph, label, onClick }: { on?: boolean; color?: string; glyph: string; label: string; onClick: () => void }) {
+function Chip({ on, color, glyph, label, icon, onClick }: { on?: boolean; color?: string; glyph: string; label: string; icon?: string; onClick: () => void }) {
   return (
     <button type="button" className="tz-chip" aria-pressed={!!on} style={{ ["--chip-color" as string]: color ?? "#5E5266" }} onClick={onClick}>
-      <span className="tz-chip__coin">{glyph}</span>{label}
+      {icon
+        ? <span className="tz-chip__coin tz-chip__coin--img"><img src={icon} alt="" width={28} height={28} loading="lazy" decoding="async" /></span> /* eslint-disable-line @next/next/no-img-element */
+        : <span className="tz-chip__coin">{glyph}</span>}
+      {label}
     </button>
   );
 }
@@ -368,13 +372,13 @@ function Sheet({ title, children, onClose }: { title: string; children: React.Re
   );
 }
 
-function PickerSheet({ title, items, onPick, onClose }: { title: string; items: { id: string; label: string }[]; onPick: (id: string) => void; onClose: () => void }) {
+function PickerSheet({ title, items, onPick, onClose }: { title: string; items: { id: string; label: string; icon?: string }[]; onPick: (id: string) => void; onClose: () => void }) {
   const [q, setQ] = useState("");
   const list = items.filter((i) => i.label.toLowerCase().includes(q.toLowerCase()));
   return (
     <Sheet title={title} onClose={onClose}>
       <input className="tz-input" placeholder="Search" aria-label="Search" value={q} onChange={(e) => setQ(e.target.value)} autoFocus />
-      <div className="tz-chips">{list.map((i) => <Chip key={i.id} glyph={i.label.slice(0, 3).toUpperCase()} label={i.label} onClick={() => onPick(i.id)} />)}{list.length === 0 && <span className="tz-muted tz-small">Nothing matches.</span>}</div>
+      <div className="tz-chips">{list.map((i) => <Chip key={i.id} glyph={i.label.slice(0, 3).toUpperCase()} icon={i.icon} label={i.label} onClick={() => onPick(i.id)} />)}{list.length === 0 && <span className="tz-muted tz-small">Nothing matches.</span>}</div>
     </Sheet>
   );
 }

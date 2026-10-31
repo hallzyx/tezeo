@@ -51,7 +51,7 @@ reach Postgres, and both services have health checks.
 npm ci
 cp .env.example .env.local      # set DATABASE_URL=postgres://user:pass@localhost:5432/tezeo
 npm run dev                     # http://localhost:3000
-npm run typecheck && npm test   # 46 tests, run on an embedded Postgres (PGlite): no server needed
+npm run typecheck && npm test   # 51 tests, run on an embedded Postgres (PGlite): no server needed
 npm run build && npm start
 ```
 
@@ -74,6 +74,7 @@ Simulator tricks (simulated mode only): a tip whose smallest-unit amount ends in
 * `src/lib/tips.ts` + `domain.ts` tip state machine: `pending → converting → received | failed | refunded | expired`.
   Aurora is the source of truth; the server re-checks status on each poll and never trusts the browser.
 * Landing (`/`): the designer's prototype in `design/landing.html` + `landing.css` (spec in `design/LANDING.md`), ported by `npm run landing:sync` (re-run it after any design change; never edit `src/app/_landing/markup.ts` by hand). Behaviour lives in `src/app/_landing/LandingEffects.tsx`.
+* Chain and coin logos: vendored from [Web3Icons](https://github.com/0xa3k5/web3icons) (MIT) into `public/icons/` by `npm run icons:sync` (only the ~70 we use, ~130 KB). `src/lib/icons.ts` maps Aurora's chain slugs and coin symbols to them; anything without a logo (a few exotic chains) keeps a text glyph. Logos are trademarks of their owners.
 * Pages: `/alerts/[token]` (OBS), `/` landing, `/onboarding`, `/@handle` (+ `/@handle/pass`), `/dashboard/[token]`, `/pass/[token]`.
 * API: `/api/assets`, `/api/creators`, `/api/tips`, `/api/tips/[id]` (GET status, PATCH fan note),
   `/api/dashboard/[token]` (+ `/pass` settings).

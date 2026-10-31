@@ -1,0 +1,6 @@
+/* Chain / coin logos inside the round "coin" slot of chips (replaces the text glyph when a logo exists). */
+.tz-chip__coin--img { background: transparent; padding: 0; overflow: hidden; }
+.tz-chip__coin--img img { display: block; width: 100%; height: 100%; border-radius: 50%; object-fit: contain; }
+/* landing: marquee chips + mock chips */
+.tzl-chain__g--img { background: transparent !important; padding: 0; overflow: hidden; }
+.tzl-chain__g--img img { display: block; width: 100%; height: 100%; border-radius: 50%; object-fit: contain; }
