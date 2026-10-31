@@ -1,5 +1,5 @@
 import { randomBytes, randomUUID } from "node:crypto";
-import { db } from "./db";
+import { q, q1 } from "./db";
 import { getAurora } from "./aurora";
 import { TERMINAL, clampFeeBps, mapStatus, type TipStatus } from "./domain";
 import { env } from "./env";
@@ -24,16 +24,14 @@ export const PASS_DAYS = 30;
 export const PASS_MAX_USD = 500;
 
 /** Creator turns the 30-day pass on/off and sets its price and perk. Price is whole USD, paid once. */
-export function updateCreatorPass(token: string, input: { enabled: boolean; priceUsd: number; perk: string }): CreatorRow | undefined {
+export async function updateCreatorPass(token: string, input: { enabled: boolean; priceUsd: number; perk: string }): Promise<CreatorRow | undefined> {
   const price = Math.round(input.priceUsd);
   if (!(price >= 1 && price <= PASS_MAX_USD)) throw new Error(`Pass price must be between $1 and $${PASS_MAX_USD}.`);
-  const r = db().prepare("UPDATE creators SET pass_enabled=?, pass_price_usd=?, pass_perk=? WHERE dashboard_token=?")
-    .run(input.enabled ? 1 : 0, price, input.perk.trim().slice(0, 140), token);
-  return r.changes ? getCreatorByToken(token) : undefined;
+  return q1<CreatorRow>("UPDATE creators SET pass_enabled=$1, pass_price_usd=$2, pass_perk=$3 WHERE dashboard_token=$4 RETURNING *",
+    [input.enabled ? 1 : 0, price, input.perk.trim().slice(0, 140), token]);
 }
 
-export const getTipByPassToken = (t: string) =>
-  db().prepare("SELECT * FROM tips WHERE pass_token = ?").get(t) as TipRow | undefined;
+export const getTipByPassToken = (t: string) => q1<TipRow>("SELECT * FROM tips WHERE pass_token = $1", [t]);
 
 /**
  * How much of an origin asset to ask for so the creator still receives `priceUsd` after Aurora's
@@ -45,9 +43,9 @@ export function passAmountUnits(priceUsd: number, asset: { decimals: number; usd
   return BigInt(Math.ceil(coins * 10 ** asset.decimals)).toString();
 }
 
-export function createCreator(input: {
+export async function createCreator(input: {
   handle: string; displayName: string; message?: string; avatarUrl?: string; accent?: string; wallet: string;
-}): CreatorRow {
+}): Promise<CreatorRow> {
   const row: CreatorRow = {
     id: randomUUID(),
     handle: input.handle,
@@ -60,21 +58,19 @@ export function createCreator(input: {
     pass_enabled: 0, pass_price_usd: 10, pass_perk: "",
     created_at: new Date().toISOString(),
   };
-  db().prepare(
+  await q(
     `INSERT INTO creators (id,handle,display_name,message,avatar_url,accent,wallet,dashboard_token,pass_enabled,pass_price_usd,pass_perk,created_at)
-     VALUES (@id,@handle,@display_name,@message,@avatar_url,@accent,@wallet,@dashboard_token,@pass_enabled,@pass_price_usd,@pass_perk,@created_at)`,
-  ).run(row);
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)`,
+    [row.id, row.handle, row.display_name, row.message, row.avatar_url, row.accent, row.wallet, row.dashboard_token, row.pass_enabled, row.pass_price_usd, row.pass_perk, row.created_at],
+  );
   return row;
 }
 
-export const getCreatorByHandle = (h: string) =>
-  db().prepare("SELECT * FROM creators WHERE handle = ?").get(h) as CreatorRow | undefined;
-export const getCreatorByToken = (t: string) =>
-  db().prepare("SELECT * FROM creators WHERE dashboard_token = ?").get(t) as CreatorRow | undefined;
-export const getTip = (id: string) =>
-  db().prepare("SELECT * FROM tips WHERE id = ?").get(id) as TipRow | undefined;
+export const getCreatorByHandle = (h: string) => q1<CreatorRow>("SELECT * FROM creators WHERE handle = $1", [h.toLowerCase()]);
+export const getCreatorByToken = (t: string) => q1<CreatorRow>("SELECT * FROM creators WHERE dashboard_token = $1", [t]);
+export const getTip = (id: string) => q1<TipRow>("SELECT * FROM tips WHERE id = $1", [id]);
 export const listTips = (creatorId: string, limit = 100) =>
-  db().prepare("SELECT * FROM tips WHERE creator_id = ? ORDER BY created_at DESC LIMIT ?").all(creatorId, limit) as TipRow[];
+  q<TipRow>("SELECT * FROM tips WHERE creator_id = $1 ORDER BY created_at DESC LIMIT $2", [creatorId, limit]);
 
 /** RF-4/RF-5: ask Aurora for a quote + a deposit address unique to this tip. */
 export async function createTip(creator: CreatorRow, input: {
@@ -115,17 +111,17 @@ export async function createTip(creator: CreatorRow, input: {
     is_pass: input.isPass ? 1 : 0, pass_token: null, pass_expires_at: null, detail: null,
     created_at: now, updated_at: now,
   };
-  db().prepare(
-    `INSERT INTO tips (id,creator_id,status,origin_asset_id,origin_chain,origin_symbol,amount_in,amount_out_usdc,final_out_usdc,app_fee_bps,deposit_address,deposit_memo,refund_to,deadline,settlement_tx,fan_name,fan_message,is_pass,pass_token,pass_expires_at,created_at,updated_at)
-     VALUES (@id,@creator_id,@status,@origin_asset_id,@origin_chain,@origin_symbol,@amount_in,@amount_out_usdc,@final_out_usdc,@app_fee_bps,@deposit_address,@deposit_memo,@refund_to,@deadline,@settlement_tx,@fan_name,@fan_message,@is_pass,@pass_token,@pass_expires_at,@created_at,@updated_at)`,
-  ).run(row);
+  await q(
+    `INSERT INTO tips (id,creator_id,status,origin_asset_id,origin_chain,origin_symbol,amount_in,amount_out_usdc,final_out_usdc,app_fee_bps,deposit_address,deposit_memo,refund_to,deadline,settlement_tx,fan_name,fan_message,is_pass,pass_token,pass_expires_at,detail,created_at,updated_at)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23)`,
+    [row.id, row.creator_id, row.status, row.origin_asset_id, row.origin_chain, row.origin_symbol, row.amount_in, row.amount_out_usdc, row.final_out_usdc, row.app_fee_bps, row.deposit_address, row.deposit_memo, row.refund_to, row.deadline, row.settlement_tx, row.fan_name, row.fan_message, row.is_pass, row.pass_token, row.pass_expires_at, row.detail ?? null, row.created_at, row.updated_at],
+  );
   return row;
 }
 
-export function setTipNote(id: string, fanName: string, fanMessage: string): TipRow | undefined {
-  db().prepare("UPDATE tips SET fan_name=?, fan_message=?, updated_at=? WHERE id=?")
-    .run(fanName.slice(0, 40), fanMessage.slice(0, 280), new Date().toISOString(), id);
-  return getTip(id);
+export function setTipNote(id: string, fanName: string, fanMessage: string): Promise<TipRow | undefined> {
+  return q1<TipRow>("UPDATE tips SET fan_name=$1, fan_message=$2, updated_at=$3 WHERE id=$4 RETURNING *",
+    [fanName.slice(0, 40), fanMessage.slice(0, 280), new Date().toISOString(), id]);
 }
 
 /**
@@ -160,11 +156,18 @@ export async function refreshTip(tip: TipRow): Promise<TipRow> {
   return save(tip, patch);
 }
 
-function save(tip: TipRow, patch: Partial<TipRow>): TipRow {
-  const next = { ...tip, ...patch, updated_at: new Date().toISOString() };
-  db().prepare(
-    `UPDATE tips SET status=@status, final_out_usdc=@final_out_usdc, settlement_tx=@settlement_tx,
-       pass_token=@pass_token, pass_expires_at=@pass_expires_at, detail=@detail, updated_at=@updated_at WHERE id=@id`,
-  ).run({ ...next, detail: next.detail ?? null });
-  return next;
+/**
+ * Several requests can refresh the same tip at once (fan page, dashboard, OBS alerts). The write is
+ * therefore conditional: a tip already in a final state is never overwritten, and a pass token /
+ * expiry, once issued, is never replaced (so a pass is issued exactly once and never extended).
+ */
+async function save(tip: TipRow, patch: Partial<TipRow>): Promise<TipRow> {
+  const n = { ...tip, ...patch, updated_at: new Date().toISOString() };
+  const row = await q1<TipRow>(
+    `UPDATE tips SET status=$1, final_out_usdc=$2, settlement_tx=$3, detail=$4, updated_at=$5,
+       pass_token=COALESCE(pass_token,$6), pass_expires_at=COALESCE(pass_expires_at,$7)
+     WHERE id=$8 AND status NOT IN ('received','failed','refunded','expired') RETURNING *`,
+    [n.status, n.final_out_usdc, n.settlement_tx, n.detail ?? null, n.updated_at, n.pass_token, n.pass_expires_at, tip.id],
+  );
+  return row ?? (await getTip(tip.id)) ?? n; // someone else already finalised it: return their result
 }

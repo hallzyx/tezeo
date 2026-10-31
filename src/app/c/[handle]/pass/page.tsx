@@ -10,7 +10,7 @@ type P = { params: Promise<{ handle: string }> };
 export const metadata: Metadata = { title: "Membership pass" };
 
 export default async function PassPage({ params }: P) {
-  const c = getCreatorByHandle((await params).handle.replace(/^@/, ""));
+  const c = await getCreatorByHandle((await params).handle.replace(/^@/, ""));
   if (!c || !c.pass_enabled) notFound();
   const creator: PublicCreator = {
     handle: c.handle, displayName: c.display_name, message: c.message, avatarUrl: c.avatar_url,

@@ -10,7 +10,7 @@ export async function PATCH(req: Request, ctx: { params: Promise<{ token: string
   const body = Body.safeParse(await req.json().catch(() => null));
   if (!body.success) return NextResponse.json({ error: "Check the pass price and perk." }, { status: 400 });
   try {
-    const c = updateCreatorPass(token, body.data);
+    const c = await updateCreatorPass(token, body.data);
     if (!c) return NextResponse.json({ error: "Not found" }, { status: 404 });
     return NextResponse.json({ enabled: !!c.pass_enabled, priceUsd: c.pass_price_usd, perk: c.pass_perk });
   } catch (e) {

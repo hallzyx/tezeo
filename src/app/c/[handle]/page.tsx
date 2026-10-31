@@ -11,12 +11,12 @@ export const dynamic = "force-dynamic";
 type P = { params: Promise<{ handle: string }> };
 
 export async function generateMetadata({ params }: P): Promise<Metadata> {
-  const c = getCreatorByHandle((await params).handle);
+  const c = await getCreatorByHandle((await params).handle);
   return c ? { title: `Tip ${c.display_name}`, description: c.message || `Send ${c.display_name} a tip from any chain.` } : {};
 }
 
 export default async function CreatorPage({ params }: P) {
-  const c = getCreatorByHandle((await params).handle.replace(/^@/, ""));
+  const c = await getCreatorByHandle((await params).handle.replace(/^@/, ""));
   if (!c) notFound();
   const url = `${env.baseUrl}/@${c.handle}`;
   const qrSvg = await QRCode.toString(url, { type: "svg", margin: 1, color: { dark: "#1C1424", light: "#FFFFFF" } });
@@ -25,5 +25,5 @@ export default async function CreatorPage({ params }: P) {
     accent: c.accent || DEFAULT_ACCENT,
     pass: c.pass_enabled ? { priceUsd: c.pass_price_usd, perk: c.pass_perk } : null,
   };
-  return <TipFlow creator={creator} qrSvg={qrSvg} pageUrl={url} goal={goalProgress(c)} wall={supporterWall(c)} />;
+  return <TipFlow creator={creator} qrSvg={qrSvg} pageUrl={url} goal={await goalProgress(c)} wall={await supporterWall(c)} />;
 }

@@ -20,7 +20,7 @@ export async function POST(req: Request) {
   const parsed = Body.safeParse(await req.json().catch(() => null));
   if (!parsed.success) return NextResponse.json({ error: "Check the form fields and try again." }, { status: 400 });
   const b = parsed.data;
-  const creator = getCreatorByHandle(b.handle.replace(/^@/, ""));
+  const creator = await getCreatorByHandle(b.handle.replace(/^@/, ""));
   if (!creator) return NextResponse.json({ error: "Creator not found." }, { status: 404 });
 
   const assets = await getAurora().listOriginAssets();

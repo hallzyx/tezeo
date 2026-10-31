@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { DEFAULT_ACCENT } from "@/lib/accent";
-import { db } from "@/lib/db";
+import { q1 } from "@/lib/db";
 import { getTipByPassToken, type CreatorRow } from "@/lib/tips";
 import { Mark, TopBar } from "@/components/ui";
 import { PassCard, passState } from "@/components/PassCard";
@@ -10,10 +10,10 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Your pass", robots: { index: false, follow: false }, referrer: "no-referrer" };
 
 export default async function PassView({ params }: { params: Promise<{ token: string }> }) {
-  const tip = getTipByPassToken((await params).token);
+  const tip = await getTipByPassToken((await params).token);
   // A pass link exists only after the payment was confirmed (see refreshTip).
   if (!tip || tip.status !== "received" || !tip.pass_expires_at) notFound();
-  const c = db().prepare("SELECT * FROM creators WHERE id = ?").get(tip.creator_id) as CreatorRow;
+  const c = (await q1<CreatorRow>("SELECT * FROM creators WHERE id = $1", [tip.creator_id]))!;
   const name = c.display_name.split(" ")[0];
   const { state, days } = passState(tip.pass_expires_at);
   return (

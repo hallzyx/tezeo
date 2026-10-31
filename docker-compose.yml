@@ -1,0 +1,53 @@
+# Tezeo: app + PostgreSQL.
+#
+# Written for Dokploy (Traefik). There are deliberately NO `ports:` and no `container_name:`:
+# Traefik reaches the app over the Docker network, and Dokploy attaches the domain to the `app`
+# service on internal port 3000 (Domains tab -> service `app`, port 3000). The database is never exposed.
+#
+# All settings come from environment variables (Dokploy "Environment" tab, or a local .env file).
+# See .env.example for the full list.
+services:
+  app:
+    build:
+      context: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      # Same network as the db service, so the host is simply `db`. Keep POSTGRES_PASSWORD URL-safe
+      # (letters and digits, e.g. `openssl rand -hex 24`), because it is embedded in this URL.
+      DATABASE_URL: postgres://${POSTGRES_USER:-tezeo}:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-tezeo}
+      # Public origin (used in QR codes and share links). Set it to the domain you give Traefik.
+      APP_BASE_URL: ${APP_BASE_URL:?Set APP_BASE_URL, e.g. https://tezeo.example.com}
+      AURORA_MODE: ${AURORA_MODE:-live}
+      AURORA_API_KEY: ${AURORA_API_KEY:-}
+      AURORA_API_BASE: ${AURORA_API_BASE:-https://intents-api.aurora.dev}
+      TEZEO_FEE_BPS: ${TEZEO_FEE_BPS:-100}
+    expose:
+      - "3000"        # internal only; Traefik routes to it
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))\""]
+      interval: 30s
+      timeout: 5s
+      start_period: 20s
+      retries: 3
+
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-tezeo}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-tezeo}
+    volumes:
+      - tezeo-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+volumes:
+  tezeo-pgdata:

@@ -10,7 +10,7 @@ export const metadata: Metadata = { title: "Dashboard", robots: { index: false, 
 
 export default async function Page({ params }: { params: Promise<{ token: string }> }) {
   const { token } = await params;
-  const c = getCreatorByToken(token);
+  const c = await getCreatorByToken(token);
   if (!c) notFound();
-  return <Dashboard token={token} initial={dashboardData(c)} accent={c.accent || DEFAULT_ACCENT} />;
+  return <Dashboard token={token} initial={await dashboardData(c)} accent={c.accent || DEFAULT_ACCENT} />;
 }

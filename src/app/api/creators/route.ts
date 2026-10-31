@@ -23,7 +23,7 @@ export async function POST(req: Request) {
   // RF-2: validate the wallet before saving.
   if (!isValidSolanaAddress(b.wallet.trim()))
     return NextResponse.json({ error: "That doesn't look like a valid Solana address." }, { status: 400 });
-  if (getCreatorByHandle(handle)) return NextResponse.json({ error: "That handle is taken." }, { status: 409 });
+  if (await getCreatorByHandle(handle)) return NextResponse.json({ error: "That handle is taken." }, { status: 409 });
 
   // DESIGN.md §3.4: keep accents legible and distinct from status colours.
   let accent = b.accent ?? "";
@@ -33,6 +33,13 @@ export async function POST(req: Request) {
     accent = a.accent;
   }
 
-  const c = createCreator({ ...b, accent, handle, wallet: b.wallet.trim() });
+  let c;
+  try {
+    c = await createCreator({ ...b, accent, handle, wallet: b.wallet.trim() });
+  } catch (e) {
+    // Two people claiming the same handle at once: the UNIQUE constraint decides (Postgres 23505).
+    if ((e as { code?: string }).code === "23505") return NextResponse.json({ error: "That handle is taken." }, { status: 409 });
+    throw e;
+  }
   return NextResponse.json({ handle: c.handle, dashboardToken: c.dashboard_token }, { status: 201 });
 }

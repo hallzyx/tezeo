@@ -19,22 +19,52 @@ Fans need no account. Creators get a public page (`/@handle` + QR), a private da
 
 ## Run it
 
+### With Docker (recommended)
+
+```bash
+cp .env.example .env          # set POSTGRES_PASSWORD (URL-safe), APP_BASE_URL, AURORA_API_KEY
+docker compose up --build     # app + PostgreSQL 16
+```
+
+`docker-compose.yml` defines two services, `app` (Next.js standalone, internal port 3000) and `db`
+(`postgres:16-alpine` with a named volume). There are **no published ports**, so nothing is reachable from
+the host until a reverse proxy is attached; for a quick local look use
+`docker compose run --rm --service-ports` or add a temporary `ports: ["3000:3000"]` to `app` in a local override.
+The schema is created automatically on first start. `GET /api/health` returns 200 only when the app can
+reach Postgres, and both services have health checks.
+
+### Deploying on Dokploy (Traefik)
+
+1. Create a **Compose** application from this repo (Compose type "Docker Compose", path `./docker-compose.yml`).
+2. **Environment** tab: set `POSTGRES_PASSWORD` (e.g. `openssl rand -hex 24`), `APP_BASE_URL` (the public
+   `https://…` domain), `AURORA_API_KEY`, and keep `AURORA_MODE=live`.
+3. **Domains** tab: add your domain, service `app`, port `3000`, enable HTTPS. Dokploy adds the Traefik
+   labels, so the compose file has no `ports:` and no `container_name`.
+4. Deploy. Data lives in the `tezeo-pgdata` volume; back it up like any Postgres volume
+   (`pg_dump` from the `db` container).
+
+`APP_BASE_URL` is read at runtime, so the same image works on any domain.
+
+### Without Docker
+
 ```bash
 npm ci
-cp .env.example .env.local      # then edit
+cp .env.example .env.local      # set DATABASE_URL=postgres://user:pass@localhost:5432/tezeo
 npm run dev                     # http://localhost:3000
-npm run typecheck && npm test   # 40 tests
+npm run typecheck && npm test   # 40 tests, run on an embedded Postgres (PGlite): no server needed
 npm run build && npm start
 ```
 
 | Variable | Meaning |
 |---|---|
+| `DATABASE_URL` | PostgreSQL connection string. Set automatically by `docker-compose.yml`. |
+| `POSTGRES_USER` / `POSTGRES_PASSWORD` / `POSTGRES_DB` | Used by compose to create the database and build `DATABASE_URL`. The password must be URL-safe. |
+| `APP_BASE_URL` | Public origin used in links and QR codes (runtime). |
 | `AURORA_API_KEY` | Aurora API key. **Server-side only**; it travels in Aurora's URL path, so `live.ts` scrubs it from errors. |
-| `AURORA_MODE` | `live` calls Aurora for real. `simulated` (default) is a local simulator: **no money moves** and the UI shows a "Demo mode" banner. |
+| `AURORA_MODE` | `live` calls Aurora for real. `simulated` is a local simulator: **no money moves** and the UI shows a "Demo mode" banner. |
 | `AURORA_API_BASE` | Defaults to `https://intents-api.aurora.dev`. |
 | `TEZEO_FEE_BPS` | Only for the simulator and validation. In live mode Aurora applies the fee configured per API key in the [Client Portal](https://portal.intents.aurora.dev), and the app displays that. |
-| `DATABASE_PATH` | SQLite file (default `./data/tezeo.db`). |
-| `NEXT_PUBLIC_BASE_URL` | Public origin used in links and QR codes. |
+| `DATABASE_POOL_MAX` | Optional, default 10. |
 
 Simulator tricks (simulated mode only): a tip whose smallest-unit amount ends in `…13` ends **refunded**, `…14` **failed**.
 
@@ -66,4 +96,5 @@ Simulator tricks (simulated mode only): a tip whose smallest-unit amount ends in
 * "Remind on day 27" for passes is not built (no email/notification channel). The pass UI says it simply ends.
 * Creator accent guard deviates from DESIGN.md §3.4 in one number: ΔE threshold is 0.05, not 0.08, because the designer's own default accent (Turquesa) measures 0.064 from Hierba.
 * OBS alerts poll every 4s (no websockets), so an alert can lag a confirmed tip by a few seconds.
-* Storage is a local SQLite file: fine for a demo, replace before multi-instance deployment. The dashboard link is a bearer secret (shown once, no recovery).
+* The dashboard, OBS and pass links are bearer secrets (shown once, no recovery). Schema changes are additive `CREATE … IF NOT EXISTS` run at start-up; there is no migration tool yet.
+* **Docker image not built in CI yet.** The Docker daemon was not available where this was developed, so the image itself was never built. What *was* verified: `docker compose config` is valid, and the exact standalone bundle the Dockerfile ships ran against a real PostgreSQL 16 server (health check, full browser flows, concurrency).

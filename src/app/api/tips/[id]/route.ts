@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 
 export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> }) {
   const { id } = await ctx.params;
-  const tip = getTip(id);
+  const tip = await getTip(id);
   if (!tip) return NextResponse.json({ error: "Not found" }, { status: 404 });
   try {
     return NextResponse.json(tipView(await refreshTip(tip)));
@@ -22,10 +22,10 @@ const Note = z.object({ fanName: z.string().trim().max(40).optional(), fanMessag
 /** Fan adds a short note while waiting (DESIGN.md §7.D) or with a pass (§7.H). */
 export async function PATCH(req: Request, ctx: { params: Promise<{ id: string }> }) {
   const { id } = await ctx.params;
-  const tip = getTip(id);
+  const tip = await getTip(id);
   if (!tip) return NextResponse.json({ error: "Not found" }, { status: 404 });
   const body = Note.safeParse(await req.json().catch(() => null));
   if (!body.success) return NextResponse.json({ error: "That note is too long." }, { status: 400 });
-  const next = setTipNote(id, body.data.fanName ?? tip.fan_name, body.data.fanMessage ?? tip.fan_message);
+  const next = await setTipNote(id, body.data.fanName ?? tip.fan_name, body.data.fanMessage ?? tip.fan_message);
   return NextResponse.json(tipView(next ?? tip));
 }

@@ -9,7 +9,7 @@ export async function PATCH(req: Request, ctx: { params: Promise<{ token: string
   const body = Body.safeParse(await req.json().catch(() => null));
   if (!body.success) return NextResponse.json({ error: "Check the goal name and amount." }, { status: 400 });
   try {
-    const x = setGoal(token, body.data);
+    const x = await setGoal(token, body.data);
     if (!x) return NextResponse.json({ error: "Not found" }, { status: 404 });
     return NextResponse.json({ title: x.goal_title, targetUsd: x.goal_target_usd });
   } catch (e) {

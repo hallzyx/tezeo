@@ -9,7 +9,7 @@ export const metadata: Metadata = { title: "Stream alerts", robots: { index: fal
 
 export default async function Page({ params }: { params: Promise<{ token: string }> }) {
   const { token } = await params;
-  const c = getCreatorByAlertToken(token);
+  const c = await getCreatorByAlertToken(token);
   if (!c) notFound();
   return <Alerts token={token} name={c.display_name.split(" ")[0]} accent={c.accent || DEFAULT_ACCENT} />;
 }
