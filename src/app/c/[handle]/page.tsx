@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { env } from "@/lib/env";
 import { DEFAULT_ACCENT } from "@/lib/accent";
 import { getCreatorByHandle } from "@/lib/tips";
+import { goalProgress, supporterWall } from "@/lib/extras";
 import { TipFlow, type PublicCreator } from "./TipFlow";
 
 export const dynamic = "force-dynamic";
@@ -24,5 +25,5 @@ export default async function CreatorPage({ params }: P) {
     accent: c.accent || DEFAULT_ACCENT,
     pass: c.pass_enabled ? { priceUsd: c.pass_price_usd, perk: c.pass_perk } : null,
   };
-  return <TipFlow creator={creator} qrSvg={qrSvg} pageUrl={url} />;
+  return <TipFlow creator={creator} qrSvg={qrSvg} pageUrl={url} goal={goalProgress(c)} wall={supporterWall(c)} />;
 }

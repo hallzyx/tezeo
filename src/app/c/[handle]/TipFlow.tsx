@@ -28,7 +28,10 @@ const first = (n: string) => n.split(" ")[0];
 
 let assetCache: { mode: string; assets: Asset[] } | null = null;
 
-export function TipFlow({ creator, qrSvg, pageUrl, passMode = false }: { creator: PublicCreator; qrSvg: string; pageUrl: string; passMode?: boolean }) {
+export interface PublicGoal { title: string; targetUsd: number; raisedUsd: number; pct: number }
+export interface WallEntry { id: string; name: string; message: string; isPass: boolean }
+
+export function TipFlow({ creator, qrSvg, pageUrl, passMode = false, goal = null, wall = [] }: { creator: PublicCreator; qrSvg: string; pageUrl: string; passMode?: boolean; goal?: PublicGoal | null; wall?: WallEntry[] }) {
   const name = first(creator.displayName);
   const [step, setStep] = useState<Step>("amount");
   const [amountUsd, setAmountUsd] = useState(passMode ? creator.pass?.priceUsd ?? 5 : 5);
@@ -206,6 +209,13 @@ export function TipFlow({ creator, qrSvg, pageUrl, passMode = false }: { creator
           <span className="tzs-handle">@{creator.handle}</span>
         </div>
         {creator.message && <p className="tzs-bubble">“{creator.message}”</p>}
+        {goal && (
+          <div className="tzs-goal" data-testid="goal">
+            <div className="tz-row"><b>{goal.title}</b><span className="tz-spacer" /><span className="tz-small tz-muted">{goal.pct}%</span></div>
+            <div className="tzs-goal__bar" role="progressbar" aria-label={goal.title} aria-valuemin={0} aria-valuemax={goal.targetUsd} aria-valuenow={goal.raisedUsd} style={{ ["--_p" as string]: `${goal.pct}%` }}><span /></div>
+            <span className="tz-small tz-muted">${goal.raisedUsd.toLocaleString("en-US")} of ${goal.targetUsd.toLocaleString("en-US")} raised</span>
+          </div>
+        )}
         <div className="tz-stack" style={{ ["--tz-stack-gap" as string]: "10px" }}>
           <span className="tz-overline">Send {name} a tip</span>
           <div className="tz-amounts" role="group" aria-label="Tip amount">
@@ -227,6 +237,14 @@ export function TipFlow({ creator, qrSvg, pageUrl, passMode = false }: { creator
         <button className="tz-btn tz-btn--primary tz-btn--lg tz-btn--block" onClick={goPay} disabled={!amountOk}>Send {usd(amountNow).replace(/\.00$/, "")} to {name}</button>
         {creator.pass && <a className="tz-btn tz-btn--secondary tz-btn--block" href={`/@${creator.handle}/pass`}>Get {name}'s Pass · ${creator.pass.priceUsd}</a>}
         <p className="tzs-trust"><Icon name="shield" />Pay from any wallet, any chain. {name} gets dollars.</p>
+        {wall.length > 0 && (
+          <section className="tz-stack" style={{ ["--tz-stack-gap" as string]: "10px" }} aria-label="Supporters" data-testid="wall">
+            <span className="tz-overline">Recent supporters</span>
+            <ul className="tzs-wall">{wall.map((w) => (
+              <li key={w.id}><b>{w.name}{w.isPass && <span className="tz-badge">Pass</span>}</b>{w.message && <span>“{w.message}”</span>}</li>
+            ))}</ul>
+          </section>
+        )}
         <div className="tzs-foot"><Mark />woven by tezeo</div>
       </>
     );

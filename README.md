@@ -23,7 +23,7 @@ Fans need no account. Creators get a public page (`/@handle` + QR), a private da
 npm ci
 cp .env.example .env.local      # then edit
 npm run dev                     # http://localhost:3000
-npm run typecheck && npm test   # 34 tests
+npm run typecheck && npm test   # 40 tests
 npm run build && npm start
 ```
 
@@ -43,7 +43,7 @@ Simulator tricks (simulated mode only): a tip whose smallest-unit amount ends in
 * `src/lib/aurora/` provider interface, **verified live client** (`live.ts`) and a clearly labelled **simulator**.
 * `src/lib/tips.ts` + `domain.ts` tip state machine: `pending → converting → received | failed | refunded | expired`.
   Aurora is the source of truth; the server re-checks status on each poll and never trusts the browser.
-* Pages: `/` landing, `/onboarding`, `/@handle` (+ `/@handle/pass`), `/dashboard/[token]`, `/pass/[token]`.
+* Pages: `/alerts/[token]` (OBS), `/` landing, `/onboarding`, `/@handle` (+ `/@handle/pass`), `/dashboard/[token]`, `/pass/[token]`.
 * API: `/api/assets`, `/api/creators`, `/api/tips`, `/api/tips/[id]` (GET status, PATCH fan note),
   `/api/dashboard/[token]` (+ `/pass` settings).
 * `scripts/phase0-validate.ts` end-to-end conversion check. Details in [`docs/PHASE0.md`](docs/PHASE0.md).
@@ -55,7 +55,7 @@ Simulator tricks (simulated mode only): a tip whose smallest-unit amount ends in
 | **0. Aurora validation** | **API contract verified live** with a real key: tokens list, real quote with deposit address, status polling, Solana USDC as destination. **A funded conversion has NOT been run**, so a real USDC delivery to Solana is unproven. Run `npm run phase0` (command in `docs/PHASE0.md`). |
 | **1. Core UI** | Built and driven in a real browser (Playwright, mobile + desktop, light + dark). The full fan flow (amount → network/coin → quote → deposit → live tracking → thank-you / failure / refund) and the dashboard were exercised against the **simulator**. Against **live Aurora** we verified the asset list and quote creation through the app (no deposit made). |
 | **2. Membership pass** | Built and tested (unit tests with a stub provider + browser run on the simulator). The quote is sized and enforced so the guaranteed minimum covers the price; the pass is issued only once the payment is `received`. |
-| **3. Extras (OBS alerts, goals, supporter wall)** | **Not started.** Skipped deliberately: a funded live conversion should come first. |
+| **3. Extras (OBS alerts, goals, supporter wall)** | Built, tested (6 new tests) and driven in a browser on the simulator: OBS Browser Source page `/alerts/[token]` (own token, `?preview=1` to test the look), a funding goal with progress bar, and a public supporter wall (confirmed tips only; names and notes, never amounts or addresses). Not verified against live Aurora, like everything that depends on a confirmed payment. |
 
 ### Known gaps and decisions
 
@@ -65,4 +65,5 @@ Simulator tricks (simulated mode only): a tip whose smallest-unit amount ends in
 * Failure/refund screens show the cause class (underpaid vs. other) and the refund address, but not exact refunded amounts or a refund explorer link: Aurora's status response carries them, the app doesn't store them yet. There is no support channel yet, so "Details for support" gives a copyable reference ID instead of a "Talk to a human" button.
 * "Remind on day 27" for passes is not built (no email/notification channel). The pass UI says it simply ends.
 * Creator accent guard deviates from DESIGN.md §3.4 in one number: ΔE threshold is 0.05, not 0.08, because the designer's own default accent (Turquesa) measures 0.064 from Hierba.
+* OBS alerts poll every 4s (no websockets), so an alert can lag a confirmed tip by a few seconds.
 * Storage is a local SQLite file: fine for a demo, replace before multi-instance deployment. The dashboard link is a bearer secret (shown once, no recovery).

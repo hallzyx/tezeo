@@ -98,3 +98,10 @@ button.tzs-mini { cursor: pointer; }
   }
 }
 .tzs-fullbleed { width: 100%; }
+/* goal + supporter wall */
+.tzs-goal { display: grid; gap: 8px; padding: var(--tz-space-4); border-radius: var(--tz-radius-lg); background: var(--tz-surface); border: 1.5px solid var(--tz-border); }
+.tzs-goal__bar { height: 10px; border-radius: 10px; background: var(--tz-bg-sunken, var(--tz-border)); overflow: hidden; }
+.tzs-goal__bar > span { display: block; height: 100%; width: var(--_p, 0%); border-radius: inherit; background: repeating-linear-gradient(90deg, var(--creator-accent-fill) 0 10px, color-mix(in srgb, var(--creator-accent-fill) 70%, white) 10px 12px); transition: width var(--tz-dur-slow) var(--tz-ease-out); }
+.tzs-wall { display: grid; gap: 10px; list-style: none; margin: 0; padding: 0; }
+.tzs-wall li { background: var(--creator-accent-soft); border-radius: var(--tz-radius-md); padding: 10px 12px; display: grid; gap: 2px; font-size: var(--tz-text-sm); }
+.tzs-wall li b { display: flex; gap: 8px; align-items: center; }

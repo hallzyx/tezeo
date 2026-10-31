@@ -1,5 +1,6 @@
 import { fromUnits } from "./domain";
 import { listTips, type CreatorRow } from "./tips";
+import { getExtras, goalProgress } from "./extras";
 
 /** Creator-facing history (RF-8). Unpaid/expired quotes are not history, so they are hidden. */
 export function dashboardData(creator: CreatorRow) {
@@ -12,6 +13,8 @@ export function dashboardData(creator: CreatorRow) {
   const thisMonth = received.filter((t) => new Date(t.created_at) >= monthStart);
   return {
     creator: { handle: creator.handle, displayName: creator.display_name, accent: creator.accent },
+    goal: { title: getExtras(creator.id).goal_title, targetUsd: getExtras(creator.id).goal_target_usd, progress: goalProgress(creator) },
+    alertToken: getExtras(creator.id).alert_token,
     pass: { enabled: !!creator.pass_enabled, priceUsd: creator.pass_price_usd, perk: creator.pass_perk },
     // Passes exist only once the payment is confirmed (pass_token is issued on "received").
     passes: received.filter((t) => t.is_pass && t.pass_token && t.pass_expires_at).slice(0, 50).map((t) => ({

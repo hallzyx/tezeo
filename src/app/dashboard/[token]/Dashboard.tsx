@@ -68,6 +68,7 @@ export function Dashboard({ token, initial, accent }: { token: string; initial: 
         <a className="on" href="#home" aria-current="page"><Icon name="home" />Home</a>
         <a href="#tips"><Icon name="list" />Tips</a>
         <a href="#passes"><Icon name="pass" />Passes</a>
+        <a href="#stream"><Icon name="heart" />Stream</a>
         <a href={`/@${data.creator.handle}`}><Icon name="brush" />My page</a>
       </aside>
       <main id="home">
@@ -116,6 +117,7 @@ export function Dashboard({ token, initial, accent }: { token: string; initial: 
             </table>
           )}
         </div>
+        <StreamTools token={token} goal={data.goal} alertToken={data.alertToken} />
         <PassSettings token={token} pass={data.pass} passes={data.passes} handle={data.creator.handle} />
         <div className="tzs-foot"><Mark />woven by tezeo · keep this link private</div>
       </main>
@@ -164,6 +166,43 @@ function PassSettings({ token, pass, passes, handle }: { token: string; pass: Da
           </ul>
         )}
       </div>
+    </div>
+  );
+}
+
+function StreamTools({ token, goal, alertToken }: { token: string; goal: DashboardData["goal"]; alertToken: string }) {
+  const [title, setTitle] = useState(goal.title);
+  const [target, setTarget] = useState(goal.targetUsd ? String(goal.targetUsd) : "");
+  const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
+  const [copied, setCopied] = useState(false);
+  // Origin is only known in the browser; set it after mount so server and client HTML match.
+  const [origin, setOrigin] = useState("");
+  useEffect(() => setOrigin(location.origin), []);
+  const url = `${origin}/alerts/${alertToken}`;
+  async function save(e: React.FormEvent) {
+    e.preventDefault(); setMsg(null);
+    const r = await fetch(`/api/dashboard/${token}/goal`, { method: "PATCH", headers: { "content-type": "application/json" }, body: JSON.stringify({ title, targetUsd: Number(target || 0) }) });
+    const j = await r.json();
+    setMsg(r.ok ? { ok: true, text: Number(target) ? "Goal saved. It shows on your page and counts tips from now on." : "Goal removed." } : { ok: false, text: j.error ?? "Could not save." });
+  }
+  return (
+    <div className="tz-card tz-stack" id="stream" style={{ ["--tz-stack-gap" as string]: "16px" }}>
+      <h2 className="tz-h2" style={{ fontSize: "var(--tz-text-lg)" }}>Livestream tools</h2>
+      <div className="tz-stack" style={{ ["--tz-stack-gap" as string]: "8px" }}>
+        <span className="tz-overline">Alerts for OBS</span>
+        <p className="tz-small tz-muted" style={{ margin: 0 }}>In OBS add a <b>Browser Source</b> with this URL. A card pops up for every confirmed tip. Add <span className="tz-mono">?preview=1</span> to see how it looks. This link is separate from your dashboard link, but keep it private too.</p>
+        <div className="tz-copy"><span className="tz-mono" style={{ overflowWrap: "anywhere" }} data-testid="alert-url">{url}</span>
+          <button type="button" className="tz-btn tz-btn--secondary tz-btn--icon" style={{ minHeight: 40, width: 40 }} aria-label="Copy alerts link"
+            onClick={async () => { try { await navigator.clipboard.writeText(url); } catch { /* visible anyway */ } setCopied(true); setTimeout(() => setCopied(false), 1800); }}><Icon name={copied ? "check" : "copy"} /></button></div>
+      </div>
+      <form className="tz-stack" onSubmit={save} style={{ ["--tz-stack-gap" as string]: "12px" }}>
+        <span className="tz-overline">Funding goal</span>
+        <div className="tz-field"><label className="tz-label" htmlFor="gt">Goal name</label><input id="gt" className="tz-input" maxLength={80} value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g. New microphone" /></div>
+        <div className="tz-field"><label className="tz-label" htmlFor="ga">Target (USDC)</label><input id="ga" className="tz-input" inputMode="numeric" value={target} onChange={(e) => setTarget(e.target.value.replace(/\D/g, "").slice(0, 7))} aria-describedby="ga-h" /><span id="ga-h" className="tz-hint">Leave empty to remove the goal. Only tips received after you save count.</span></div>
+        {goal.progress && <p className="tz-small" style={{ margin: 0 }}>Now: ${goal.progress.raisedUsd} of ${goal.progress.targetUsd} ({goal.progress.pct}%)</p>}
+        {msg && <p className={msg.ok ? "tz-hint" : "tz-field__error"} role="status">{msg.text}</p>}
+        <button className="tz-btn tz-btn--primary">Save goal</button>
+      </form>
     </div>
   );
 }
