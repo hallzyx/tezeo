@@ -39,6 +39,8 @@ export interface Quote {
   appFeeBps: number;
   /** Fixed network cost of the Solana payout, USDC smallest units (6 decimals). */
   withdrawFeeUsdc?: string;
+  /** Market value in USD of what the fan sends, as Aurora priced it. */
+  amountInUsd?: string;
   timeEstimateSec?: number;
   /** ISO timestamp after which the deposit address stops being honoured. */
   deadline: string;

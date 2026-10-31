@@ -77,7 +77,7 @@ interface QuoteResponse {
   correlationId?: string | null;
   quoteRequest: { appFees?: { recipient: string; fee: number }[] | null };
   quote: {
-    depositAddress?: string; depositMemo?: string; amountIn: string; amountOut: string; minAmountOut: string;
+    depositAddress?: string; depositMemo?: string; amountIn: string; amountInUsd?: string; amountOut: string; minAmountOut: string;
     deadline?: string; timeWhenInactive?: string; timeEstimate?: number; withdrawFee?: string; refundFee?: string;
   };
 }
@@ -136,6 +136,7 @@ export const liveAurora: AuroraProvider = {
       minAmountOutUsdc: r.quote.minAmountOut,
       appFeeBps: appliedBps,
       withdrawFeeUsdc: r.quote.withdrawFee,
+      amountInUsd: r.quote.amountInUsd,
       timeEstimateSec: r.quote.timeEstimate,
       deadline: r.quote.deadline ?? r.quote.timeWhenInactive ?? new Date(Date.now() + 30 * 60_000).toISOString(),
       providerRef: r.correlationId ?? undefined,

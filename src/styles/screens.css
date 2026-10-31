@@ -119,3 +119,6 @@ button.tzs-mini { cursor: pointer; }
 .tzs-manual[open] { padding-bottom: var(--tz-space-4); }
 .tzs-sheet--center { align-items: center; justify-items: center; padding: var(--tz-gutter); }
 .tzs-sheet--center > div { border-radius: var(--tz-radius-xl, 28px); max-height: 90dvh; box-shadow: var(--tz-shadow-3); }
+
+.tzs-linkbtn { display: block; margin: 2px 0 0 auto; background: none; border: 0; padding: 6px 0; min-height: 32px; font: 600 var(--tz-text-xs)/1 var(--tz-font-body); color: var(--tz-brand-text); cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+.tz-table tr[data-detail] td { padding-top: 0; border-top: 0; }

@@ -18,7 +18,7 @@ export function Onboarding() {
   const [f, setF] = useState({ handle: "", displayName: "", message: "", wallet: "", accent: DEFAULT_ACCENT, avatarUrl: "" });
   const [err, setErr] = useState<{ field?: string; msg: string; suggestion?: string } | null>(null);
   const [busy, setBusy] = useState(false);
-  const [done, setDone] = useState<{ handle: string; dashboardToken: string } | null>(null);
+  const [done, setDone] = useState<{ handle: string; dashboardToken: string; walletHasUsdc?: boolean | null } | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const set = (k: keyof typeof f) => (v: string) => setF((p) => ({ ...p, [k]: v }));
   const walletOk = f.wallet === "" || B58.test(f.wallet.trim());
@@ -50,6 +50,12 @@ export function Onboarding() {
           <CopyBox value={`${origin}/@${done.handle}`} label="Copy page link" toast="Link copied" />
           <a className="tz-btn tz-btn--secondary" href={`/@${done.handle}`}>Open my page</a>
         </div>
+        {done.walletHasUsdc === false && (
+          <div className="tz-card tz-card--sunken tz-stack" style={{ ["--tz-stack-gap" as string]: "6px" }} role="note" data-testid="new-wallet-note">
+              <span className="tz-overline">Heads up about your wallet</span>
+              <p className="tz-small" style={{ margin: 0 }}>A Solana wallet needs a USDC account before it can receive USDC, and yours doesn't have one yet. Your <b>first tip carries a one-time set-up cost of about $0.25</b>. After that, delivery costs about $0.01 per tip. You'll see the exact amounts on each tip in your dashboard.</p>
+            </div>
+        )}
         <div className="tz-card tz-card--sunken tz-stack" style={{ ["--tz-stack-gap" as string]: "8px" }}>
           <span className="tz-overline">Your private dashboard link</span>
           <p className="tz-small tz-muted" style={{ margin: 0 }}><b>Save this now.</b> It's the only way into your dashboard, and we can't send it again. Anyone with the link can see your tips, so keep it private.</p>

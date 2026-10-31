@@ -1,6 +1,9 @@
 import type { TipRow } from "./tips";
 
-/** Shape sent to browsers. Never includes creator wallet secrets or dashboard tokens. */
+/**
+ * Shape sent to fans. Never includes creator wallet secrets or dashboard tokens, and deliberately no fees or
+ * net amounts: a fan sees what they pay, and the costs are shown to the creator (dashboard breakdown).
+ */
 export function tipView(t: TipRow) {
   return {
     id: t.id,
@@ -8,8 +11,6 @@ export function tipView(t: TipRow) {
     originChain: t.origin_chain,
     originSymbol: t.origin_symbol,
     amountIn: t.amount_in,
-    amountOutUsdc: t.final_out_usdc ?? t.amount_out_usdc,
-    appFeeBps: t.app_fee_bps,
     depositAddress: t.deposit_address,
     depositMemo: t.deposit_memo,
     refundTo: t.refund_to,

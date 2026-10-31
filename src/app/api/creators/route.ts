@@ -3,6 +3,7 @@ import { z } from "zod";
 import { validateAccent } from "@/lib/accent";
 import { isValidSolanaAddress, normalizeHandle } from "@/lib/domain";
 import { createCreator, getCreatorByHandle } from "@/lib/tips";
+import { walletHasUsdcAccount } from "@/lib/solana";
 
 const Body = z.object({
   handle: z.string(),
@@ -41,5 +42,5 @@ export async function POST(req: Request) {
     if ((e as { code?: string }).code === "23505") return NextResponse.json({ error: "That handle is taken." }, { status: 409 });
     throw e;
   }
-  return NextResponse.json({ handle: c.handle, dashboardToken: c.dashboard_token }, { status: 201 });
+  return NextResponse.json({ handle: c.handle, dashboardToken: c.dashboard_token, walletHasUsdc: await walletHasUsdcAccount(c.wallet) }, { status: 201 });
 }

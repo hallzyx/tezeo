@@ -51,7 +51,7 @@ reach Postgres, and both services have health checks.
 npm ci
 cp .env.example .env.local      # set DATABASE_URL=postgres://user:pass@localhost:5432/tezeo
 npm run dev                     # http://localhost:3000
-npm run typecheck && npm test   # 55 tests, run on an embedded Postgres (PGlite): no server needed
+npm run typecheck && npm test   # 64 tests, run on an embedded Postgres (PGlite): no server needed
 npm run build && npm start
 ```
 
@@ -65,6 +65,7 @@ npm run build && npm start
 | `AURORA_API_BASE` | Defaults to `https://intents-api.aurora.dev`. |
 | `TEZEO_FEE_BPS` | Only for the simulator and validation. In live mode Aurora applies the fee configured per API key in the [Client Portal](https://portal.intents.aurora.dev), and the app displays that. |
 | `DATABASE_POOL_MAX` | Optional, default 10. |
+| `SOLANA_RPC_URL` | Optional. Solana RPC used to check whether a creator's wallet already has a USDC account. Defaults to the public mainnet endpoint, which is rate-limited: use your own (Helius, QuickNode, etc.) in production. |
 
 Simulator tricks (simulated mode only): a tip whose smallest-unit amount ends in `…13` ends **refunded**, `…14` **failed**.
 
@@ -92,7 +93,8 @@ Simulator tricks (simulated mode only): a tip whose smallest-unit amount ends in
 
 ### Known gaps and decisions
 
-* Aurora charges a **fixed ≈0.25 USDC payout cost** per delivery (observed), so tips under ~$2 are inefficient. The minimum tip is $1.
+* **Delivery cost to Solana depends on the creator's wallet** (`withdrawFee` in Aurora's quote, measured with real dry quotes, 5 and 50 USDC): about **0.01 USDC** when the wallet already has a USDC token account (3 active wallets), about **0.25 USDC** when it is brand new (2 fresh wallets). It does not depend on the amount or on the coin the fan pays with. Our explanation is that Solana needs a USDC account created for a new wallet (a rent deposit of 0.00204 SOL, about $0.20), but **that is a hypothesis**: Aurora doesn't document the field, and where that money ends up was not verified. So the *first* tip to a new wallet costs ~$0.25 more, once. The minimum tip is $1.
+* **Fans see only what they pay** (like a PayPal checkout). Fees and the creator's net are never sent to the fan's browser; the creator's dashboard shows a per-tip breakdown (sent, delivery cost, fees, received) and a heads-up when their wallet has no USDC account yet (checked over Solana RPC, `SOLANA_RPC_URL`; if the RPC can't be reached the notice is simply omitted). The RPC check could not be run against the real network from the dev sandbox; it is tested with a fake probe and a local fake RPC.
 * **Tezeo's own cut is not set by this app.** It is configured per API key in Aurora's Client Portal (the key tested reported 2 bps, Aurora's stablecoin floor). Until you set it there, Tezeo earns nothing.
 * Fans holding **USDC on Solana** cannot use the swap path (it is the destination asset); a direct transfer flow is not built.
 * Failure/refund screens show the cause class (underpaid vs. other) and the refund address, but not exact refunded amounts or a refund explorer link: Aurora's status response carries them, the app doesn't store them yet. There is no support channel yet, so "Details for support" gives a copyable reference ID instead of a "Talk to a human" button.

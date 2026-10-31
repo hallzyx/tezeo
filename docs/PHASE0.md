@@ -20,7 +20,7 @@ Last verified: 2026-10-31 with the real `AURORA_API_KEY` (never committed or pri
 
 ## Findings that affect the product
 
-1. **Fixed payout cost.** Every quote carries `withdrawFee` ≈ 0.25 USDC for the Solana payout (5 USDC in → ~4.74 USDC out). Tiny tips are inefficient; the quote screen shows this fee explicitly and the UI warns on small amounts.
+1. **Delivery cost depends on the creator's wallet (corrected).** Every quote carries `withdrawFee`. Measured with real `dry` quotes: **0.0100 USDC** to three active wallets, **0.2549 USDC** to two brand-new wallets, 0.0100 for both 5 and 50 USDC, 0.0100 whether the fan pays with USDC or ETH, and 0.0053 to an Arbitrum address. An earlier version of this document called it a "fixed 0.25 USDC payout cost": that was wrong, we had only ever quoted brand-new wallets. Likely cause (unverified, Aurora doesn't document it): Solana needs a USDC token account for a wallet that never held USDC. The first tip to such a wallet pays ~$0.25 once.
 2. **Tezeo's fee is configured in the Client Portal**, not by the app. The current key reports 2 bps (Aurora's stablecoin floor) — Tezeo's own cut is 0 until the integrator fee is set at https://portal.intents.aurora.dev. `TEZEO_FEE_BPS` is now only a display/validation hint; the quote screen shows what Aurora actually applied. Aurora splits the integrator fee 60/40 with a 2 bps (stable) / 10 bps (non-stable) floor.
 3. **USDC on Solana is excluded as an origin** (it is the destination asset); fans already holding USDC on Solana would use a plain transfer outside the swap flow.
 4. The API key sits in the URL path, so `live.ts` scrubs it from error messages. Keep every Aurora call server-side.

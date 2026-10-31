@@ -54,6 +54,9 @@ CREATE TABLE IF NOT EXISTS tips (
   created_at      TEXT NOT NULL,
   updated_at      TEXT NOT NULL
 );
+-- What the creator sees per tip: market value of what the fan sent, and Aurora's delivery cost (USDC, 6 dec).
+ALTER TABLE tips ADD COLUMN IF NOT EXISTS gross_usd TEXT;
+ALTER TABLE tips ADD COLUMN IF NOT EXISTS delivery_fee_usdc TEXT;
 CREATE INDEX IF NOT EXISTS tips_creator ON tips(creator_id, created_at DESC);
 CREATE TABLE IF NOT EXISTS creator_extras (
   creator_id      TEXT PRIMARY KEY REFERENCES creators(id),

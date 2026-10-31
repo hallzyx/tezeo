@@ -17,6 +17,8 @@ export interface TipRow {
   is_pass: number; pass_token: string | null; pass_expires_at: string | null;
   /** Why it failed/refunded, e.g. "underpaid" or Aurora's refund reason. Support-only, never shown raw. */
   detail?: string | null;
+  /** Creator-facing only: USD value of what the fan sent, and Aurora's delivery cost in USDC smallest units. */
+  gross_usd?: string | null; delivery_fee_usdc?: string | null;
   created_at: string; updated_at: string;
 }
 
@@ -109,12 +111,13 @@ export async function createTip(creator: CreatorRow, input: {
     refund_to: input.refundTo, deadline: quote.deadline, settlement_tx: null,
     fan_name: (input.fanName ?? "").slice(0, 40), fan_message: (input.fanMessage ?? "").slice(0, 280),
     is_pass: input.isPass ? 1 : 0, pass_token: null, pass_expires_at: null, detail: null,
+    gross_usd: quote.amountInUsd ?? null, delivery_fee_usdc: quote.withdrawFeeUsdc ?? null,
     created_at: now, updated_at: now,
   };
   await q(
-    `INSERT INTO tips (id,creator_id,status,origin_asset_id,origin_chain,origin_symbol,amount_in,amount_out_usdc,final_out_usdc,app_fee_bps,deposit_address,deposit_memo,refund_to,deadline,settlement_tx,fan_name,fan_message,is_pass,pass_token,pass_expires_at,detail,created_at,updated_at)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23)`,
-    [row.id, row.creator_id, row.status, row.origin_asset_id, row.origin_chain, row.origin_symbol, row.amount_in, row.amount_out_usdc, row.final_out_usdc, row.app_fee_bps, row.deposit_address, row.deposit_memo, row.refund_to, row.deadline, row.settlement_tx, row.fan_name, row.fan_message, row.is_pass, row.pass_token, row.pass_expires_at, row.detail ?? null, row.created_at, row.updated_at],
+    `INSERT INTO tips (id,creator_id,status,origin_asset_id,origin_chain,origin_symbol,amount_in,amount_out_usdc,final_out_usdc,app_fee_bps,deposit_address,deposit_memo,refund_to,deadline,settlement_tx,fan_name,fan_message,is_pass,pass_token,pass_expires_at,detail,gross_usd,delivery_fee_usdc,created_at,updated_at)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25)`,
+    [row.id, row.creator_id, row.status, row.origin_asset_id, row.origin_chain, row.origin_symbol, row.amount_in, row.amount_out_usdc, row.final_out_usdc, row.app_fee_bps, row.deposit_address, row.deposit_memo, row.refund_to, row.deadline, row.settlement_tx, row.fan_name, row.fan_message, row.is_pass, row.pass_token, row.pass_expires_at, row.detail ?? null, row.gross_usd ?? null, row.delivery_fee_usdc ?? null, row.created_at, row.updated_at],
   );
   return row;
 }

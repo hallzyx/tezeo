@@ -565,29 +565,26 @@ export const LANDING_HTML = `<a class="tzl-skip" href="#main">Skip to content</a
       <ul class="tzl-nos">
         <li><span class="tzl-nos__x" aria-hidden="true"><svg><use href="#i-user-off"/></svg></span><b>Nothing to sign up for</b><p>Open the link, pick an amount, pay from your wallet. No Tezeo account, no login.</p></li>
         <li><span class="tzl-nos__x" aria-hidden="true"><svg><use href="#i-chat"/></svg></span><b>Plain words, all the way</b><p>We say "dollars" and "your wallet". Not sure which network? Pick the one your wallet shows at the top. We check before you send.</p></li>
-        <li><span class="tzl-nos__x" aria-hidden="true"><svg><use href="#i-receipt"/></svg></span><b>Every fee, before you pay</b><p>The quote shows what you send, every cost in dollars, and exactly what the creator receives.</p></li>
+        <li><span class="tzl-nos__x" aria-hidden="true"><svg><use href="#i-receipt"/></svg></span><b>You pay what you chose</b><p>The amount you pick is the amount you send. Nothing is added on top of it.</p></li>
       </ul>
     </div>
 
     <div class="tzl-dealwrap">
       <div class="tzl-deal tz-creator">
-        <span class="tzl-example tzl-example--corner">Example quote</span>
-        <h3 class="tz-h1">Here's the deal</h3>
+        <span class="tzl-example tzl-example--corner">Example payment</span>
+        <h3 class="tz-h1">Your payment</h3>
         <dl class="tz-quote">
-          <div class="tz-quote__row"><dt>You send</dt><span class="tz-quote__lead"></span><dd>0.00213 ETH</dd></div>
-          <div class="tz-quote__row"><dt>Network &amp; swap</dt><span class="tz-quote__lead"></span><dd>−$0.18</dd></div>
-          <div class="tz-quote__row"><dt>Service fee</dt><span class="tz-quote__lead"></span><dd>−$0.10</dd></div>
-          <div class="tz-quote__row tz-quote__row--total"><dt>Vale receives</dt><span class="tz-spacer"></span><dd>4.72 USDC</dd></div>
+          <div class="tz-quote__row tz-quote__row--total"><dt>You send</dt><span class="tz-spacer"></span><dd>0.00213 ETH</dd></div>
         </dl>
         <div class="tz-stack" style="--tz-stack-gap:8px">
-          <span class="tz-small"><b>Send exactly 0.00213 ETH on Ethereum, to:</b></span>
+          <span class="tz-small"><b>Pay it from your wallet in one tap, or send it yourself to:</b></span>
           <div class="tz-copy"><span class="tz-mono">0x8f3C2b71E0aD4c9b5E7f61a0C3d29e4B5079a21c</span><span class="tz-btn tz-btn--secondary tz-btn--icon" style="min-height:40px;width:40px" aria-hidden="true"><svg><use href="#i-copy"/></svg></span></div>
         </div>
-        <p class="tz-quote__note" style="margin:0"><svg width="14" height="14" aria-hidden="true"><use href="#i-clock"/></svg><span>Price held for <span class="tz-timer">0:58</span>. If it runs out, we'll refresh it, no harm done.</span></p>
+        <p class="tz-quote__note" style="margin:0"><svg width="14" height="14" aria-hidden="true"><use href="#i-clock"/></svg><span>Price held for <span class="tz-timer">0:58</span>. When it runs out you can get a fresh one, no harm done.</span></p>
       </div>
       <div class="tzl-notes" aria-hidden="true">
-        <span class="tzl-note tzl-note--l tzl-note--1"><i>1</i>Every cost, in dollars, up front</span>
-        <span class="tzl-note tzl-note--r tzl-note--2"><i>2</i>The creator's name, next to what they get</span>
+        <span class="tzl-note tzl-note--l tzl-note--1"><i>1</i>Just the amount you chose</span>
+        <span class="tzl-note tzl-note--r tzl-note--2"><i>2</i>The exact amount to send, in your coin</span>
         <span class="tzl-note tzl-note--l tzl-note--3"><i>3</i>A fresh address, just for this tip</span>
       </div>
     </div>
@@ -680,16 +677,16 @@ export const LANDING_HTML = `<a class="tzl-skip" href="#main">Skip to content</a
     <div class="tzl-fees">
       <div class="tz-stack" style="--tz-stack-gap:var(--tz-space-5)">
         <span class="tzl-kicker"><span class="tzl-kicker__knot">07</span>What it costs</span>
-        <h2 class="tzl-h2" id="fees-title">Honest prices, <em class="tzl-em">before you pay.</em></h2>
+        <h2 class="tzl-h2" id="fees-title">Simple for fans, <em class="tzl-em">clear for creators.</em></h2>
         <div class="tzl-bigone">
           <span class="tzl-mega tzl-num">$1</span>
-          <p class="tzl-lede">is the smallest tip. Below that, network fees would eat the rest, and that's not fair to anyone.</p>
+          <p class="tzl-lede">is the smallest tip. Below that, the cost of delivering it would eat most of the tip, and that's not fair to anyone.</p>
         </div>
       </div>
       <div class="tzl-receipt">
-        <p class="tzl-receipt__title"><svg width="22" height="22" aria-hidden="true"><use href="#i-receipt"/></svg>How fees work</p>
-        <div class="tzl-receipt__row"><span class="tz-rombo"></span><b>Every fee is on the quote</b><p>Before sending anything, fans see the network &amp; swap cost and the service fee in dollars, and exactly what the creator receives.</p></div>
-        <div class="tzl-receipt__row"><span class="tz-rombo" style="--_c:var(--tz-gold)"></span><b>A small fixed cost on the Solana payout</b><p>Delivering USDC to your wallet has a small fixed network cost. It's already counted in the quote.</p></div>
+        <p class="tzl-receipt__title"><svg width="22" height="22" aria-hidden="true"><use href="#i-receipt"/></svg>How costs work</p>
+        <div class="tzl-receipt__row"><span class="tz-rombo"></span><b>Fans pay what they choose</b><p>The amount a fan picks is the amount they send. Nothing is added on top.</p></div>
+        <div class="tzl-receipt__row"><span class="tz-rombo" style="--_c:var(--tz-gold)"></span><b>Creators see where every cent went</b><p>Each tip in your dashboard shows what the fan sent, the cost of delivering it to your wallet, any fees, and what you received. Delivery is about $0.01 per tip, and about $0.25 for the first tip to a brand-new wallet, because Solana has to open a USDC account for it.</p></div>
         <div class="tzl-receipt__row"><span class="tz-rombo" style="--_c:var(--tz-refunded-line)"></span><b>Refunds are automatic</b><p>If a tip can't be finished, it goes back to the fan's wallet. The network may keep a small fee.</p></div>
       </div>
     </div>
@@ -726,7 +723,7 @@ export const LANDING_HTML = `<a class="tzl-skip" href="#main">Skip to content</a
       </details>
       <details>
         <summary>Is there a minimum tip?</summary>
-        <div class="tzl-faq__a"><p>Yes, <b>$1</b>. Below that, network fees would eat most of the tip. Every fee is on the quote before the fan pays.</p></div>
+        <div class="tzl-faq__a"><p>Yes, <b>$1</b>. Below that, the cost of delivering it would eat most of the tip. Fans always pay exactly the amount they chose; the creator sees every cost in their dashboard.</p></div>
       </details>
       <details>
         <summary>What is the Membership Pass?</summary>

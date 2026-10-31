@@ -2,7 +2,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import QRCode from "qrcode";
 import { Avatar, CopyBox, ErrorNote, Icon, Mark, ThemeToggle, TopBar, Weave } from "@/components/ui";
-import { breakdown, clock, coin, shortAddr, usd, usdc } from "@/lib/money";
+import { clock, coin, shortAddr, usd } from "@/lib/money";
 import { PassCard } from "@/components/PassCard";
 import { walletTx } from "@/lib/evm";
 import { chainIcon, coinIcon, isDarkLogo } from "@/lib/icons";
@@ -15,7 +15,7 @@ export interface PublicCreator {
 interface Asset { assetId: string; chain: string; chainLabel: string; symbol: string; decimals: number; stable: boolean; usdPrice?: number; contractAddress?: string }
 interface Tip {
   id: string; status: "pending" | "converting" | "received" | "failed" | "refunded" | "expired";
-  originAssetId: string; originSymbol: string; originChain: string; amountIn: string; amountOutUsdc: string; appFeeBps: number;
+  originAssetId: string; originSymbol: string; originChain: string; amountIn: string;
   depositAddress: string; depositMemo: string | null; refundTo: string; createdAt: string; settlementTx: string | null;
   fanMessage: string; fanName: string; failReason: "underpaid" | "other" | null; refundDetail: string | null;
   isPass: boolean; passToken: string | null; passExpiresAt: string | null;
@@ -401,10 +401,6 @@ function QuoteStep({ tip, asset, name, now, bar, mini, demo, busy, mode, onSent,
   const expired = left <= 0 && wallet === "idle";
 
   const sendAmt = coin(tip.amountIn, asset.decimals, 8, asset.stable ? 2 : 0);
-  const sendUsd = Number(sendAmt) * (asset.usdPrice ?? 0);
-  const recv = Number(usdc(tip.amountOutUsdc, 6).replace(/,/g, ""));
-  const b = breakdown(sendUsd, tip.appFeeBps, recv);
-  const feePct = tip.appFeeBps / 100;
   // One-tap wallet payment: EVM coins on supported chains, real deposit addresses only (never the simulator's).
   const tx = mode === "live" ? walletTx(asset, tip.depositAddress, tip.amountIn) : null;
 
@@ -437,12 +433,9 @@ function QuoteStep({ tip, asset, name, now, bar, mini, demo, busy, mode, onSent,
   return (
     <>
       {bar(3)}{mini}
-      <h1 className="tz-h1">Here's the deal</h1>
+      <h1 className="tz-h1">Your payment</h1>
       <dl className="tz-quote" data-testid="quote">
-        <div className="tz-quote__row"><dt>You send</dt><span className="tz-quote__lead" /><dd>{sendAmt} {asset.symbol}</dd></div>
-        <div className="tz-quote__row"><dt>Network &amp; swap</dt><span className="tz-quote__lead" /><dd>−{usd(b.network)}</dd></div>
-        <div className="tz-quote__row"><dt>Tezeo &amp; Aurora ({feePct}%)</dt><span className="tz-quote__lead" /><dd>−{usd(b.fee)}</dd></div>
-        <div className="tz-quote__row tz-quote__row--total"><dt>{name} receives</dt><span className="tz-spacer" /><dd>{usdc(tip.amountOutUsdc)} USDC</dd></div>
+        <div className="tz-quote__row tz-quote__row--total"><dt>You send</dt><span className="tz-spacer" /><dd>{sendAmt} {asset.symbol}</dd></div>
       </dl>
 
       {tx ? (
@@ -661,7 +654,7 @@ function Thanks({ tip, creator, name, pageUrl, onHome, onShare }: { tip: Tip; cr
         <span className="tz-pill tz-rise" data-status="received" style={{ ["--d" as string]: "1000ms" }}>Delivered</span>
         <h1 className="tz-display tz-rise" style={{ ["--d" as string]: "1150ms" }}>{tip.isPass ? `Welcome to ${name}'s Crew.` : `You just made ${name}'s day.`}</h1>
         <p className="tz-rise tz-muted" style={{ ["--d" as string]: "1250ms", margin: 0, maxWidth: "30ch" }}>
-          <b style={{ color: "var(--tz-text)" }}>{usdc(tip.amountOutUsdc)} USDC</b> just landed in {name}'s wallet. Your thread is part of their story now.
+          Your tip just landed in {name}'s wallet. Your thread is part of their story now.
         </p>
       </div>
       {tip.isPass && tip.passToken && tip.passExpiresAt && (

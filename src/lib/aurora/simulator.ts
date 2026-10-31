@@ -56,6 +56,8 @@ export const simulatedAurora: AuroraProvider = {
     return {
       depositAddress: addr(ts, req.recipient) + "_" + flag,
       amountIn: req.amountIn,
+      amountInUsd: usd.toFixed(6),
+      withdrawFeeUsdc: "10000",
       amountOutUsdc: String(out),
       minAmountOutUsdc: String(Math.floor(out * 0.99)),
       appFeeBps: req.appFeeBps,

@@ -1,12 +1,13 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { resetDbForTests } from "@/lib/db";
+import { setUsdcProbeForTests } from "@/lib/solana";
 import { POST as createCreatorRoute } from "@/app/api/creators/route";
 import { POST as createTipRoute } from "@/app/api/tips/route";
 import { PATCH as patchTip } from "@/app/api/tips/[id]/route";
 
 const WALLET = "GBR7vwX5Thj7GzMLYHDUS21rnyTFhGciaz59Bm7jwMrJ";
 const json = (body: unknown) => new Request("http://x", { method: "POST", body: JSON.stringify(body) });
-beforeEach(() => resetDbForTests());
+beforeEach(() => { setUsdcProbeForTests(async () => true); return resetDbForTests(); });
 afterEach(() => resetDbForTests());
 
 describe("creator onboarding API (RF-1/RF-2)", () => {

@@ -138,21 +138,13 @@ A full-bleed `.tz-weave` (64px) between the hero and the story. In the final CTA
 - **List** `ul.tzl-nos` (48px soft-brand icon tiles):
   - **Nothing to sign up for.** Open the link, pick an amount, pay from your wallet. No Tezeo account, no login.
   - **Plain words, all the way.** We say "dollars" and "your wallet". Not sure which network? Pick the one your wallet shows at the top. We check before you send.
-  - **Every fee, before you pay.** The quote shows what you send, every cost in dollars, and exactly what the creator receives.
-- **Quote card** `.tzl-dealwrap > .tzl-deal.tz-creator`: tag **Example quote**, H "Here's the deal", then a `dl.tz-quote`:
+  - **You pay what you chose.** The amount you pick is the amount you send. Nothing is added on top of it.
+- **Payment card** `.tzl-dealwrap > .tzl-deal.tz-creator`: tag **Example payment**, H "Your payment", then a `dl.tz-quote` with one total row, **You send · 0.00213 ETH**. Product decision (same as the real app): a fan sees only what they pay, like a PayPal checkout. Costs come out of the creator's side and are shown to the creator in the dashboard, never to the fan.
 
-  | Row | Amount |
-  |---|---|
-  | You send | 0.00213 ETH |
-  | Network & swap | −$0.18 |
-  | Service fee | −$0.10 |
-  | **Vale receives** | **4.72 USDC** |
-
-  Then "Send exactly 0.00213 ETH on Ethereum, to:" with a `.tz-copy` full mono address, and the timer note "Price held for 0:58. If it runs out, we'll refresh it, no harm done."
-  - The fee row is labelled **"Service fee"**, with no percentage. In the real flow the quote shows the configured fee. Do **not** put a percentage in marketing copy.
+  Then "Pay it from your wallet in one tap, or send it yourself to:" with a `.tz-copy` full mono address, and the timer note "Price held for 0:58. When it runs out you can get a fresh one, no harm done."
 - **Callouts** `.tzl-notes` (maíz numbered discs):
-  1. Every cost, in dollars, up front
-  2. The creator's name, next to what they get
+  1. Just the amount you chose
+  2. The exact amount to send, in your coin
   3. A fresh address, just for this tip
 
   On desktop (≥1000px) they are absolutely pinned around the card with stitched maíz leaders, and a tilted, dashed brand-soft backing card sits behind the quote (`.tzl-dealwrap::before`). On mobile they become a plain numbered list under the card.
@@ -187,12 +179,12 @@ A full-bleed `.tz-weave` (64px) between the hero and the story. In the final CTA
     - **Aurora Intents:** The loom: turns the coin a fan holds into USDC on Solana.
 
 ### 8. What it costs (`#fees`, knot 07)
-- **H2:** Honest prices, *before you pay.*
-- **Big number** `.tzl-bigone`: **$1** (`.tzl-mega`, up to 176px, brand) + *is the smallest tip. Below that, network fees would eat the rest, and that's not fair to anyone.*
-- **Receipt** `.tzl-receipt`: a white slip whose bottom edge is a zig-zag tear (the *z* of tezeo). Title "How fees work". Rows, each with a rombo bullet:
-  - **Every fee is on the quote.** Before sending anything, fans see the network & swap cost and the service fee in dollars, and exactly what the creator receives.
-  - **A small fixed cost on the Solana payout.** Delivering USDC to your wallet has a small fixed network cost. It's already counted in the quote.
-  - **Refunds are itemised too.** If a tip comes back, you see what was returned and what the network kept.
+- **H2:** Simple for fans, *clear for creators.*
+- **Big number** `.tzl-bigone`: **$1** (`.tzl-mega`, up to 176px, brand) + *is the smallest tip. Below that, the cost of delivering it would eat most of the tip, and that's not fair to anyone.*
+- **Receipt** `.tzl-receipt`: a white slip whose bottom edge is a zig-zag tear (the *z* of tezeo). Title "How costs work". Rows, each with a rombo bullet:
+  - **Fans pay what they choose.** The amount a fan picks is the amount they send. Nothing is added on top.
+  - **Creators see where every cent went.** Each tip in the dashboard shows what the fan sent, the cost of delivering it to the creator's wallet, any fees, and what they received. Delivery is about $0.01 per tip, and about $0.25 for the first tip to a brand-new wallet, because Solana has to open a USDC account for it.
+  - **Refunds are automatic.** If a tip can't be finished, it goes back to the fan's wallet. The network may keep a small fee.
 - **Rule:** no Tezeo percentage, no "no fees" claim anywhere.
 
 ### 9. FAQ (`#faq`, knot 08)
@@ -204,7 +196,7 @@ A full-bleed `.tz-weave` (64px) between the hero and the story. In the final CTA
   3. **What happens if a payment fails?** The money goes back to the wallet it came from, automatically. If a fan sends a bit less than the quote, they can send the rest or we return what arrived. The network may keep a small fee we can't recover, and the refund screen shows exactly how much.
   4. **Who holds my money?** **You do.** Tips are delivered as USDC straight to the Solana wallet address you set up. Tezeo doesn't keep a balance for you, so there's nothing to withdraw from us.
   5. **How fast do tips arrive?** Usually under a minute once the fan's payment is seen. Some networks take longer to confirm the payment in the first place, Bitcoin for example. Fans and creators can both watch each stage live.
-  6. **Is there a minimum tip?** Yes, **$1**. Below that, network fees would eat most of the tip. Every fee is on the quote before the fan pays.
+  6. **Is there a minimum tip?** Yes, **$1**. Below that, the cost of delivering it would eat most of the tip. Fans always pay exactly the amount they chose; the creator sees every cost in their dashboard.
   7. **What is the Membership Pass?** An optional 30-day pass a creator can offer. Fans pay once and get a Pass badge next to their name and a private pass link. There's no auto-renew: after 30 days it simply ends unless they get a new one.
   8. **Can I use it on stream?** Yes. Show your QR on screen, and add your alerts link to OBS as a **Browser Source**. A card pops up for every confirmed tip, with the fan's name and note. Keep that link private.
   9. **What do I need to create a page?** Your name, a handle, and a Solana wallet address where USDC should arrive. Add a photo, a colour and a message for your fans if you like.

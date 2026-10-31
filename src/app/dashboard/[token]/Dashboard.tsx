@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { Icon, Logo, Mark, ThemeToggle } from "@/components/ui";
 import { passState } from "@/components/PassCard";
 import type { DashboardData } from "@/lib/dashboard";
@@ -20,6 +20,7 @@ export function Dashboard({ token, initial, accent }: { token: string; initial: 
   const [toasts, setToasts] = useState<{ id: string; text: string }[]>([]);
   const [fresh, setFresh] = useState<Set<string>>(new Set());
   const [copied, setCopied] = useState(false);
+  const [openId, setOpenId] = useState<string | null>(null);
   const seen = useRef(new Set(initial.tips.map((t) => t.id)));
   const known = useRef(new Map(initial.tips.map((t) => [t.id, t.status])));
   const name = data.creator.displayName.split(" ")[0];
@@ -79,6 +80,13 @@ export function Dashboard({ token, initial, accent }: { token: string; initial: 
           <button className="tz-btn tz-btn--secondary" onClick={share}><Icon name="share" />{copied ? "Link copied" : "Share my page"}</button>
         </div>
 
+        {data.walletHasUsdc === false && (
+          <div className="tz-card tz-card--sunken tz-stack" style={{ ["--tz-stack-gap" as string]: "6px" }} role="note" data-testid="new-wallet-note">
+            <span className="tz-overline">Heads up about your wallet</span>
+            <p className="tz-small" style={{ margin: 0 }}>A Solana wallet needs a USDC account before it can receive USDC, and yours doesn't have one yet. Your <b>first tip carries a one-time set-up cost of about $0.25</b>. After that, delivery costs about $0.01 per tip. You'll see the exact amounts on each tip in your dashboard.</p>
+          </div>
+        )}
+
         <div className="tzs-stats">
           <div className="tz-card tz-stat" style={{ background: "var(--tz-surface-inverse)", color: "var(--tz-text-inverse)", border: 0 }}>
             <span className="tz-overline" style={{ color: "inherit", opacity: 0.7 }}>Received this month</span>
@@ -104,14 +112,20 @@ export function Dashboard({ token, initial, accent }: { token: string; initial: 
               <thead><tr><th>Fan</th><th>Date</th><th>Paid with</th><th className="num">You got</th><th>Status</th></tr></thead>
               <tbody>
                 {data.tips.map((t) => (
-                  <tr key={t.id} className={fresh.has(t.id) ? "tzs-newrow" : undefined}>
+                  <Fragment key={t.id}>
+                  <tr className={fresh.has(t.id) ? "tzs-newrow" : undefined}>
                     <td><div className="tzs-fan"><span className="tzs-dot" style={{ background: COLORS[(t.fanName.charCodeAt(0) || 0) % COLORS.length] }} aria-hidden="true">{(t.fanName[0] ?? "?").toUpperCase()}</span>
                       <div><b>{t.fanName || "Someone kind"} {t.isPass && <span className="tz-badge">Pass</span>}</b><small>{t.fanMessage ? `“${t.fanMessage.slice(0, 48)}${t.fanMessage.length > 48 ? "…" : ""}”` : "No message"}</small></div></div></td>
                     <td data-col="date" className="tz-muted">{fmtDate(t.createdAt)}</td>
                     <td data-col="chain">{t.originSymbol} · {t.originChain.toUpperCase()}</td>
-                    <td data-col="amount" className="num">{t.usdc !== null ? <b>{money(t.usdc)} USDC</b> : "—"}</td>
+                    <td data-col="amount" className="num">{t.usdc !== null ? <b>{money(t.usdc)} USDC</b> : "—"}
+                      {t.gross !== null && <button type="button" className="tzs-linkbtn" aria-expanded={openId === t.id} onClick={() => setOpenId(openId === t.id ? null : t.id)}>{openId === t.id ? "Hide details" : "Details"}</button>}</td>
                     <td data-col="status"><span className="tz-pill" data-status={t.status}>{STATUS_LABEL[t.status] ?? t.status}</span></td>
                   </tr>
+                  {openId === t.id && t.gross !== null && (
+                    <tr data-detail="1"><td colSpan={5} data-col="detail"><TipBreakdown t={t} /></td></tr>
+                  )}
+                  </Fragment>
                 ))}
               </tbody>
             </table>
@@ -206,3 +220,20 @@ function StreamTools({ token, goal, alertToken }: { token: string; goal: Dashboa
     </div>
   );
 }
+
+/** Where one tip's money went. The fan only ever sees what they paid; this is the creator's transparency view. */
+function TipBreakdown({ t }: { t: DashboardData["tips"][number] }) {
+  const delivery = t.delivery ?? 0, fees = t.fees ?? 0;
+  return (
+    <div className="tz-card tz-card--sunken tz-stack" style={{ ["--tz-stack-gap" as string]: "8px", padding: "var(--tz-space-4)" }} data-testid="tip-breakdown">
+      <dl className="tz-quote">
+        <div className="tz-quote__row"><dt>Your fan sent</dt><span className="tz-quote__lead" /><dd>{usdFmt(t.gross ?? 0)}</dd></div>
+        <div className="tz-quote__row"><dt>Delivery to your Solana wallet</dt><span className="tz-quote__lead" /><dd>−{usdFmt(delivery)}</dd></div>
+        <div className="tz-quote__row"><dt>Service fees &amp; price spread</dt><span className="tz-quote__lead" /><dd>−{usdFmt(fees)}</dd></div>
+        <div className="tz-quote__row tz-quote__row--total"><dt>You received</dt><span className="tz-spacer" /><dd>{money(t.usdc ?? 0)} USDC</dd></div>
+      </dl>
+      {delivery >= 0.1 && <p className="tz-small tz-muted" style={{ margin: 0 }}>Delivery costs more the first time: Solana needs a USDC account for your wallet, and it is set up with this first tip. Later tips cost about $0.01.</p>}
+    </div>
+  );
+}
+const usdFmt = (n: number) => "$" + n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
