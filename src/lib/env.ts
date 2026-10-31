@@ -1,6 +1,6 @@
 export const env = {
   auroraApiKey: process.env.AURORA_API_KEY ?? "",
-  auroraApiBase: process.env.AURORA_API_BASE ?? "https://api.intents.aurora.dev",
+  auroraApiBase: process.env.AURORA_API_BASE ?? "https://intents-api.aurora.dev",
   auroraMode: (process.env.AURORA_MODE ?? "simulated") as "live" | "simulated",
   tezeoFeeBps: Number(process.env.TEZEO_FEE_BPS ?? 100),
   databasePath: process.env.DATABASE_PATH ?? "./data/tezeo.db",
