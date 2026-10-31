@@ -64,7 +64,7 @@ html { scroll-behavior: smooth; scroll-padding-top: calc(var(--tzl-nav-h) + 16px
 }
 .tzl-nav__links a:hover { color: var(--tz-text); background: var(--tz-bg-sunken); }
 .tzl-nav__end { display: flex; align-items: center; gap: var(--tz-space-2); margin-left: auto; }
-.tzl-nav__cta { min-height: 2.75rem; padding-inline: var(--tz-space-4); font-size: var(--tz-text-sm); }
+.tzl-nav__cta { min-height: 2.75rem; padding-inline: var(--tz-space-4); font-size: var(--tz-text-sm); gap: 0; }
 .tzl-nav__cta .tzl-long { display: none; }
 @media (min-width: 400px) { .tzl-nav__cta .tzl-long { display: inline; } }
 
