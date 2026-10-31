@@ -34,7 +34,8 @@ button.tzs-mini { cursor: pointer; }
 .tzs-error { color: var(--tz-failed-fg); background: var(--tz-failed-bg); border-radius: var(--tz-radius-md); padding: 10px 12px; font-size: var(--tz-text-sm); display: flex; gap: 8px; align-items: flex-start; }
 .tzs-desktop-qr { display: none; }
 @media (min-width: 900px) {
-  .tzs-creator-layout { display: grid; grid-template-columns: minmax(0, var(--tz-column)) 260px; gap: var(--tz-space-8); justify-content: center; align-items: start; }
+  /* Only the amount step has a QR column; every other step stays a single, centred column. */
+  .tzs-creator-layout--qr { display: grid; grid-template-columns: minmax(0, var(--tz-column)) 260px; gap: var(--tz-space-8); justify-content: center; align-items: start; }
   .tzs-desktop-qr { display: grid; gap: var(--tz-space-3); justify-items: center; position: sticky; top: 120px; margin-top: 48px; text-align: center; }
   .tzs-share-mobile { display: none !important; }
 }

@@ -392,7 +392,7 @@ export function TipFlow({ creator, qrSvg, pageUrl, passMode = false, goal = null
       </div>}
       {isThanks && <Weave slim />}
       {step === "amount" && !passMode && <Weave height={96} />}
-      <div className="tzs-creator-layout">
+      <div className={`tzs-creator-layout${step === "amount" && !passMode ? " tzs-creator-layout--qr" : ""}`}>
         <main className={`tzs-main${step === "amount" && !passMode ? " tzs-main--flush" : ""}`} aria-live="off">{body}</main>
         {step === "amount" && !passMode && (
           <aside className="tzs-desktop-qr" aria-label="Scan to tip">
