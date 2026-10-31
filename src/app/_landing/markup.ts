@@ -596,8 +596,8 @@ export const LANDING_HTML = `<a class="tzl-skip" href="#main">Skip to content</a
         <p>Tezeo designs the experience. Two open networks move the money.</p>
       </div>
       <div class="tzl-built__pair">
-        <div class="tzl-builder"><span class="tzl-builder__g" style="background:linear-gradient(135deg,#9945FF,#14F195)" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m12 5 7 7-7 7-7-7z" fill="none" stroke="#120D18" stroke-width="2.4"/></svg></span><b>Solana</b><span>Where your dollars land: USDC, in your own wallet.</span></div>
-        <div class="tzl-builder"><span class="tzl-builder__g" style="background:var(--tz-anil-500)" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 17c4 0 5-10 9-10s5 10 9 10M3 12h4m10 0h4" fill="none" stroke="#FFF7EC" stroke-width="2.2" stroke-linecap="round"/></svg></span><b>Aurora Intents</b><span>The loom: turns the coin a fan holds into USDC on Solana.</span></div>
+        <div class="tzl-builder"><span class="tzl-builder__g tzl-builder__g--img" aria-hidden="true"><img src="/icons/chains/sol.svg" alt="" width="32" height="32" loading="lazy" decoding="async"></span><b>Solana</b><span>Where your dollars land: USDC, in your own wallet.</span></div>
+        <div class="tzl-builder"><span class="tzl-builder__g tzl-builder__g--img" aria-hidden="true"><img src="/icons/chains/aurora.svg" alt="" width="32" height="32" loading="lazy" decoding="async"></span><b>Aurora Intents</b><span>The loom: turns the coin a fan holds into USDC on Solana.</span></div>
       </div>
     </div>
   </div>
