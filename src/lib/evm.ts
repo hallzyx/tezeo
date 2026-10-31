@@ -18,6 +18,12 @@ export const EVM_CHAINS: Record<string, EvmChain> = {
   xlayer: { id: 196, name: "X Layer", native: "OKB" },
   monad: { id: 143, name: "Monad", native: "MON" },
   bera: { id: 80094, name: "Berachain", native: "BERA" },
+  // Long names used by the local simulator (live Aurora uses the short slugs above).
+  ethereum: { id: 1, name: "Ethereum", native: "ETH" },
+  arbitrum: { id: 42161, name: "Arbitrum", native: "ETH" },
+  optimism: { id: 10, name: "Optimism", native: "ETH" },
+  polygon: { id: 137, name: "Polygon", native: "POL" },
+  avalanche: { id: 43114, name: "Avalanche", native: "AVAX" },
 };
 
 /** Aurora chain slug for an EVM chain id (what a connected wallet reports), if we support it. */

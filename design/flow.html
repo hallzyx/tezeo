@@ -46,6 +46,10 @@
 <section class="fl-screen fl-page tz-creator" id="amount" style="--creator-accent:#1A9E8F">
   <p class="fl-proto-note"><b>A · Amount.</b> &lt;768: one column, band 96px, sticky CTA dock. 768–1023: 576px column, roomier tiles. ≥1024: weave band 128px, then creator pane (352px: identity, goal, scan-to-tip QR, wall) beside a raised step card (640px) that sits on the band's edge.</p>
   <div class="fl-demo" role="note"><svg aria-hidden="true"><use href="#i-clock"/></svg>Demo mode: payments here are simulated and no real money moves.</div>
+  <div class="fl-bar fl-bar--float fl-bar--mobile">
+    <button class="fl-theme" type="button" aria-label="Share this page"><svg><use href="#i-share"/></svg></button>
+    <button class="fl-theme" type="button" aria-label="Switch to dark mode" data-flip><svg><use href="#i-moon"/></svg></button>
+  </div>
   <div class="tz-weave fl-band" role="presentation"></div>
   <div class="fl-shell fl-shell--flush">
     <div class="fl-side fl-side--creator">
@@ -64,10 +68,6 @@
     </div>
 
     <main class="fl-stage fl-stage--lift">
-      <div class="fl-bar" style="justify-content:flex-end">
-        <button class="fl-theme" type="button" aria-label="Share this page"><svg><use href="#i-share"/></svg></button>
-        <button class="fl-theme" type="button" aria-label="Switch to dark mode" data-flip><svg><use href="#i-moon"/></svg></button>
-      </div>
       <h2 class="fl-ask">Send Valentina a tip</h2>
       <div class="tz-amounts" role="group" aria-label="Tip amount">
         <button class="tz-amount-opt" aria-pressed="false"><span class="tz-amount">$3</span><small>a cafecito</small></button>
@@ -160,6 +160,7 @@
 
       <div class="fl-dock">
         <button class="tz-btn tz-btn--primary tz-btn--lg tz-btn--block" disabled>See the quote</button>
+        <p class="fl-why-disabled" id="why-q">Add your wallet address to see the quote.</p>
       </div>
     </main>
   </div>
@@ -258,8 +259,8 @@
         <svg class="tz-loom" viewBox="0 0 300 120" role="img" aria-label="Converting your payment into USDC">
           <text class="tz-loom__label" x="0" y="64">BASE</text>
           <path class="tz-loom__t tz-loom__t--1" d="M44 20 C110 20 130 60 190 60"/><path class="tz-loom__t tz-loom__t--2" d="M44 60 C80 40 130 80 190 60"/><path class="tz-loom__t tz-loom__t--3" d="M44 100 C110 100 130 60 190 60"/>
-          <path class="tz-loom__out" d="M190 60 H250"/><circle class="tz-loom__eye" cx="190" cy="60" r="10"/><path class="tz-loom__shuttle" d="M206 54 212 60 206 66 200 60Z"/>
-          <text class="tz-loom__label" x="258" y="64" style="fill:var(--tz-text)">SOLANA</text>
+          <path class="tz-loom__out" d="M190 60 H234"/><circle class="tz-loom__eye" cx="190" cy="60" r="10"/><path class="tz-loom__shuttle" d="M206 54 212 60 206 66 200 60Z"/>
+          <text class="tz-loom__label" x="242" y="64" style="fill:var(--tz-text)">SOLANA</text>
         </svg>
       </div>
       <div class="fl-track-split">
@@ -411,7 +412,7 @@
 <section class="fl-screen fl-page tz-creator" id="onboarding" style="--creator-accent:#7C3AED">
   <p class="fl-proto-note"><b>G · Onboarding.</b> &lt;1024: form, then a full live preview with a Light/Dark switch (it replaces the two tiny tiles) right above the CTA. ≥1024: form (512px) beside a sticky 384px phone preview of the real page: weave, avatar, name, handle, message, amounts, CTA. The CTA reads "Create my page" (today it says "Create you's page" while the name is empty).</p>
   <div class="fl-onb">
-    <form class="fl-onb__form" onsubmit="return false">
+    <form class="fl-onb__form" id="onb-form" onsubmit="return false">
       <div><span class="tz-overline">Create your page</span><h1>Let's weave your page</h1></div>
       <div class="tz-field"><label class="tz-label" for="o-name">Your name</label><input id="o-name" class="tz-input" value="Mateo Quispe"></div>
       <div class="tz-field"><label class="tz-label" for="o-h">Handle</label><input id="o-h" class="tz-input" value="mateodraws" aria-describedby="o-h-h"><span id="o-h-h" class="tz-hint">Your link: tezeo.app/@mateodraws · 3–24 letters, numbers or _</span></div>
@@ -430,10 +431,6 @@
         </div>
         <span class="tz-hint">The pay button and status colours stay Tezeo's, so everyone recognises a real payment page.</span></div>
       <div class="tz-field"><label class="tz-label" for="o-w">Your Solana wallet (where USDC arrives)</label><input id="o-w" class="tz-input tz-mono" placeholder="e.g. 7xKX…gAsU" aria-describedby="o-w-h"><span id="o-w-h" class="tz-hint">Double-check it: tips are paid straight to this address and can't be reversed.</span></div>
-      <div class="fl-dock" style="margin-top:var(--tz-space-2)">
-        <button class="tz-btn tz-btn--primary tz-btn--lg tz-btn--block" type="submit">Create my page</button>
-        <p class="fl-trust"><svg aria-hidden="true"><use href="#i-shield"/></svg>We check your wallet address before saving it.</p>
-      </div>
     </form>
 
     <aside class="fl-preview" aria-label="Live preview of your page">
@@ -451,6 +448,10 @@
       </div>
       <p class="tz-small tz-muted" style="margin:0">Example. The preview updates as you type.</p>
     </aside>
+    <div class="fl-dock fl-onb__cta">
+      <button class="tz-btn tz-btn--primary tz-btn--lg tz-btn--block" type="submit" form="onb-form">Create my page</button>
+      <p class="fl-trust"><svg aria-hidden="true"><use href="#i-shield"/></svg>We check your wallet address before saving it.</p>
+    </div>
   </div>
 </section>
 
@@ -461,6 +462,7 @@
     var root = document.documentElement;
     document.querySelectorAll('[data-flip]').forEach(function (b) { b.addEventListener('click', function () { root.dataset.theme = root.dataset.theme === 'dark' ? 'light' : 'dark'; }); });
     // onboarding preview: render the phone in the chosen theme (prototype: flips the page theme)
+    document.querySelectorAll('[data-pv]').forEach(function (x) { x.setAttribute('aria-pressed', x.dataset.pv === root.dataset.theme); });
     document.querySelectorAll('[data-pv]').forEach(function (b) { b.addEventListener('click', function () {
       document.querySelectorAll('[data-pv]').forEach(function (x) { x.setAttribute('aria-pressed', x === b); }); root.dataset.theme = b.dataset.pv; }); });
     // decorative QR (not scannable)

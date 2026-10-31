@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { encodeErc20Transfer, walletTx } from "@/lib/evm";
+import { chainSlugById, encodeErc20Transfer, walletTx } from "@/lib/evm";
 
 const DEP = "0xCF4D6a42E0c3E8C64CEda35A5805FE35e20053dc";
 const USDC_BASE = { chain: "base", symbol: "USDC", contractAddress: "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913" };
@@ -32,5 +32,19 @@ describe("wallet payment transaction", () => {
   it("rejects bad input at the encoder", () => {
     expect(() => encodeErc20Transfer("0x123", 1n)).toThrow();
     expect(() => encodeErc20Transfer(DEP, 0n)).toThrow();
+  });
+});
+
+describe("simulator chain names", () => {
+  const DEP = "0xCF4D6a42E0c3E8C64CEda35A5805FE35e20053dc";
+  it("long names resolve like live slugs, and a chain id still maps back to the short slug", () => {
+    const pairs: [string, string, string][] = [["ethereum", "eth", "ETH"], ["arbitrum", "arb", "ETH"], ["optimism", "op", "ETH"], ["polygon", "pol", "POL"], ["avalanche", "avax", "AVAX"]];
+    for (const [long, short, native] of pairs) {
+      const a = walletTx({ chain: long, symbol: native }, DEP, "1000"), b = walletTx({ chain: short, symbol: native }, DEP, "1000");
+      expect(a, long).not.toBeNull();
+      expect(a?.chainId, long).toBe(b?.chainId);
+    }
+    expect(chainSlugById(1)).toBe("eth");
+    expect(chainSlugById(137)).toBe("pol");
   });
 });

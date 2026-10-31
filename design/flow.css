@@ -52,9 +52,9 @@
     justify-content: center; align-items: start;
   }
   .fl-shell--flush { padding-top: 0; }
-  .fl-side  { grid-area: side; }
-  .fl-wall  { grid-area: wall; }
-  .fl-stage { grid-area: stage; }
+  .fl-shell > .fl-side, .fl-shell > .fl-sum { grid-area: side; }
+  .fl-shell > .fl-wall  { grid-area: wall; }
+  .fl-shell > .fl-stage { grid-area: stage; }
 }
 
 /* ----- the step card ----- */
@@ -296,18 +296,20 @@
 /* ---------------------------------------------------------------------
    9. DASHBOARD — wide: tips on the left, a tools rail on the right
    --------------------------------------------------------------------- */
-.fl-dash { display: grid; grid-template-columns: 1fr; min-height: 100dvh; background: var(--tz-bg); }
+.fl-dash { display: grid; grid-template-columns: minmax(0, 1fr); min-height: 100dvh; background: var(--tz-bg); }
 .fl-dash__nav { display: none; }
 .fl-dash__main { padding: var(--tz-space-4) var(--tz-gutter) calc(var(--tz-space-16) + 24px); display: grid; gap: var(--tz-space-5); align-content: start; min-width: 0; }
 .fl-dash__head { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px; }
 .fl-dash__head h1 { margin-top: 6px; }
-.fl-dash__head .fl-actions { margin-left: auto; display: flex; gap: 8px; }
+.fl-dash__head > div:first-child { min-width: 0; }
+.fl-dash__head .fl-actions { margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap; }
 .fl-stats { display: grid; gap: var(--tz-space-3); grid-template-columns: 1fr 1fr; }
 .fl-stats > :first-child { grid-column: 1 / -1; }
 .fl-stat-hero { background: var(--tz-surface-inverse); color: var(--tz-text-inverse); border: 0; overflow: hidden; position: relative; }
 .fl-stat-hero .tz-overline, .fl-stat-hero .tz-amount__unit { color: inherit; opacity: 0.72; }
 .fl-stat-hero .tz-weave { position: absolute; left: 0; right: 0; bottom: 0; --_h: 10px; }
-.fl-cols { display: grid; gap: var(--tz-space-5); align-items: start; }
+.fl-cols { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--tz-space-5); align-items: start; }
+.fl-cols > * { min-width: 0; }
 .fl-rail { display: grid; gap: var(--tz-space-4); align-content: start; }
 .fl-card-h { display: flex; align-items: center; gap: 10px; }
 .fl-card-h h2 { font: 700 var(--tz-text-lg)/1.2 var(--tz-font-display); margin: 0; }
@@ -398,6 +400,7 @@
 }
 .fl-proto-note b { color: var(--tz-text); }
 .fl-clean .fl-proto-note { display: none; }
+.fl-screen[hidden], .fl-proto-index[hidden] { display: none !important; }
 .fl-screen + .fl-screen { border-top: 8px solid var(--tz-border-strong); }
 .fl-proto-index { max-width: 52rem; margin: 0 auto; padding: var(--tz-space-8) var(--tz-gutter); display: grid; gap: var(--tz-space-3); }
 .fl-proto-index a { color: var(--tz-brand-text); font-weight: 600; }
@@ -405,3 +408,35 @@
 @media (prefers-reduced-motion: reduce) {
   .fl-passoffer, .fl-wallet { transition: none; }
 }
+
+/* Stacked tip rows (≤640): the fan column may shrink; the breakdown spans the whole card. */
+@media (max-width: 640px) {
+  .fl-tips-card .tz-table--stack tr { grid-template-columns: minmax(0, 1fr) auto; }
+  .fl-tips-card .tz-table--stack td[data-col="detail"] { grid-column: 1 / -1; }
+  .fl-tips-card .tz-table--stack td[data-col="date"] { font-size: var(--tz-text-xs); }
+  .fl-fan small { max-width: none; }
+}
+.fl-fan > div { min-width: 0; }
+@media (max-width: 380px) { .fl-tabbar a { min-width: 0; flex: 1; padding: 6px 2px; } }
+
+/* Share + theme float: over the band's corner on phones/tablets, in the card's corner on desktop. */
+.fl-page { position: relative; }
+.fl-stage { position: relative; }
+.fl-bar--float { position: absolute; z-index: 5; top: calc(36px + 12px); right: 12px; gap: 8px; }
+@media (min-width: 1024px) { .fl-bar--float { top: var(--fl-pad); right: var(--fl-pad); } .fl-ask { padding-right: 112px; } }
+@media (min-width: 1024px) { .fl-bar--mobile { top: calc(36px + 128px + 3.5rem + var(--fl-pad)); right: max(calc((100% - (var(--fl-side) + var(--fl-stage) + var(--fl-gap))) / 2 + var(--fl-pad)), var(--fl-pad)); } }
+@media (min-width: 641px) {
+  .fl-tips-card td[data-col="date"], .fl-tips-card td[data-col="chain"], .fl-tips-card td[data-col="amount"], .fl-tips-card td[data-col="status"] { white-space: nowrap; }
+  .fl-fan small { max-width: 24ch; }
+}
+@media (min-width: 1024px) {
+  .fl-onb { grid-template-areas: "form preview" "cta preview"; }
+  .fl-onb__form { grid-area: form; }
+  .fl-preview { grid-area: preview; }
+  .fl-onb__cta { grid-area: cta; }
+}
+
+/* Keyboard + dock: a focused field scrolls clear of the docked CTA. Native controls take the brand. */
+.fl-page input, .fl-page textarea, .fl-onb input, .fl-onb textarea { scroll-margin-bottom: 140px; }
+.fl-page input[type="checkbox"], .fl-dash input[type="checkbox"] { accent-color: var(--tz-brand); }
+.fl-why-disabled { margin: 0; text-align: center; font-size: var(--tz-text-xs); color: var(--tz-text-muted); }
