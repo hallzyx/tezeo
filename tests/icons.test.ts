@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import { describe, expect, it } from "vitest";
-import { chainIcon, coinIcon } from "@/lib/icons";
+import { chainIcon, coinIcon, isDarkLogo } from "@/lib/icons";
 import { CHAIN_ICONS, COIN_ICONS } from "@/lib/icons.generated";
 
 describe("chain and coin logos", () => {
@@ -25,6 +25,11 @@ describe("chain and coin logos", () => {
     expect(coinIcon("USDC")).toBe("/icons/coins/usdc.svg");
     expect(coinIcon("eth")).toBe("/icons/coins/eth.svg");
     expect(coinIcon("TON")).toBe("/icons/chains/ton.svg");
+  });
+  it("flags near-black logos so they get a white outline on dark backgrounds", () => {
+    for (const c of ["aptos", "stellar", "xlayer"]) expect(isDarkLogo(chainIcon(c)), c).toBe(true);
+    for (const c of ["eth", "base", "sol", "btc"]) expect(isDarkLogo(chainIcon(c)), c).toBe(false);
+    expect(isDarkLogo(undefined)).toBe(false);
   });
   it("returns undefined for the unknown so the UI keeps its text glyph", () => {
     expect(chainIcon("nope-chain")).toBeUndefined();

@@ -5,7 +5,7 @@ import { Avatar, CopyBox, ErrorNote, Icon, Mark, ThemeToggle, TopBar, Weave } fr
 import { breakdown, clock, coin, shortAddr, usd, usdc } from "@/lib/money";
 import { PassCard } from "@/components/PassCard";
 import { walletTx } from "@/lib/evm";
-import { chainIcon, coinIcon } from "@/lib/icons";
+import { chainIcon, coinIcon, isDarkLogo } from "@/lib/icons";
 import { WalletPay, type WalletState } from "./WalletPay";
 
 export interface PublicCreator {
@@ -353,7 +353,7 @@ function Chip({ on, color, glyph, label, icon, onClick }: { on?: boolean; color?
   return (
     <button type="button" className="tz-chip" aria-pressed={!!on} style={{ ["--chip-color" as string]: color ?? "#5E5266" }} onClick={onClick}>
       {icon
-        ? <span className="tz-chip__coin tz-chip__coin--img"><img src={icon} alt="" width={28} height={28} loading="lazy" decoding="async" /></span> /* eslint-disable-line @next/next/no-img-element */
+        ? <span className="tz-chip__coin tz-chip__coin--img"><img src={icon} alt="" width={28} height={28} loading="lazy" decoding="async" className={isDarkLogo(icon) ? "tz-logo--dark" : undefined} /></span> /* eslint-disable-line @next/next/no-img-element */
         : <span className="tz-chip__coin">{glyph}</span>}
       {label}
     </button>

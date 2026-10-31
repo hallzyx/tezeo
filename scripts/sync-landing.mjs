@@ -34,7 +34,10 @@ const CHAIN_BY_LABEL = { ethereum: "eth", eth: "eth", base: "base", arbitrum: "a
   aptos: "aptos", stellar: "stellar", monad: "monad", "x layer": "xlayer", gnosis: "gnosis", solana: "sol" };
 const chainSrc = (label) => { const s = CHAIN_BY_LABEL[label.trim().toLowerCase()]; return s && has("chains", s) ? `/icons/chains/${s}.svg` : null; };
 const coinSrc = (label) => { const s = label.trim().toLowerCase(); return has("coins", s) ? `/icons/coins/${s}.svg` : has("chains", s) ? `/icons/chains/${s}.svg` : null; };
-const img = (src, px) => `<img src="${src}" alt="" width="${px}" height="${px}" loading="lazy" decoding="async">`;
+const darkSet = new Set([...fs.readFileSync("src/lib/icons.generated.ts", "utf8").matchAll(/"((?:chains|coins)\/[a-z0-9-]+)"/g)].map((m) => m[1]));
+const isDarkSrc = (src) => darkSet.has(src.replace(/^\/icons\//, "").replace(/\.svg$/, ""));
+const cls = (src) => (isDarkSrc(src) ? ' class="tz-logo--dark"' : "");
+const img = (src, px) => `<img src="${src}"${cls(src)} alt="" width="${px}" height="${px}" loading="lazy" decoding="async">`;
 let swapped = 0;
 // marquee chips (networks and coins)
 body = body.replace(/<li class="(tzl-chain(?: tzl-chain--coin)?)"><span class="(tzl-chain__g[^"]*)" style="([^"]*)">([^<]*)<\/span>([^<]*)<\/li>/g,
@@ -54,7 +57,7 @@ body = body.replace(/<circle cx="([\d.]+)" cy="([\d.]+)" r="([\d.]+)" fill="#[0-
   (m, cx, cy, r, labelEl, label) => {
     const src = chainSrc(label); if (!src) return m; swapped++;
     const d = (+r * 2).toFixed(2);
-    return `<image href="${src}" x="${(+cx - +r).toFixed(2)}" y="${(+cy - +r).toFixed(2)}" width="${d}" height="${d}"/>${labelEl}`;
+    return `<image href="${src}"${cls(src)} x="${(+cx - +r).toFixed(2)}" y="${(+cy - +r).toFixed(2)}" width="${d}" height="${d}"/>${labelEl}`;
   });
 
 const esc = body.replace(/\\/g, "\\\\").replace(/`/g, "\\`").replace(/\$\{/g, "\\${");

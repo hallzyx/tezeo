@@ -1,4 +1,4 @@
-import { CHAIN_ICONS, COIN_ICONS } from "./icons.generated";
+import { CHAIN_ICONS, COIN_ICONS, DARK_ICONS } from "./icons.generated";
 
 /** Aurora chain slugs we may meet under another name (the local simulator uses long names). */
 const ALIAS: Record<string, string> = {
@@ -20,4 +20,9 @@ export function coinIcon(symbol: string): string | undefined {
   const s = symbol.toLowerCase();
   if (COIN_ICONS.has(s)) return `/icons/coins/${s}.svg`;
   return CHAIN_ICONS.has(s) ? `/icons/chains/${s}.svg` : undefined;
+}
+
+/** True for near-black logos, which need a white outline on dark backgrounds (see `.tz-logo--dark`). */
+export function isDarkLogo(src: string | undefined): boolean {
+  return !!src && DARK_ICONS.has(src.replace(/^\/icons\//, "").replace(/\.svg$/, ""));
 }

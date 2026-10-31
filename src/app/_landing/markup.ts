@@ -283,10 +283,10 @@ export const LANDING_HTML = `<a class="tzl-skip" href="#main">Skip to content</a
           <li class="tzl-chain"><span class="tzl-chain__g tzl-chain__g--ink tzl-chain__g--img" style="--_c:#4DA2FF"><img src="/icons/chains/sui.svg" alt="" width="36" height="36" loading="lazy" decoding="async"></span>Sui</li>
           <li class="tzl-chain"><span class="tzl-chain__g tzl-chain__g--img" style="--_c:#0098EA"><img src="/icons/chains/ton.svg" alt="" width="36" height="36" loading="lazy" decoding="async"></span>TON</li>
           <li class="tzl-chain"><span class="tzl-chain__g tzl-chain__g--img" style="--_c:#EB0029"><img src="/icons/chains/tron.svg" alt="" width="36" height="36" loading="lazy" decoding="async"></span>Tron</li>
-          <li class="tzl-chain"><span class="tzl-chain__g tzl-chain__g--img" style="--_c:#3A2E44"><img src="/icons/chains/aptos.svg" alt="" width="36" height="36" loading="lazy" decoding="async"></span>Aptos</li>
-          <li class="tzl-chain"><span class="tzl-chain__g tzl-chain__g--img" style="--_c:#5E5266"><img src="/icons/chains/stellar.svg" alt="" width="36" height="36" loading="lazy" decoding="async"></span>Stellar</li>
+          <li class="tzl-chain"><span class="tzl-chain__g tzl-chain__g--img" style="--_c:#3A2E44"><img src="/icons/chains/aptos.svg" class="tz-logo--dark" alt="" width="36" height="36" loading="lazy" decoding="async"></span>Aptos</li>
+          <li class="tzl-chain"><span class="tzl-chain__g tzl-chain__g--img" style="--_c:#5E5266"><img src="/icons/chains/stellar.svg" class="tz-logo--dark" alt="" width="36" height="36" loading="lazy" decoding="async"></span>Stellar</li>
           <li class="tzl-chain"><span class="tzl-chain__g tzl-chain__g--img" style="--_c:#836EF9"><img src="/icons/chains/monad.svg" alt="" width="36" height="36" loading="lazy" decoding="async"></span>Monad</li>
-          <li class="tzl-chain"><span class="tzl-chain__g tzl-chain__g--img" style="--_c:#261D2E"><img src="/icons/chains/xlayer.svg" alt="" width="36" height="36" loading="lazy" decoding="async"></span>X Layer</li>
+          <li class="tzl-chain"><span class="tzl-chain__g tzl-chain__g--img" style="--_c:#261D2E"><img src="/icons/chains/xlayer.svg" class="tz-logo--dark" alt="" width="36" height="36" loading="lazy" decoding="async"></span>X Layer</li>
           <li class="tzl-chain"><span class="tzl-chain__g tzl-chain__g--img" style="--_c:#04795B"><img src="/icons/chains/gnosis.svg" alt="" width="36" height="36" loading="lazy" decoding="async"></span>Gnosis</li>
           <li class="tzl-chain"><span class="tzl-chain__g tzl-chain__g--img" style="--_c:#9945FF"><img src="/icons/chains/sol.svg" alt="" width="36" height="36" loading="lazy" decoding="async"></span>Solana</li>
         </ul>
@@ -294,10 +294,10 @@ export const LANDING_HTML = `<a class="tzl-skip" href="#main">Skip to content</a
           <li class="tzl-chain"><span class="tzl-chain__g tzl-chain__g--ink tzl-chain__g--img" style="--_c:#4DA2FF"><img src="/icons/chains/sui.svg" alt="" width="36" height="36" loading="lazy" decoding="async"></span>Sui</li>
           <li class="tzl-chain"><span class="tzl-chain__g tzl-chain__g--img" style="--_c:#0098EA"><img src="/icons/chains/ton.svg" alt="" width="36" height="36" loading="lazy" decoding="async"></span>TON</li>
           <li class="tzl-chain"><span class="tzl-chain__g tzl-chain__g--img" style="--_c:#EB0029"><img src="/icons/chains/tron.svg" alt="" width="36" height="36" loading="lazy" decoding="async"></span>Tron</li>
-          <li class="tzl-chain"><span class="tzl-chain__g tzl-chain__g--img" style="--_c:#3A2E44"><img src="/icons/chains/aptos.svg" alt="" width="36" height="36" loading="lazy" decoding="async"></span>Aptos</li>
-          <li class="tzl-chain"><span class="tzl-chain__g tzl-chain__g--img" style="--_c:#5E5266"><img src="/icons/chains/stellar.svg" alt="" width="36" height="36" loading="lazy" decoding="async"></span>Stellar</li>
+          <li class="tzl-chain"><span class="tzl-chain__g tzl-chain__g--img" style="--_c:#3A2E44"><img src="/icons/chains/aptos.svg" class="tz-logo--dark" alt="" width="36" height="36" loading="lazy" decoding="async"></span>Aptos</li>
+          <li class="tzl-chain"><span class="tzl-chain__g tzl-chain__g--img" style="--_c:#5E5266"><img src="/icons/chains/stellar.svg" class="tz-logo--dark" alt="" width="36" height="36" loading="lazy" decoding="async"></span>Stellar</li>
           <li class="tzl-chain"><span class="tzl-chain__g tzl-chain__g--img" style="--_c:#836EF9"><img src="/icons/chains/monad.svg" alt="" width="36" height="36" loading="lazy" decoding="async"></span>Monad</li>
-          <li class="tzl-chain"><span class="tzl-chain__g tzl-chain__g--img" style="--_c:#261D2E"><img src="/icons/chains/xlayer.svg" alt="" width="36" height="36" loading="lazy" decoding="async"></span>X Layer</li>
+          <li class="tzl-chain"><span class="tzl-chain__g tzl-chain__g--img" style="--_c:#261D2E"><img src="/icons/chains/xlayer.svg" class="tz-logo--dark" alt="" width="36" height="36" loading="lazy" decoding="async"></span>X Layer</li>
           <li class="tzl-chain"><span class="tzl-chain__g tzl-chain__g--img" style="--_c:#04795B"><img src="/icons/chains/gnosis.svg" alt="" width="36" height="36" loading="lazy" decoding="async"></span>Gnosis</li>
           <li class="tzl-chain"><span class="tzl-chain__g tzl-chain__g--img" style="--_c:#9945FF"><img src="/icons/chains/sol.svg" alt="" width="36" height="36" loading="lazy" decoding="async"></span>Solana</li>
         </ul>
