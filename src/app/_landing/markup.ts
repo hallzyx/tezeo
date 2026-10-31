@@ -226,16 +226,87 @@ export const LANDING_HTML = `<a class="tzl-skip" href="#main">Skip to content</a
       </li>
     </ol>
 
-    <div class="tzl-life" aria-labelledby="life-title">
-      <div class="tzl-life__head">
-        <h3 id="life-title">Every tip is tracked, live.</h3>
-        <p>Fans watch each stage on their screen. You watch it on your dashboard.</p>
+    <div class="tzl-trk" data-reveal="track" aria-labelledby="trk-title">
+      <div class="tz-weave tz-weave--slim tzl-trk__selvedge" role="presentation"></div>
+      <div class="tzl-trk__head">
+        <div class="tzl-trk__titles">
+          <h3 id="trk-title">Every tip is tracked, live.</h3>
+          <p>One thread, three knots. The fan watches it on their phone. The creator watches it on their dashboard.</p>
+        </div>
+        <span class="tzl-example">Example · Ana tips Vale $5</span>
       </div>
-      <ol class="tzl-life__track">
-        <li class="tzl-life__stage" data-status="pending"><span class="tz-pill" data-status="pending">Waiting</span><b>Waiting for your payment</b><p>It usually shows up in a minute or two.</p></li>
-        <li class="tzl-life__stage" data-status="converting"><span class="tz-pill" data-status="converting">Converting</span><b>We're weaving your ETH into dollars for Vale</b><p>You can close this tab. We'll keep going.</p></li>
-        <li class="tzl-life__stage" data-status="received"><span class="tz-pill" data-status="received">Delivered</span><b>You just made Vale's day.</b><p>4.72 USDC just landed in Vale's wallet.</p></li>
-      </ol>
+
+      <div class="tzl-trk__grid">
+        <div class="tzl-trk__lanes" aria-hidden="true">
+          <span class="tzl-trk__lane tzl-trk__lane--fan"><svg><use href="#i-user"/></svg><b>Ana sees</b><small>on her phone</small></span>
+          <span class="tzl-trk__lead"><span class="tzl-trk__coin">0.00213 ETH</span><span class="tzl-seg tzl-seg--lead"><i></i></span></span>
+          <span class="tzl-trk__lane tzl-trk__lane--creator"><svg><use href="#i-chart"/></svg><b>Vale sees</b><small>on her dashboard</small></span>
+        </div>
+
+        <ol class="tzl-trk__stations">
+          <li class="tzl-trk__st tzl-trk__st--1">
+            <div class="tzl-trk__fan">
+              <span class="tzl-trk__mlabel">Ana's screen</span>
+              <span class="tz-pill" data-status="pending">Waiting</span>
+              <b>Waiting for your payment</b>
+              <p>It usually shows up in a minute or two.</p>
+            </div>
+            <div class="tzl-trk__rail" aria-hidden="true">
+              <span class="tzl-seg tzl-seg--in tzl-seg--gold"><i></i></span>
+              <span class="tzl-seg tzl-seg--out tzl-seg--weave"><i></i><b></b></span>
+              <span class="tzl-trk__node tzl-trk__node--wait"><span class="tzl-trk__lit"><i></i></span></span>
+            </div>
+            <div class="tzl-trk__creator tzl-trk__echo--quiet">
+              <span class="tzl-trk__mlabel">Vale's dashboard</span>
+              <p><b>Nothing to see yet.</b> Ana has her own deposit address for this tip. Nothing moves until she sends.</p>
+            </div>
+          </li>
+          <li class="tzl-trk__st tzl-trk__st--2">
+            <div class="tzl-trk__fan">
+              <span class="tzl-trk__mlabel">Ana's screen</span>
+              <span class="tz-pill" data-status="converting">Converting</span>
+              <b>We're weaving your ETH into dollars for Vale</b>
+              <p>You can close this tab. We'll keep going.</p>
+            </div>
+            <div class="tzl-trk__rail" aria-hidden="true">
+              <span class="tzl-seg tzl-seg--in tzl-seg--weave2"><i></i><b></b></span>
+              <span class="tzl-seg tzl-seg--out tzl-seg--usdc"><i></i></span>
+              <span class="tzl-trk__node tzl-trk__node--loom"><span class="tzl-trk__lit"><i></i></span></span>
+            </div>
+            <div class="tzl-trk__creator">
+              <span class="tzl-trk__mlabel">Vale's dashboard</span>
+              <div class="tzl-trk__row"><span class="tzl-dot" style="--_c:var(--tz-cochinilla-500)">A</span><span><b>Ana</b><small>ETH · Ethereum</small></span><span class="tz-pill" data-status="converting">Converting</span></div>
+              <small class="tzl-trk__meta">1 on its way</small>
+            </div>
+          </li>
+          <li class="tzl-trk__st tzl-trk__st--3">
+            <div class="tzl-trk__fan">
+              <span class="tzl-trk__mlabel">Ana's screen</span>
+              <span class="tz-pill" data-status="received">Delivered</span>
+              <b>You just made Vale's day.</b>
+              <p>4.72 USDC just landed in Vale's wallet.</p>
+            </div>
+            <div class="tzl-trk__rail" aria-hidden="true">
+              <span class="tzl-seg tzl-seg--in tzl-seg--usdc"><i></i></span>
+              <span class="tzl-trk__node tzl-trk__node--knot">
+                <span class="tz-knot is-playing">
+                  <svg viewBox="0 0 64 64">
+                    <rect class="tz-knot__tile" width="64" height="64" rx="16" fill="#D1245A"/>
+                    <path class="tz-knot__thread tz-knot__thread--a" pathLength="80" d="M9.5 19H22c9 0 15.5 6 15.5 14v19.5" fill="none" stroke="#FFC23D" stroke-width="7.5" stroke-linecap="round"/>
+                    <path class="tz-knot__gap" d="M42 19c-9 0-15.5 6-15.5 14" fill="none" stroke="#D1245A" stroke-width="13.5"/>
+                    <path class="tz-knot__thread tz-knot__thread--b" pathLength="80" d="M54.5 19H42c-9 0-15.5 6-15.5 14v19.5" fill="none" stroke="#FFF7EC" stroke-width="7.5" stroke-linecap="round"/>
+                  </svg>
+                </span>
+              </span>
+            </div>
+            <div class="tzl-trk__creator">
+              <span class="tzl-trk__mlabel">Vale's dashboard</span>
+              <div class="tz-toast" data-status="received"><div class="tz-toast__body"><strong>New tip from Ana · 4.72 USDC</strong>Straight to Vale's Solana wallet.</div></div>
+              <span class="tzl-trk__landed"><span class="tz-amount tzl-num">+4.72<span class="tz-amount__unit">USDC</span></span><small>in Vale's wallet</small></span>
+            </div>
+          </li>
+        </ol>
+      </div>
     </div>
   </div>
 </section>

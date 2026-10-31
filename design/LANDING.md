@@ -77,13 +77,30 @@ A full-bleed `.tz-weave` (64px) between the hero and the story. In the final CTA
   3. **We weave it into dollars.** Aurora Intents converts it to USDC on Solana. Every tip gets its own deposit address and live tracking. *Art:* the existing `.tz-loom` (ETH / TON / SUI → USDC).
   4. **Dollars land in your wallet.** USDC arrives in your own Solana wallet, usually in under a minute. Not in an account we hold for you. *Art:* `.tzl-landed` (the static mark, "+4.72 USDC", "in Vale's wallet · example").
 - **Layout:** on mobile this is a vertical stepper, with a running-stitch thread between the knots (`::before`). At ≥1000px it becomes 4 columns that use **subgrid** (`grid-template-rows: subgrid`, `.tzl-how__body { display: contents }`), so titles, text and art line up across the row. The thread turns horizontal between the knots.
-- **Lifecycle strip** `.tzl-life` (a sunken panel):
-  - Heading: **Every tip is tracked, live.** / *Fans watch each stage on their screen. You watch it on your dashboard.*
-  - Three `.tzl-life__stage[data-status]` cards, each with a top border in its status line colour and a `.tz-pill`:
-    - **Waiting:** "Waiting for your payment" / "It usually shows up in a minute or two."
-    - **Converting:** "We're weaving your ETH into dollars for Vale" / "You can close this tab. We'll keep going."
-    - **Delivered:** "You just made Vale's day." / "4.72 USDC just landed in Vale's wallet."
-  - Stacked on mobile, three columns at ≥760px, joined by a short thread.
+- **Tracking strip: "el hilo del tip"** (`.tzl-trk[data-reveal="track"]`). This replaces the old three-card strip. One continuous thread runs through three knots, and it carries the state itself:
+  - **Copy:**
+    - Heading: **Every tip is tracked, live.**
+    - Sub: *One thread, three knots. The fan watches it on their phone. The creator watches it on their dashboard.*
+    - Tag `.tzl-example`: **Example · Ana tips Vale $5**
+  - **Panel:** `bg-sunken` with faint vertical warp threads every 32px (a loom before weaving), a hairline border, radius xl, and a full-bleed `.tz-weave--slim` selvedge on top (`.tzl-trk__selvedge`).
+  - **Lanes (desktop):** a 8.5rem lane column (`.tzl-trk__lanes`, `aria-hidden`) labels the top row **Ana sees** (*on her phone*) and the bottom row **Vale sees** (*on her dashboard*). The middle row holds the gold lead thread entering from the left, tagged with a mono `0.00213 ETH` chip (`.tzl-trk__coin`). On mobile the lane column is hidden, and each block gets a small overline instead (`.tzl-trk__mlabel`: "Ana's screen" / "Vale's dashboard").
+  - **Stations** (`ol.tzl-trk__stations > li.tzl-trk__st--1/2/3`). Each one has `.tzl-trk__fan` (a `.tz-pill`, a headline and a line of copy), `.tzl-trk__rail` (two half-segments plus a knot) and `.tzl-trk__creator` (the echo):
+
+    | # | Fan sees (top) | Knot (shape cue) | Thread leaving it | Vale sees (bottom) |
+    |---|---|---|---|---|
+    | 1 | pill **Waiting**: "Waiting for your payment" / "It usually shows up in a minute or two." | `.tzl-trk__node--wait`: a maíz ring with a **pulsing rombo** (pending shape) | gold → añil (`.tzl-seg--weave`) | a dashed quiet card: **Nothing to see yet.** Ana has her own deposit address for this tip. Nothing moves until she sends. |
+    | 2 | pill **Converting**: "We're weaving your ETH into dollars for Vale" / "You can close this tab. We'll keep going." | `.tzl-trk__node--loom`: the **loom eye** (ink ring, añil halo) with a **turning rombo** | añil → cochinilla, then the cochinilla USDC thread with a cream running stitch (`.tzl-seg--usdc`) | dashboard row `.tzl-trk__row`: Ana · ETH · Ethereum · Converting pill, then "1 on its way" |
+    | 3 | pill **Delivered**: "You just made Vale's day." / "4.72 USDC just landed in Vale's wallet." | `.tzl-trk__node--knot`: the **knot** (`.tz-knot`, mark tile, no burst) ties the thread off | none (tied off) | `.tz-toast[data-status=received]` "New tip from Ana · 4.72 USDC / Straight to Vale's Solana wallet.", then `.tzl-trk__landed` **+4.72 USDC** in Vale's wallet |
+
+  - **Thread mechanics:** each station's rail has `.tzl-seg--in` (from the left edge to the knot) and `.tzl-seg--out` (from the knot to the right edge). The halves meet at the column borders, so the line looks continuous. Each `.tzl-seg` is:
+    - a faint dashed **guide** (the "not yet" state) as its background,
+    - an `<i>` **fill** in `--_fill` that grows from 0 to 1 along the thread,
+    - on the converting halves, a `<b>` **añil running stitch**.
+
+    `--_dir`, `--_origin` and `--_stitch` switch the same markup between horizontal and vertical.
+  - **Layout:**
+    - **Desktop (≥960px):** a 4-column grid (lane column + 3 stations) × 3 rows (fan / 112px rail / creator). Stations use nested **subgrid** so all three fan blocks, rails and creator echoes line up. The thread is horizontal: 6px, then 10px once it becomes USDC. The knot is 80px.
+    - **Mobile:** a 64px rail column on the left holds a vertical thread (6px / 8px). Fan copy and the creator echo stack to its right. The knot is 60px. The dashboard row's pill drops under the name.
 
 ### 3. Pay from anywhere (`#anywhere`, knot 02, night panel)
 - **H2:** Whatever they hold, *you get dollars.* (gold em) · **Lede:** Your fans don't need to buy a new coin or learn a new app. They send from the wallet and network they already use. **Tezeo does the weaving.**
@@ -216,6 +233,7 @@ A full-bleed `.tz-weave` (64px) between the hero and the story. In the final CTA
 | Out-thread stitch | `.tzl-out-stitch` | load, loop | 1.4s linear | dollars flowing on to the wallet | stopped |
 | Loom eye rombo (`tz-spin-rombo`) | `.tzl-eye-rombo` | load, loop | 2.4s in-out | work in progress | stopped |
 | Tip arrives (`tzl-arrive`) | hero `.tzl-tiprow--new`; dashboard row on reveal | load (hero, 1.2s delay) / `.is-in` | 1.2s ease-out, plays once; maíz flash settles to pending-bg | a new tip landing | static highlighted row |
+| Tracking sequence (`tzl-trk-*`) | `.tzl-trk` | `[data-reveal=track].is-in`, **plays once**, about 4.7s, then rests on the delivered state | lead and first gold half 0.2–1.1s (`tzl-trk-draw`, linear) → **Waiting** at 1.1s: knot 1 pops in (`tzl-trk-pop` 420ms spring), its rombo pulses once (`tz-pulse` 0.8s), the fan copy wakes (`tzl-trk-wake` 0.32→1) and the creator echo drops in (`tzl-trk-echo`) → **Converting** at 1.9s: knot 2 pops, its rombo turns twice (`tz-spin-rombo` 0.7s ×2), the gold→añil→cochinilla halves draw over 1.4s with the añil running stitch visible only in that window (`tzl-trk-run`), and the dashboard row drops in at 2.2s → **Delivered** at 3.3s: the USDC thread draws (0.4s + 0.4s), the knot draws at 4.1s (re-timed `tz-knot`, **no burst**), the fan copy wakes, and the toast plus "+4.72 USDC" spring in at 4.6s. Mobile uses the same timings with vertical variants (`-v` keyframes). Timing lives in the `--t-lead`, `--t-p1`…`--t-p4` vars. | the tip's journey, told by the thread itself | no animation; the finished weave is shown (all knots lit, thread solid, echoes visible, knot drawn). Without JS it is the same final state. |
 | Toast in (`tz-toast-in`) | dashboard `.tz-toast` | `[data-reveal=toast].is-in` | 420ms spring, 500ms delay | new-tip notification | visible, no animation |
 | Alert in (`tzl-alert-in`) | `.tzl-alert` | `[data-reveal=alert].is-in` | 700ms spring, 400ms delay | the OBS card popping on stream | visible, no animation |
 | Goal fill | `.tzl-goal__bar > span` width transition | `[data-reveal=goal].is-in` | 1.4s ease-out | the band filling with tips | final width |
@@ -225,11 +243,11 @@ A full-bleed `.tz-weave` (64px) between the hero and the story. In the final CTA
 | River marquee (`tzl-marquee`) | `.tzl-marquee__track` | loop; pauses on hover or focus | 60s, 70s, 85s linear, **left→right** | many chains streaming toward the creator | rows wrap into a static centred grid; the duplicate set is hidden; the edge mask and threads are removed |
 | Fibre sway (`tz-fibre`, reused) | `.tzl-snap__fibre` | loop, alternate | 3.2s in-out | a calm frayed end, never shaking | stopped |
 | Flow back (`tzl-flow-back`) | `.tzl-snap__home` | loop | 1.6s linear, dash moves **right→left** | the refund going back home | static dashed thread |
-| Knot (reused `.tz-knot`) | final CTA | `.is-in` (replayed when in view) | 1.2s, plus the burst at 1.1s | the one celebration on the page | fully drawn, no burst |
+| Knot (reused `.tz-knot`) | final CTA (and, without burst, the tracking strip) | `.is-in` (replayed when in view) | 1.2s, plus the burst at 1.1s | the one celebration on the page | fully drawn, no burst |
 | FAQ rombo | `summary::after` | open/close | 240ms spring | open state | no transition |
 | Pass tilt | `.tzl-tile--pass .tz-pass` | hover | 420ms spring | playful | no transition |
 
-There is one celebration per page (the final knot). Nothing else bursts.
+There is one celebration per page (the final knot with its burst). The tracking strip ties its knot without the burst.
 
 ---
 
@@ -244,6 +262,7 @@ There is one celebration per page (the final knot). Nothing else bursts.
 | Seal | `.tzl-seal`, viewBox 168 | `textPath` on a 62r circle with `textLength=384`. |
 | Snapped thread | `.tzl-snap`, viewBox 1100×240 | See §6. |
 | Mini loom | step 3 | Existing `.tz-loom` markup. |
+| Tracking thread | `.tzl-trk` | Pure CSS (no SVG): half-segment spans with gradient fills, plus the inline `.tz-knot` SVG from preview.html. `#i-user` was added to the sprite for the "Ana sees" lane. |
 | Sparkline | dashboard tile | `preserveAspectRatio=none`, `vector-effect: non-scaling-stroke`. |
 | Into-arrow | `.tzl-into__arrow` | Dashed maíz line only (no head, so it doesn't stretch). |
 | Builder glyphs | `.tzl-builder__g` | A generic rombo on a violet→green gradient for Solana, and a wave on añil for Aurora. These are **not** their logos. |
@@ -270,7 +289,7 @@ There is one celebration per page (the final knot). Nothing else bursts.
 - Touch targets: nav controls, the menu summary, CTAs, footer links and FAQ summaries (64px) are all at least 48px.
 - Verified: no horizontal scroll at 320, 390 or 1440px (`scrollWidth === innerWidth`). At <360px the lockup collapses to the mark.
 - `prefers-reduced-motion`: every loop stops, reveals show their final state, and smooth scrolling is turned off (see §3).
-- Status is never colour-only: pills carry their rombo shape plus words, the life-strip stages carry words, and the failed steps carry ✕ and text.
+- Status is never colour-only: pills carry their rombo shape plus words, the tracking knots each have their own shape (pulsing rombo, turning rombo in the loom eye, knot tile) plus a pill and words, and the failed steps carry ✕ and text.
 
 ---
 
