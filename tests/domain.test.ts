@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { clampFeeBps, fromUnits, isValidSolanaAddress, mapStatus, normalizeHandle, toUnits } from "@/lib/domain";
+import { clampFeeBps, fromUnits, isValidSolanaAddress, mapStatus, meetsMinTip, normalizeHandle, toUnits } from "@/lib/domain";
 
 describe("domain", () => {
   it("validates Solana addresses", () => {
@@ -36,5 +36,22 @@ describe("domain", () => {
     expect(mapStatus("SUCCESS")).toBe("received");
     expect(mapStatus("REFUNDED")).toBe("refunded");
     expect(mapStatus("INCOMPLETE_DEPOSIT")).toBe("failed");
+  });
+});
+
+describe("minimum tip ($1)", () => {
+  const usdc = { decimals: 6, stable: true, usdPrice: 0.9999 }; // Aurora quotes USDC a hair under $1
+  it("accepts exactly 1.00 of a dollar coin even when its quoted price is 0.9999", () => {
+    expect(meetsMinTip("1000000", usdc)).toBe(true);
+  });
+  it("still rejects less than a dollar", () => {
+    expect(meetsMinTip("990000", usdc)).toBe(false);
+    expect(meetsMinTip("500000", usdc)).toBe(false);
+  });
+  it("gives other coins 1% slack for price moves, no more", () => {
+    const eth = { decimals: 18, stable: false, usdPrice: 3200 };
+    expect(meetsMinTip(String(BigInt(Math.ceil((1 / 3200) * 1e18))), eth)).toBe(true);
+    expect(meetsMinTip(String(BigInt(Math.ceil((0.995 / 3200) * 1e18))), eth)).toBe(true);
+    expect(meetsMinTip(String(BigInt(Math.ceil((0.95 / 3200) * 1e18))), eth)).toBe(false);
   });
 });

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getAurora } from "@/lib/aurora";
-import { toUnits } from "@/lib/domain";
+import { meetsMinTip, toUnits } from "@/lib/domain";
 import { passAmountUnits } from "@/lib/tips";
 import { createTip, getCreatorByHandle } from "@/lib/tips";
 import { tipView } from "@/lib/view";
@@ -30,8 +30,7 @@ export async function POST(req: Request) {
   const units = b.pass ? passAmountUnits(creator.pass_price_usd, asset) : b.amount ? toUnits(b.amount, asset.decimals) : null;
   if (!units) return NextResponse.json({ error: "Enter a valid amount." }, { status: 400 });
 
-  const usdValue = (Number(units) / 10 ** asset.decimals) * (asset.usdPrice ?? 0);
-  if (!b.pass && asset.usdPrice && usdValue < 1)
+  if (!b.pass && (asset.stable || asset.usdPrice) && !meetsMinTip(units, asset))
     return NextResponse.json({ error: "The smallest tip is $1. Network fees would eat the rest." }, { status: 422 });
 
   try {

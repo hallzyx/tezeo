@@ -65,3 +65,16 @@ export interface QuoteBreakdown {
   creatorReceivesUsdc: string;
   minCreatorReceivesUsdc: string;
 }
+
+export const MIN_TIP_USD = 1;
+
+/**
+ * Does `units` of `asset` reach the $1 minimum tip? Dollar coins count at face value: Aurora quotes USDC at
+ * ~$0.9999, which made an exact 1.00 USDC look like "less than $1". Other coins get 1% slack for the price
+ * moving between the fan's screen and our server.
+ */
+export function meetsMinTip(units: string, asset: Pick<OriginAsset, "decimals" | "stable" | "usdPrice">): boolean {
+  const amount = Number(units) / 10 ** asset.decimals;
+  const usd = asset.stable ? amount : amount * (asset.usdPrice ?? 0);
+  return usd >= MIN_TIP_USD * (asset.stable ? 0.999 : 0.99);
+}
