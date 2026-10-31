@@ -1,4 +1,4 @@
-import { CHAIN_ICONS, COIN_ICONS, DARK_ICONS } from "./icons.generated";
+import { CHAIN_ICONS, COIN_ICONS, DARK_ICONS, WALLET_ICONS } from "./icons.generated";
 
 /** Aurora chain slugs we may meet under another name (the local simulator uses long names). */
 const ALIAS: Record<string, string> = {
@@ -25,4 +25,11 @@ export function coinIcon(symbol: string): string | undefined {
 /** True for near-black logos, which need a white outline on dark backgrounds (see `.tz-logo--dark`). */
 export function isDarkLogo(src: string | undefined): boolean {
   return !!src && DARK_ICONS.has(src.replace(/^\/icons\//, "").replace(/\.svg$/, ""));
+}
+
+/** Logo for a wallet app by name or rdns ("MetaMask", "io.metamask", "Coinbase Wallet", "Rabby Wallet"...). */
+export function walletIcon(nameOrRdns: string): string | undefined {
+  const n = nameOrRdns.toLowerCase();
+  const id = ["metamask", "coinbase", "rabby", "trust", "phantom", "rainbow", "okx", "zerion", "ledger", "safe", "exodus"].find((w) => n.includes(w));
+  return id && WALLET_ICONS.has(id) ? `/icons/wallets/${id}.svg` : undefined;
 }

@@ -9,7 +9,7 @@ import { forgetRefund, loadRefund, looksValidRefund, saveRefund } from "@/lib/re
 import { chainIcon, coinIcon, isDarkLogo } from "@/lib/icons";
 import { WalletPay, type WalletState } from "./WalletPay";
 import { WalletConnect, type Connected } from "./WalletConnect";
-import { useWallets } from "./wallets";
+import { isMobileDevice, useWallets } from "./wallets";
 
 export interface PublicCreator {
   handle: string; displayName: string; message: string; avatarUrl: string; accent: string;
@@ -104,7 +104,8 @@ export function TipFlow({ creator, qrSvg, pageUrl, passMode = false, goal = null
 
   // ---------- refund address: connected wallet first, typed address as the fallback ----------
   const isEvm = !!EVM_CHAINS[chain];
-  const walletRoute = wallets.length > 0 && isEvm && !payByHand;
+  // Wallet route: a browser wallet is present, or we are on a phone (where MetaMask/Coinbase/Trust deep links apply).
+  const walletRoute = isEvm && !payByHand && (wallets.length > 0 || (walletsChecked && isMobileDevice()));
   const effectiveRefund = walletRoute ? (connected?.address ?? "") : refundTo.trim();
   const refundOk = !!effectiveRefund && looksValidRefund(chain, effectiveRefund);
   const kv = typeof window === "undefined" ? null : window.localStorage;
@@ -347,7 +348,10 @@ export function TipFlow({ creator, qrSvg, pageUrl, passMode = false, goal = null
                 {saved && <button type="button" className="tzs-linkbtn" style={{ margin: 0 }} onClick={() => { setRefundTo(saved); setRemember(false); }}>Use my saved address</button>}
               </>
             )}
-            {wallets.length > 0 && isEvm && <button type="button" className="tzs-linkbtn" style={{ margin: 0 }} onClick={() => setPayByHand(false)}>Connect a wallet instead</button>}
+            {isEvm && wallets.length > 0 && <button type="button" className="tzs-linkbtn" style={{ margin: 0 }} onClick={() => setPayByHand(false)}>Connect a wallet instead</button>}
+            {isEvm && walletsChecked && wallets.length === 0 && !isMobileDevice() && (
+              <p className="tz-small tz-muted" style={{ margin: 0 }}>Want to pay in one tap? <a href="https://metamask.io/download" target="_blank" rel="noopener noreferrer">Get MetaMask</a>, then come back.</p>
+            )}
           </div>
         )}
         {err && <ErrorNote>{err}</ErrorNote>}
@@ -356,7 +360,7 @@ export function TipFlow({ creator, qrSvg, pageUrl, passMode = false, goal = null
       </>
     );
   } else if (step === "quote" && tip && asset) {
-    body = <QuoteStep {...{ tip, asset, name, now, bar, mini, demo, busy }} mode={data?.mode ?? ""} onSent={() => setStep("track")} onRefresh={() => requestQuoteFor(tip)} onBack={reset} />;
+    body = <QuoteStep {...{ tip, asset, name, now, bar, mini, demo, busy }} walletId={connected?.walletId} mode={data?.mode ?? ""} onSent={() => setStep("track")} onRefresh={() => requestQuoteFor(tip)} onBack={reset} />;
   } else if (step === "track" && tip && asset) {
     body = <TrackStep {...{ tip, asset, creator, name, pageUrl, demo }} onAgain={retryFresh} onHome={reset} onTip={setTip} onShare={() => setSheet("share")} />;
   } else {
@@ -452,9 +456,9 @@ function PickerSheet({ title, items, onPick, onClose }: { title: string; items: 
 }
 
 // ======================= C. Quote & deposit =======================
-function QuoteStep({ tip, asset, name, now, bar, mini, demo, busy, mode, onSent, onRefresh, onBack }: {
+function QuoteStep({ tip, asset, name, now, bar, mini, demo, busy, mode, walletId, onSent, onRefresh, onBack }: {
   tip: Tip; asset: Asset; name: string; now: number; bar: (n: number) => React.ReactNode;
-  mini: React.ReactNode; demo: React.ReactNode; busy: boolean; mode: string;
+  mini: React.ReactNode; demo: React.ReactNode; busy: boolean; mode: string; walletId?: string;
   onSent: () => void; onRefresh: () => Promise<string | null>; onBack: () => void;
 }) {
   const [qr, setQr] = useState("");
@@ -509,7 +513,7 @@ function QuoteStep({ tip, asset, name, now, bar, mini, demo, busy, mode, onSent,
       {tx ? (
         <>
           <section className="tz-stack" style={{ ["--tz-stack-gap" as string]: "10px" }} aria-label="Pay with your wallet">
-            <WalletPay tx={tx} tipId={tip.id} symbol={asset.symbol} amountLabel={`${sendAmt} ${asset.symbol}`} onSent={onSent} onState={setWallet} />
+            <WalletPay tx={tx} tipId={tip.id} symbol={asset.symbol} amountLabel={`${sendAmt} ${asset.symbol}`} walletId={walletId} onSent={onSent} onState={setWallet} />
             <p className="tz-small tz-muted" style={{ margin: 0 }}>Your wallet opens and asks you to confirm. We fill in the address and the exact amount, so there's nothing to copy.</p>
           </section>
           <details className="tzs-manual">

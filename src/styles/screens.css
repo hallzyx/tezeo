@@ -122,3 +122,12 @@ button.tzs-mini { cursor: pointer; }
 
 .tzs-linkbtn { display: block; margin: 2px 0 0 auto; background: none; border: 0; padding: 6px 0; min-height: 32px; font: 600 var(--tz-text-xs)/1 var(--tz-font-body); color: var(--tz-brand-text); cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
 .tz-table tr[data-detail] td { padding-top: 0; border-top: 0; }
+/* compact horizontal wallet buttons */
+.tzs-wallets { display: flex; flex-wrap: wrap; gap: 6px; }
+.tzs-wallet { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 10px 0 8px; border-radius: var(--tz-radius-md); border: 1.5px solid var(--tz-border); background: var(--tz-surface); color: var(--tz-text); font: 600 13px/1 var(--tz-font-body); cursor: pointer; text-decoration: none; white-space: nowrap; transition: border-color var(--tz-dur-fast), transform var(--tz-dur-instant); }
+.tzs-wallet:hover { border-color: var(--tz-brand); }
+.tzs-wallet:active { transform: translateY(1px); }
+.tzs-wallet:disabled { opacity: .55; cursor: default; }
+.tzs-wallet img { width: 20px; height: 20px; border-radius: 6px; flex: none; }
+.tzs-wallet small { color: var(--tz-text-muted); font-weight: 500; font-size: var(--tz-text-xs); }
+.tzs-wallet__dot { width: 20px; height: 20px; border-radius: 6px; background: var(--tz-border); flex: none; }

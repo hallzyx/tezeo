@@ -51,7 +51,7 @@ reach Postgres, and both services have health checks.
 npm ci
 cp .env.example .env.local      # set DATABASE_URL=postgres://user:pass@localhost:5432/tezeo
 npm run dev                     # http://localhost:3000
-npm run typecheck && npm test   # 71 tests, run on an embedded Postgres (PGlite): no server needed
+npm run typecheck && npm test   # 77 tests, run on an embedded Postgres (PGlite): no server needed
 npm run build && npm start
 ```
 

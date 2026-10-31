@@ -35,6 +35,9 @@ const isDark = (svg) => {
 };
 const dark = [];
 
+// Browser / mobile wallets (EIP-6963 gives us the icon of an installed wallet, these cover "not installed" and fallbacks).
+const WALLETS = ["metamask", "coinbase", "rabby", "trust", "phantom", "rainbow", "okx", "zerion", "ledger", "safe", "exodus"];
+
 const load = async (file) => {
   if (!fs.existsSync(file)) return null;
   return (await import(pathToFileURL(path.resolve(file)).href)).default;
@@ -44,6 +47,7 @@ const clean = (svg) => svg.replace(/\sclass="web3icons"/, "").trim() + "\n";
 fs.rmSync("public/icons", { recursive: true, force: true });
 fs.mkdirSync("public/icons/chains", { recursive: true });
 fs.mkdirSync("public/icons/coins", { recursive: true });
+fs.mkdirSync("public/icons/wallets", { recursive: true });
 
 const chains = [], coins = [], missing = [];
 const coinSvg = async (sym) => load(`${ROOT}/tokens/branded/${sym}.svg.js`);
@@ -61,6 +65,12 @@ for (const sym of COINS) {
   if (svg) { fs.writeFileSync(`public/icons/coins/${sym.toLowerCase()}.svg`, clean(svg)); coins.push(sym.toLowerCase()); if (isDark(svg)) dark.push(`coins/${sym.toLowerCase()}`); } else missing.push(`coin:${sym}`);
 }
 
+const wallets = [];
+for (const w of WALLETS) {
+  const svg = await load(`${ROOT}/wallets/branded/${w}.svg.js`);
+  if (svg) { fs.writeFileSync(`public/icons/wallets/${w}.svg`, clean(svg)); wallets.push(w); } else missing.push(`wallet:${w}`);
+}
+
 fs.writeFileSync("public/icons/LICENSE.txt",
 `Chain and coin logos in this folder come from Web3Icons (@web3icons/core), https://github.com/0xa3k5/web3icons,
 distributed under the MIT License. The logos themselves are trademarks of their respective owners and are shown
@@ -71,6 +81,7 @@ fs.writeFileSync("src/lib/icons.generated.ts",
 export const CHAIN_ICONS: ReadonlySet<string> = new Set(${JSON.stringify(chains)});
 export const COIN_ICONS: ReadonlySet<string> = new Set(${JSON.stringify(coins)});
 /** Near-black logos ("chains/aptos"...): they need a white outline on dark backgrounds. */
+export const WALLET_ICONS: ReadonlySet<string> = new Set(${JSON.stringify(wallets)});
 export const DARK_ICONS: ReadonlySet<string> = new Set(${JSON.stringify(dark)});
 `);
 const kb = (d) => Math.round(fs.readdirSync(d).reduce((s, f) => s + fs.statSync(path.join(d, f)).size, 0) / 1024);
