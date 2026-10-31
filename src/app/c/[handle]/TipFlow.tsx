@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import QRCode from "qrcode";
 import { Avatar, CopyBox, ErrorNote, Icon, Mark, ThemeToggle, TopBar, Weave } from "@/components/ui";
 import { breakdown, clock, coin, shortAddr, usd, usdc } from "@/lib/money";
+import { PassCard } from "@/components/PassCard";
 
 export interface PublicCreator {
   handle: string; displayName: string; message: string; avatarUrl: string; accent: string;
@@ -27,10 +28,11 @@ const first = (n: string) => n.split(" ")[0];
 
 let assetCache: { mode: string; assets: Asset[] } | null = null;
 
-export function TipFlow({ creator, qrSvg, pageUrl }: { creator: PublicCreator; qrSvg: string; pageUrl: string }) {
+export function TipFlow({ creator, qrSvg, pageUrl, passMode = false }: { creator: PublicCreator; qrSvg: string; pageUrl: string; passMode?: boolean }) {
   const name = first(creator.displayName);
   const [step, setStep] = useState<Step>("amount");
-  const [amountUsd, setAmountUsd] = useState(5);
+  const [amountUsd, setAmountUsd] = useState(passMode ? creator.pass?.priceUsd ?? 5 : 5);
+  const [passNote, setPassNote] = useState("");
   const [custom, setCustom] = useState("");
   const [data, setData] = useState<{ mode: string; assets: Asset[] } | null>(assetCache);
   const [chain, setChain] = useState("");
@@ -66,6 +68,7 @@ export function TipFlow({ creator, qrSvg, pageUrl }: { creator: PublicCreator; q
   }, [loadAssets]);
 
   useEffect(() => { const i = setInterval(() => setNow(Date.now()), 1000); return () => clearInterval(i); }, []);
+  useEffect(() => { loadAssets().catch(() => {}); }, [loadAssets]);
 
   // Poll the tip (RF-6). Aurora is the source of truth; the server refreshes on each GET.
   useEffect(() => {
@@ -84,7 +87,7 @@ export function TipFlow({ creator, qrSvg, pageUrl }: { creator: PublicCreator; q
     return () => clearInterval(i);
   }, [tip, step]);
 
-  const amountNow = custom ? Number(custom) : amountUsd;
+  const amountNow = passMode ? creator.pass?.priceUsd ?? amountUsd : custom ? Number(custom) : amountUsd;
   const amountOk = Number.isFinite(amountNow) && amountNow >= 1 && amountNow <= 10_000;
 
   // ---------- derived: chains & coins ----------
@@ -120,20 +123,23 @@ export function TipFlow({ creator, qrSvg, pageUrl }: { creator: PublicCreator; q
   }
 
   const cryptoAmount = useMemo(() => {
+    if (passMode) return "pass"; // the server sizes a pass quote so the creator receives the full price
     const a = data?.assets.find((x) => x.assetId === assetId);
     if (!a?.usdPrice) return null;
     if (a.stable) return amountNow.toFixed(2); // dollar coins: ask for the exact dollar amount, not a price-drift fraction
     const dp = Math.min(a.decimals, 8);
     const m = 10 ** dp;
     return (Math.ceil((amountNow / a.usdPrice) * m) / m).toFixed(dp);
-  }, [data, assetId, amountNow]);
+  }, [data, assetId, amountNow, passMode]);
 
   async function requestQuote() {
     setErr(""); setBusy(true);
     try {
       const r = await fetch("/api/tips", {
         method: "POST", headers: { "content-type": "application/json" },
-        body: JSON.stringify({ handle: creator.handle, originAssetId: assetId, amount: cryptoAmount, refundTo: refundTo.trim() }),
+        body: JSON.stringify(passMode
+          ? { handle: creator.handle, originAssetId: assetId, pass: true, fanMessage: passNote, refundTo: refundTo.trim() }
+          : { handle: creator.handle, originAssetId: assetId, amount: cryptoAmount, refundTo: refundTo.trim() }),
       });
       const j = await r.json();
       if (!r.ok) return setErr(friendly(j.error));
@@ -159,9 +165,9 @@ export function TipFlow({ creator, qrSvg, pageUrl }: { creator: PublicCreator; q
     </div>
   );
   const mini = (
-    <button type="button" className="tzs-mini" onClick={() => { setTip(null); setStep("amount"); }} disabled={step === "track"}>
+    <button type="button" className="tzs-mini" onClick={() => { setTip(null); setStep("amount"); }} disabled={step === "track" || passMode}>
       <Avatar name={creator.displayName} src={creator.avatarUrl} small />
-      <div><b>{usd(amountNow).replace(/\.00$/, "")} for {name}</b><span>Change amount</span></div>
+      <div><b>{passMode ? `${name}'s Pass · ${usd(amountNow).replace(/\.00$/, "")}` : `${usd(amountNow).replace(/\.00$/, "")} for ${name}`}</b><span>{passMode ? "30 days of being part of the crew" : "Change amount"}</span></div>
     </button>
   );
 
@@ -172,7 +178,26 @@ export function TipFlow({ creator, qrSvg, pageUrl }: { creator: PublicCreator; q
   );
 
   let body: React.ReactNode;
-  if (step === "amount") {
+  if (step === "amount" && passMode) {
+    const price = usd(amountNow).replace(/\.00$/, "");
+    body = (
+      <>
+        <div className="tzs-topnav"><a className="tzs-back" href={`/@${creator.handle}`} aria-label={`Back to ${name}'s page`}><Icon name="back" /></a><span className="tz-spacer" /><ThemeToggle /></div>
+        <div className="tzs-mini" style={{ cursor: "default" }}><Avatar name={creator.displayName} src={creator.avatarUrl} small /><div><b>{name}'s Pass</b><span>30 days of being part of the crew</span></div></div>
+        <PassCard creatorName={name} holder="" preview />
+        <ul className="tz-stack" style={{ ["--tz-stack-gap" as string]: "10px", listStyle: "none", margin: 0, padding: 0 }}>
+          {creator.pass?.perk && <li className="tz-row"><span className="tz-rombo" style={{ ["--_c" as string]: "var(--creator-accent-fill)", ["--_s" as string]: "8px" }} />{creator.pass.perk}</li>}
+          <li className="tz-row"><span className="tz-rombo" style={{ ["--_c" as string]: "var(--creator-accent-fill)", ["--_s" as string]: "8px" }} />A Pass badge next to your name in {name}'s tip list</li>
+          <li className="tz-row"><span className="tz-rombo" style={{ ["--_c" as string]: "var(--creator-accent-fill)", ["--_s" as string]: "8px" }} />No auto-renew. It ends after 30 days, and you pay once.</li>
+        </ul>
+        <div className="tz-field"><label className="tz-label" htmlFor="passnote">Message with your pass</label><input id="passnote" className="tz-input" maxLength={140} value={passNote} onChange={(e) => setPassNote(e.target.value)} placeholder={`Say hi to ${name}`} /></div>
+        {err && <ErrorNote>{err}</ErrorNote>}
+        {demo}
+        <button className="tz-btn tz-btn--primary tz-btn--lg tz-btn--block" onClick={goPay}>Get the pass · {price}</button>
+        <p className="tzs-trust"><Icon name="shield" />Pay from any wallet, any chain. {name} gets dollars.</p>
+      </>
+    );
+  } else if (step === "amount") {
     body = (
       <>
         <div className="tzs-id">
@@ -254,7 +279,7 @@ export function TipFlow({ creator, qrSvg, pageUrl }: { creator: PublicCreator; q
     try {
       const a = data!.assets.find((x) => x.assetId === t.originAssetId)!;
       const r = await fetch("/api/tips", { method: "POST", headers: { "content-type": "application/json" },
-        body: JSON.stringify({ handle: creator.handle, originAssetId: a.assetId, amount: coin(t.amountIn, a.decimals, 8), refundTo: t.refundTo }) });
+        body: JSON.stringify(passMode ? { handle: creator.handle, originAssetId: a.assetId, pass: true, fanMessage: t.fanMessage, fanName: t.fanName, refundTo: t.refundTo } : { handle: creator.handle, originAssetId: a.assetId, amount: coin(t.amountIn, a.decimals, 8), refundTo: t.refundTo }) });
       if (r.ok) { const j = await r.json(); setTip(j); history.replaceState(null, "", `?tip=${j.id}`); }
     } finally { setBusy(false); }
   }
@@ -263,15 +288,15 @@ export function TipFlow({ creator, qrSvg, pageUrl }: { creator: PublicCreator; q
   const isThanks = step === "track" && tip?.status === "received";
   return (
     <div className="tzs-page tz-creator" style={accentStyle}>
-      {step === "amount" && <div style={{ position: "absolute", top: 12, right: 12, zIndex: 5, display: "flex", gap: 8 }}>
+      {step === "amount" && !passMode && <div style={{ position: "absolute", top: 12, right: 12, zIndex: 5, display: "flex", gap: 8 }}>
         <button type="button" className="tz-btn tz-btn--secondary tz-btn--icon tzs-theme tzs-share-mobile" aria-label="Share this page" onClick={() => setSheet("share")}><Icon name="share" /></button>
         <ThemeToggle />
       </div>}
       {isThanks && <Weave slim />}
-      {step === "amount" && <Weave height={96} />}
+      {step === "amount" && !passMode && <Weave height={96} />}
       <div className="tzs-creator-layout">
-        <main className={`tzs-main${step === "amount" ? " tzs-main--flush" : ""}`} aria-live="off">{body}</main>
-        {step === "amount" && (
+        <main className={`tzs-main${step === "amount" && !passMode ? " tzs-main--flush" : ""}`} aria-live="off">{body}</main>
+        {step === "amount" && !passMode && (
           <aside className="tzs-desktop-qr" aria-label="Scan to tip">
             <div className="tz-qr tzs-qr" dangerouslySetInnerHTML={{ __html: qrSvg }} />
             <b>Scan to tip {name}</b><span className="tz-small tz-muted">Or share <span className="tz-mono">/@{creator.handle}</span></span>
@@ -549,11 +574,20 @@ function Thanks({ tip, creator, name, pageUrl, onHome, onShare }: { tip: Tip; cr
           </div>
         </div>
         <span className="tz-pill tz-rise" data-status="received" style={{ ["--d" as string]: "1000ms" }}>Delivered</span>
-        <h1 className="tz-display tz-rise" style={{ ["--d" as string]: "1150ms" }}>You just made {name}'s day.</h1>
+        <h1 className="tz-display tz-rise" style={{ ["--d" as string]: "1150ms" }}>{tip.isPass ? `Welcome to ${name}'s Crew.` : `You just made ${name}'s day.`}</h1>
         <p className="tz-rise tz-muted" style={{ ["--d" as string]: "1250ms", margin: 0, maxWidth: "30ch" }}>
           <b style={{ color: "var(--tz-text)" }}>{usdc(tip.amountOutUsdc)} USDC</b> just landed in {name}'s wallet. Your thread is part of their story now.
         </p>
       </div>
+      {tip.isPass && tip.passToken && tip.passExpiresAt && (
+        <div className="tz-stack tz-rise" style={{ ["--d" as string]: "1350ms", ["--tz-stack-gap" as string]: "12px" }}>
+          <PassCard creatorName={name} holder={tip.fanName} expiresAt={tip.passExpiresAt} />
+          <span className="tz-overline">Your private pass link</span>
+          <CopyBox value={`${typeof location === "undefined" ? "" : location.origin}/pass/${tip.passToken}`} label="Copy pass link" toast="Pass link copied" />
+          <p className="tz-small tz-muted" style={{ margin: 0 }}>Save it. It's how you show you're a member, and we can't send it again.</p>
+          <a className="tz-btn tz-btn--secondary tz-btn--block" href={`/pass/${tip.passToken}`}>View my pass</a>
+        </div>
+      )}
       {tip.fanMessage && (
         <div className="tzs-note tz-rise" style={{ ["--d" as string]: "1400ms" }}>
           <span className="tz-overline">Your note</span><p>“{tip.fanMessage}”{tip.fanName ? ` — ${tip.fanName}` : ""}</p>

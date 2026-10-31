@@ -21,6 +21,29 @@ export interface TipRow {
 }
 
 export const PASS_DAYS = 30;
+export const PASS_MAX_USD = 500;
+
+/** Creator turns the 30-day pass on/off and sets its price and perk. Price is whole USD, paid once. */
+export function updateCreatorPass(token: string, input: { enabled: boolean; priceUsd: number; perk: string }): CreatorRow | undefined {
+  const price = Math.round(input.priceUsd);
+  if (!(price >= 1 && price <= PASS_MAX_USD)) throw new Error(`Pass price must be between $1 and $${PASS_MAX_USD}.`);
+  const r = db().prepare("UPDATE creators SET pass_enabled=?, pass_price_usd=?, pass_perk=? WHERE dashboard_token=?")
+    .run(input.enabled ? 1 : 0, price, input.perk.trim().slice(0, 140), token);
+  return r.changes ? getCreatorByToken(token) : undefined;
+}
+
+export const getTipByPassToken = (t: string) =>
+  db().prepare("SELECT * FROM tips WHERE pass_token = ?").get(t) as TipRow | undefined;
+
+/**
+ * How much of an origin asset to ask for so the creator still receives `priceUsd` after Aurora's
+ * fixed payout cost (~$0.25), route fees and slippage. `bump` widens the margin on a retry.
+ */
+export function passAmountUnits(priceUsd: number, asset: { decimals: number; usdPrice?: number; stable: boolean }, bump = 1): string {
+  const usd = (priceUsd * 1.02 + 0.4) * bump;
+  const coins = usd / (asset.usdPrice ?? 1);
+  return BigInt(Math.ceil(coins * 10 ** asset.decimals)).toString();
+}
 
 export function createCreator(input: {
   handle: string; displayName: string; message?: string; avatarUrl?: string; accent?: string; wallet: string;
@@ -62,11 +85,25 @@ export async function createTip(creator: CreatorRow, input: {
   const assets = await aurora.listOriginAssets();
   const asset = assets.find((a) => a.assetId === input.originAssetId);
   if (!asset) throw new Error("Unsupported asset"); // RF-3: only what Aurora supports
+  if (input.isPass && !creator.pass_enabled) throw new Error("Pass is not available for this creator.");
   const feeBps = clampFeeBps(env.tezeoFeeBps, asset);
-  const quote = await aurora.quote({
-    originAssetId: asset.assetId, amountIn: input.amountIn,
+  const ask = (amountIn: string) => aurora.quote({
+    originAssetId: asset.assetId, amountIn,
     recipient: creator.wallet, refundTo: input.refundTo, appFeeBps: feeBps,
   });
+  let quote = await ask(input.amountIn);
+  if (input.isPass) {
+    // RF pass: the quoted amount must still cover the pass price after fees. Compare the guaranteed
+    // minimum (after slippage), never the optimistic estimate.
+    const need = BigInt(creator.pass_price_usd) * 1_000_000n;
+    if (BigInt(quote.minAmountOutUsdc) < need) {
+      // One automatic retry sized from what the first quote actually delivered.
+      const ratio = Number(need) / Math.max(1, Number(quote.minAmountOutUsdc));
+      quote = await ask(String(BigInt(Math.ceil(Number(input.amountIn) * ratio * 1.01))));
+    }
+    if (BigInt(quote.minAmountOutUsdc) < need)
+      throw new Error(`Pass price not covered: this quote delivers at least ${Number(quote.minAmountOutUsdc) / 1e6} USDC but the pass costs ${creator.pass_price_usd}.`);
+  }
   const now = new Date().toISOString();
   const row: TipRow = {
     id: randomUUID(), creator_id: creator.id, status: "pending",

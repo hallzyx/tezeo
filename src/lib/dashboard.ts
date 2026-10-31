@@ -8,10 +8,16 @@ export function dashboardData(creator: CreatorRow) {
   const received = tips.filter((t) => t.status === "received");
   const sum = (rows: typeof received) =>
     rows.reduce((s, t) => s + Number(fromUnits(t.final_out_usdc ?? t.amount_out_usdc, 6, 6)), 0);
-  const thisMonth = received.filter((t) => new Date(t.created_at) >= monthStart);
   const now = Date.now();
+  const thisMonth = received.filter((t) => new Date(t.created_at) >= monthStart);
   return {
     creator: { handle: creator.handle, displayName: creator.display_name, accent: creator.accent },
+    pass: { enabled: !!creator.pass_enabled, priceUsd: creator.pass_price_usd, perk: creator.pass_perk },
+    // Passes exist only once the payment is confirmed (pass_token is issued on "received").
+    passes: received.filter((t) => t.is_pass && t.pass_token && t.pass_expires_at).slice(0, 50).map((t) => ({
+      id: t.id, fanName: t.fan_name, expiresAt: t.pass_expires_at as string,
+      active: new Date(t.pass_expires_at as string).getTime() > now,
+    })),
     stats: {
       receivedThisMonthUsdc: sum(thisMonth),
       totalUsdc: sum(received),

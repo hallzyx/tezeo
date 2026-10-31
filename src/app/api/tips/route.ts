@@ -2,13 +2,14 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getAurora } from "@/lib/aurora";
 import { toUnits } from "@/lib/domain";
+import { passAmountUnits } from "@/lib/tips";
 import { createTip, getCreatorByHandle } from "@/lib/tips";
 import { tipView } from "@/lib/view";
 
 const Body = z.object({
   handle: z.string(),
   originAssetId: z.string(),
-  amount: z.string(), // decimal in origin asset units, e.g. "0.01"
+  amount: z.string().optional(), // decimal in origin asset units, e.g. "0.01"; ignored for passes (server sizes it)
   refundTo: z.string().trim().min(10).max(120),
   fanName: z.string().trim().max(40).optional(),
   fanMessage: z.string().trim().max(280).optional(),
@@ -25,11 +26,12 @@ export async function POST(req: Request) {
   const assets = await getAurora().listOriginAssets();
   const asset = assets.find((a) => a.assetId === b.originAssetId);
   if (!asset) return NextResponse.json({ error: "That asset isn't supported." }, { status: 400 });
-  const units = toUnits(b.amount, asset.decimals);
+  if (b.pass && !creator.pass_enabled) return NextResponse.json({ error: "Pass is not available for this creator." }, { status: 422 });
+  const units = b.pass ? passAmountUnits(creator.pass_price_usd, asset) : b.amount ? toUnits(b.amount, asset.decimals) : null;
   if (!units) return NextResponse.json({ error: "Enter a valid amount." }, { status: 400 });
 
   const usdValue = (Number(units) / 10 ** asset.decimals) * (asset.usdPrice ?? 0);
-  if (asset.usdPrice && usdValue < 1)
+  if (!b.pass && asset.usdPrice && usdValue < 1)
     return NextResponse.json({ error: "The smallest tip is $1. Network fees would eat the rest." }, { status: 422 });
 
   try {
