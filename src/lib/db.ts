@@ -53,6 +53,9 @@ export function db(): Database.Database {
     );
     CREATE INDEX IF NOT EXISTS tips_creator ON tips(creator_id, created_at DESC);
   `);
+  // Additive migrations for databases created before a column existed.
+  const cols = (d.prepare("PRAGMA table_info(tips)").all() as { name: string }[]).map((c) => c.name);
+  if (!cols.includes("detail")) d.exec("ALTER TABLE tips ADD COLUMN detail TEXT");
   _db = d;
   return d;
 }

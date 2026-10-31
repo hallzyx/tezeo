@@ -1,0 +1,361 @@
+/* =====================================================================
+   TEZEO — Design tokens  (v1.0)
+   "Every tip is a thread. Tezeo weaves them together."
+
+   Usage
+   - Import once, before components.css.
+   - Theme: light by default; dark follows the OS (prefers-color-scheme)
+     unless overridden with <html data-theme="light|dark">.
+   - Creator customization: set --creator-accent on any wrapper
+     (e.g. <main class="tz-creator" style="--creator-accent:#1A9E8F">).
+     Always consume the *derived* tokens (--creator-accent-fill, -ink, -text,
+     -soft), never the raw value. See DESIGN.md §4.4.
+
+   Fonts (Google Fonts, all OFL / free):
+     Display  Bricolage Grotesque  (opsz 12–96, wght 400–800)
+     UI/Body  Instrument Sans      (wght 400–700)
+     Numbers  JetBrains Mono       (wght 400–600; addresses, tx ids)
+   Plain CSS:  see the @import below.
+   Next.js (next/font — then drop the @import below):
+               import { Bricolage_Grotesque, Instrument_Sans, JetBrains_Mono } from "next/font/google";
+               const display = Bricolage_Grotesque({ subsets:["latin"], axes:["opsz"], variable:"--font-bricolage" });
+               const body    = Instrument_Sans({ subsets:["latin"], variable:"--font-instrument" });
+               const mono    = JetBrains_Mono({ subsets:["latin"], variable:"--font-jetbrains" });
+               <html className={`${display.variable} ${body.variable} ${mono.variable}`}>
+               The --tz-font-* tokens pick those variables up automatically.
+   ===================================================================== */
+
+
+:root {
+  /* ---------------------------------------------------------------
+     1. RAW PALETTE — named after Latin American dyes & fibres.
+        Do not use raw palette tokens in components; use the
+        semantic layer (section 2).
+     --------------------------------------------------------------- */
+
+  /* Cochinilla — the carmine dye of the Andes and Oaxaca. Brand primary. */
+  --tz-cochinilla-50:  #FFF0F4;
+  --tz-cochinilla-100: #FFDCE6;
+  --tz-cochinilla-200: #FFB3C9;
+  --tz-cochinilla-300: #FF85A8;
+  --tz-cochinilla-400: #FF5C8F;   /* primary on dark */
+  --tz-cochinilla-500: #D1245A;   /* THE brand colour */
+  --tz-cochinilla-600: #B0184A;   /* hover / text on light */
+  --tz-cochinilla-700: #8C0F3A;
+  --tz-cochinilla-800: #5E0A27;
+  --tz-cochinilla-900: #33051A;
+
+  /* Maíz — marigold / corn gold. Celebration, highlights, the second thread. */
+  --tz-maiz-100: #FFF1CC;
+  --tz-maiz-200: #FFE08A;
+  --tz-maiz-300: #FFD15C;
+  --tz-maiz-400: #FFC23D;         /* the gold thread */
+  --tz-maiz-500: #F2A900;
+  --tz-maiz-700: #8A5A00;
+  --tz-maiz-900: #3A2C0E;
+
+  /* Añil — indigo. The "in motion / converting" colour and dark-mode depth. */
+  --tz-anil-100: #ECEAFF;
+  --tz-anil-300: #A9A2FF;
+  --tz-anil-500: #5B4FE0;
+  --tz-anil-600: #3E32C8;
+  --tz-anil-900: #221E4A;
+
+  /* Hierba — received / success. */
+  --tz-hierba-100: #DDF5E8;
+  --tz-hierba-300: #4FD69A;
+  --tz-hierba-500: #12A065;
+  --tz-hierba-700: #0B6B44;
+  --tz-hierba-900: #0E2F22;
+
+  /* Arcilla — fired clay. Failed. Deliberately orange-brick so it never
+     reads as brand cochinilla. Always paired with an icon + words. */
+  --tz-arcilla-100: #FDE4DC;
+  --tz-arcilla-300: #FF8A6B;
+  --tz-arcilla-500: #D9481F;
+  --tz-arcilla-700: #A33116;
+  --tz-arcilla-900: #3A1710;
+
+  /* Piedra — river stone. Refunded / neutral-informational. */
+  --tz-piedra-100: #E3EBF3;
+  --tz-piedra-300: #9CC0E0;
+  --tz-piedra-500: #5A7D9C;
+  --tz-piedra-700: #3F5D78;
+  --tz-piedra-900: #182633;
+
+  /* Algodón (cotton, light) → Obsidiana (volcanic glass, dark). Warm neutrals
+     with a violet undertone, never pure grey. */
+  --tz-algodon-0:   #FFFFFF;
+  --tz-algodon-50:  #FBF6EE;   /* page */
+  --tz-algodon-100: #F5EDE1;
+  --tz-algodon-200: #EADFCF;
+  --tz-algodon-300: #D9CBB8;
+  --tz-obsidiana-400: #8C7F92;
+  --tz-obsidiana-500: #5E5266;
+  --tz-obsidiana-600: #3A2E44;
+  --tz-obsidiana-700: #261D2E;
+  --tz-obsidiana-800: #1C1523;
+  --tz-obsidiana-900: #120D18;  /* night */
+  --tz-ink:           #1C1424;  /* text on light */
+  --tz-cream:         #FFF7EC;  /* the algodón thread */
+
+  /* ---------------------------------------------------------------
+     2. SEMANTIC COLOUR — LIGHT (default)
+     --------------------------------------------------------------- */
+  color-scheme: light;
+
+  --tz-bg:            var(--tz-algodon-50);
+  --tz-bg-sunken:     var(--tz-algodon-100);
+  --tz-surface:       var(--tz-algodon-0);
+  --tz-surface-2:     var(--tz-algodon-100);
+  --tz-surface-inverse: var(--tz-obsidiana-900);
+  --tz-border:        var(--tz-algodon-200);
+  --tz-border-strong: var(--tz-algodon-300);
+  --tz-text:          var(--tz-ink);
+  --tz-text-muted:    var(--tz-obsidiana-500);   /* 6.79:1 on bg */
+  --tz-text-faint:    var(--tz-obsidiana-400);   /* 3.51:1 — large/decorative only */
+  --tz-text-inverse:  var(--tz-cream);
+
+  --tz-brand:         var(--tz-cochinilla-500);  /* fills, CTA */
+  --tz-brand-hover:   var(--tz-cochinilla-600);
+  --tz-brand-press:   var(--tz-cochinilla-700);
+  --tz-on-brand:      #FFFFFF;                   /* 5.11:1 on brand */
+  --tz-brand-text:    var(--tz-cochinilla-600);  /* links / brand text, 6.35:1 */
+  --tz-brand-soft:    var(--tz-cochinilla-50);
+  --tz-gold:          var(--tz-maiz-400);
+  --tz-on-gold:       var(--tz-ink);             /* 11.1:1 */
+  --tz-focus:         var(--tz-anil-500);
+
+  /* Payment status — each has fg (text/icon), bg (pill/tint), line (thread) */
+  --tz-pending-fg:    var(--tz-maiz-700);   --tz-pending-bg:    var(--tz-maiz-100);   --tz-pending-line:    var(--tz-maiz-500);
+  --tz-converting-fg: var(--tz-anil-600);   --tz-converting-bg: var(--tz-anil-100);   --tz-converting-line: var(--tz-anil-500);
+  --tz-received-fg:   var(--tz-hierba-700); --tz-received-bg:   var(--tz-hierba-100); --tz-received-line:   var(--tz-hierba-500);
+  --tz-failed-fg:     var(--tz-arcilla-700);--tz-failed-bg:     var(--tz-arcilla-100);--tz-failed-line:     var(--tz-arcilla-500);
+  --tz-refunded-fg:   var(--tz-piedra-700); --tz-refunded-bg:   var(--tz-piedra-100); --tz-refunded-line:   var(--tz-piedra-500);
+
+  /* ---------------------------------------------------------------
+     3. CREATOR ACCENT — one colour the creator owns.
+        Raw input → four safe derivatives. Tezeo-owned UI (primary CTA,
+        status colours, focus ring) NEVER uses the creator accent.
+     --------------------------------------------------------------- */
+  --creator-accent: #1A9E8F;  /* default if the creator picked none: "turquesa" */
+
+  /* Derived tokens live in the CREATOR ACCENT block at the end of this file. */
+
+  /* ---------------------------------------------------------------
+     4. TYPOGRAPHY
+     --------------------------------------------------------------- */
+  --tz-font-display: var(--font-bricolage, "Bricolage Grotesque"), "Instrument Sans", ui-sans-serif, system-ui, sans-serif;
+  --tz-font-body:    var(--font-instrument, "Instrument Sans"), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --tz-font-mono:    var(--font-jetbrains, "JetBrains Mono"), ui-monospace, "SFMono-Regular", Menlo, monospace;
+
+  /* Fluid type scale (mobile → desktop), ratio ≈ 1.25 → 1.333 */
+  --tz-text-2xs: 0.6875rem;                               /* 11 — legal, overlines */
+  --tz-text-xs:  0.75rem;                                 /* 12 */
+  --tz-text-sm:  0.875rem;                                /* 14 */
+  --tz-text-md:  1rem;                                    /* 16 — body */
+  --tz-text-lg:  1.125rem;                                /* 18 */
+  --tz-text-xl:  clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem); /* 20–24 */
+  --tz-text-2xl: clamp(1.5rem, 1.3rem + 1vw, 2rem);       /* 24–32 */
+  --tz-text-3xl: clamp(2rem, 1.6rem + 2vw, 3rem);         /* 32–48 — amounts */
+  --tz-text-4xl: clamp(2.5rem, 1.8rem + 3.5vw, 4.5rem);   /* 40–72 — thank-you */
+
+  --tz-leading-tight: 1.05;
+  --tz-leading-snug:  1.25;
+  --tz-leading-body:  1.5;
+  --tz-tracking-display: -0.025em;
+  --tz-tracking-overline: 0.12em;
+
+  --tz-weight-regular: 400;
+  --tz-weight-medium:  500;
+  --tz-weight-semi:    600;
+  --tz-weight-bold:    700;
+  --tz-weight-black:   800;
+
+  /* ---------------------------------------------------------------
+     5. SPACE — 4px base. Name = multiples of 4.
+     --------------------------------------------------------------- */
+  --tz-space-0: 0;
+  --tz-space-1: 0.25rem;  /* 4  */
+  --tz-space-2: 0.5rem;   /* 8  */
+  --tz-space-3: 0.75rem;  /* 12 */
+  --tz-space-4: 1rem;     /* 16 — mobile gutter */
+  --tz-space-5: 1.25rem;  /* 20 */
+  --tz-space-6: 1.5rem;   /* 24 */
+  --tz-space-8: 2rem;     /* 32 */
+  --tz-space-10: 2.5rem;  /* 40 */
+  --tz-space-12: 3rem;    /* 48 */
+  --tz-space-16: 4rem;    /* 64 */
+  --tz-space-24: 6rem;    /* 96 */
+
+  --tz-gutter: var(--tz-space-4);
+  --tz-column: 30rem;      /* 480 — the fan flow column */
+  --tz-container: 72rem;   /* 1152 — dashboard */
+  --tz-tap: 3rem;          /* 48 — minimum touch target */
+
+  /* ---------------------------------------------------------------
+     6. SHAPE — soft but not bubbly. Pills are for status & chips only.
+     --------------------------------------------------------------- */
+  --tz-radius-xs: 6px;
+  --tz-radius-sm: 10px;
+  --tz-radius-md: 14px;    /* inputs, chips */
+  --tz-radius-lg: 20px;    /* cards */
+  --tz-radius-xl: 28px;    /* sheets, hero cards */
+  --tz-radius-pill: 999px;
+  --tz-border-width: 1.5px;
+  --tz-thread: 3px;        /* timeline / decorative thread weight */
+
+  /* ---------------------------------------------------------------
+     7. ELEVATION — warm, ink-tinted shadows (never neutral grey)
+     --------------------------------------------------------------- */
+  --tz-shadow-color: 330 40% 18%;
+  --tz-shadow-1: 0 1px 2px hsl(var(--tz-shadow-color) / 0.06), 0 1px 1px hsl(var(--tz-shadow-color) / 0.04);
+  --tz-shadow-2: 0 2px 4px hsl(var(--tz-shadow-color) / 0.06), 0 8px 20px -6px hsl(var(--tz-shadow-color) / 0.14);
+  --tz-shadow-3: 0 4px 8px hsl(var(--tz-shadow-color) / 0.06), 0 24px 48px -12px hsl(var(--tz-shadow-color) / 0.22);
+  --tz-shadow-brand: 0 10px 24px -8px rgb(209 36 90 / 0.55);
+  --tz-ring: 0 0 0 3px var(--tz-bg), 0 0 0 5px var(--tz-focus);
+
+  /* ---------------------------------------------------------------
+     8. MOTION
+     --------------------------------------------------------------- */
+  --tz-dur-instant: 80ms;   /* press feedback */
+  --tz-dur-fast:    160ms;  /* hover, toggles */
+  --tz-dur-base:    240ms;  /* most transitions */
+  --tz-dur-slow:    420ms;  /* sheets, step changes */
+  --tz-dur-weave:   1800ms; /* one loop of the weaving loader */
+  --tz-dur-moment:  1200ms; /* the thank-you "knot" */
+
+  --tz-ease-out:    cubic-bezier(0.22, 1, 0.36, 1);      /* default for entering */
+  --tz-ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);      /* threads in motion */
+  --tz-ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);   /* the knot, chips selecting */
+  --tz-ease-in:     cubic-bezier(0.55, 0, 1, 0.45);      /* leaving */
+
+  /* ---------------------------------------------------------------
+     9. Z-INDEX
+     --------------------------------------------------------------- */
+  --tz-z-sticky: 10;
+  --tz-z-sheet: 40;
+  --tz-z-toast: 60;
+}
+
+/* ---------------------------------------------------------------
+   DARK — "Noche de feria": obsidian night lit by dyed threads.
+   Applied when the OS is dark (unless data-theme="light"),
+   or explicitly with data-theme="dark".
+   --------------------------------------------------------------- */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --tz-bg:            var(--tz-obsidiana-900);
+    --tz-bg-sunken:     #0C0810;
+    --tz-surface:       var(--tz-obsidiana-800);
+    --tz-surface-2:     var(--tz-obsidiana-700);
+    --tz-surface-inverse: var(--tz-algodon-50);
+    --tz-border:        #2F2438;
+    --tz-border-strong: var(--tz-obsidiana-600);
+    --tz-text:          #F7EFE6;
+    --tz-text-muted:    #B9A9BF;
+    --tz-text-faint:    #8A7A92;
+    --tz-text-inverse:  var(--tz-ink);
+    --tz-brand:         var(--tz-cochinilla-400);
+    --tz-brand-hover:   var(--tz-cochinilla-300);
+    --tz-brand-press:   var(--tz-cochinilla-200);
+    --tz-on-brand:      var(--tz-obsidiana-900);
+    --tz-brand-text:    var(--tz-cochinilla-400);
+    --tz-brand-soft:    #3A1426;
+    --tz-focus:         var(--tz-anil-300);
+    --tz-pending-fg:    var(--tz-maiz-400);    --tz-pending-bg:    var(--tz-maiz-900);    --tz-pending-line:    var(--tz-maiz-400);
+    --tz-converting-fg: var(--tz-anil-300);    --tz-converting-bg: var(--tz-anil-900);    --tz-converting-line: var(--tz-anil-300);
+    --tz-received-fg:   var(--tz-hierba-300);  --tz-received-bg:   var(--tz-hierba-900);  --tz-received-line:   var(--tz-hierba-300);
+    --tz-failed-fg:     var(--tz-arcilla-300); --tz-failed-bg:     var(--tz-arcilla-900); --tz-failed-line:     var(--tz-arcilla-300);
+    --tz-refunded-fg:   var(--tz-piedra-300);  --tz-refunded-bg:   var(--tz-piedra-900);  --tz-refunded-line:   var(--tz-piedra-300);
+    --tz-shadow-color: 280 60% 2%;
+    --tz-shadow-brand: 0 10px 28px -8px rgb(255 92 143 / 0.45);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --tz-bg:            var(--tz-obsidiana-900);
+  --tz-bg-sunken:     #0C0810;
+  --tz-surface:       var(--tz-obsidiana-800);
+  --tz-surface-2:     var(--tz-obsidiana-700);
+  --tz-surface-inverse: var(--tz-algodon-50);
+  --tz-border:        #2F2438;
+  --tz-border-strong: var(--tz-obsidiana-600);
+  --tz-text:          #F7EFE6;
+  --tz-text-muted:    #B9A9BF;
+  --tz-text-faint:    #8A7A92;
+  --tz-text-inverse:  var(--tz-ink);
+  --tz-brand:         var(--tz-cochinilla-400);
+  --tz-brand-hover:   var(--tz-cochinilla-300);
+  --tz-brand-press:   var(--tz-cochinilla-200);
+  --tz-on-brand:      var(--tz-obsidiana-900);
+  --tz-brand-text:    var(--tz-cochinilla-400);
+  --tz-brand-soft:    #3A1426;
+  --tz-focus:         var(--tz-anil-300);
+  --tz-pending-fg:    var(--tz-maiz-400);    --tz-pending-bg:    var(--tz-maiz-900);    --tz-pending-line:    var(--tz-maiz-400);
+  --tz-converting-fg: var(--tz-anil-300);    --tz-converting-bg: var(--tz-anil-900);    --tz-converting-line: var(--tz-anil-300);
+  --tz-received-fg:   var(--tz-hierba-300);  --tz-received-bg:   var(--tz-hierba-900);  --tz-received-line:   var(--tz-hierba-300);
+  --tz-failed-fg:     var(--tz-arcilla-300); --tz-failed-bg:     var(--tz-arcilla-900); --tz-failed-line:     var(--tz-arcilla-300);
+  --tz-refunded-fg:   var(--tz-piedra-300);  --tz-refunded-bg:   var(--tz-piedra-900);  --tz-refunded-line:   var(--tz-piedra-300);
+  --tz-shadow-color: 280 60% 2%;
+  --tz-shadow-brand: 0 10px 28px -8px rgb(255 92 143 / 0.45);
+}
+
+/* ---------------------------------------------------------------
+   CREATOR ACCENT — derivation.
+   Custom properties resolve where they are declared, so the derived
+   tokens are re-declared on every element that may set --creator-accent
+   (:root and .tz-creator). Put the accent on a .tz-creator wrapper.
+   --------------------------------------------------------------- */
+:root, .tz-creator {
+  /* Fallback (no relative colour): raw value + server-side validation (DESIGN.md §4.4) */
+  --creator-accent-fill: var(--creator-accent);   /* backgrounds with --creator-accent-ink text */
+  --creator-accent-ink:  #FFFFFF;                  /* text ON the fill */
+  --creator-accent-text: var(--creator-accent);   /* accent-coloured text on page/surface */
+  --creator-accent-soft: color-mix(in srgb, var(--creator-accent) 14%, var(--tz-surface));
+}
+/* Light: clamp OKLCH lightness ≤ 0.52 so white on the fill stays ≥ 4.5:1 and the
+   same colour reads as text on cream. Chroma is capped to stop neon accents vibrating. */
+@supports (color: oklch(from red l c h)) {
+  :root, .tz-creator {
+    --creator-accent-fill: oklch(from var(--creator-accent) min(l, 0.52) min(c, 0.2) h);
+    --creator-accent-text: oklch(from var(--creator-accent) min(l, 0.5) min(c, 0.2) h);
+    --creator-accent-soft: oklch(from var(--creator-accent) 0.95 min(c, 0.05) h);
+  }
+}
+/* Dark: the accent gets LIGHTER (≥ 0.76) to glow on obsidiana; text on it flips to night ink. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]), :root:not([data-theme="light"]) .tz-creator {
+    --creator-accent-ink:  var(--tz-obsidiana-900);
+    --creator-accent-soft: color-mix(in srgb, var(--creator-accent) 18%, var(--tz-surface));
+  }
+}
+:root[data-theme="dark"], :root[data-theme="dark"] .tz-creator {
+  --creator-accent-ink:  var(--tz-obsidiana-900);
+  --creator-accent-soft: color-mix(in srgb, var(--creator-accent) 18%, var(--tz-surface));
+}
+@supports (color: oklch(from red l c h)) {
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]), :root:not([data-theme="light"]) .tz-creator {
+      --creator-accent-fill: oklch(from var(--creator-accent) max(l, 0.76) min(c, 0.17) h);
+      --creator-accent-text: oklch(from var(--creator-accent) max(l, 0.78) min(c, 0.17) h);
+      --creator-accent-soft: oklch(from var(--creator-accent) 0.27 min(c, 0.06) h);
+    }
+  }
+  :root[data-theme="dark"], :root[data-theme="dark"] .tz-creator {
+    --creator-accent-fill: oklch(from var(--creator-accent) max(l, 0.76) min(c, 0.17) h);
+    --creator-accent-text: oklch(from var(--creator-accent) max(l, 0.78) min(c, 0.17) h);
+    --creator-accent-soft: oklch(from var(--creator-accent) 0.27 min(c, 0.06) h);
+  }
+}
+
+/* Reduced motion: collapse durations globally; components also opt out of loops. */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --tz-dur-fast: 1ms;
+    --tz-dur-base: 1ms;
+    --tz-dur-slow: 1ms;
+    --tz-dur-moment: 1ms;
+  }
+}

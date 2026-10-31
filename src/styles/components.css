@@ -1,0 +1,674 @@
+/* =====================================================================
+   TEZEO — Components  (v1.0)
+   Framework-agnostic. Requires tokens.css. Every class is prefixed tz-.
+   State is expressed with ARIA / data attributes wherever possible
+   (aria-pressed, aria-invalid, data-state, data-status) so the CSS
+   and the accessibility tree can never disagree.
+   ===================================================================== */
+
+/* ---------------------------------------------------------------------
+   0. BASE (opt-in: add .tz-app to <body> or a root wrapper)
+   --------------------------------------------------------------------- */
+.tz-app {
+  margin: 0;
+  background: var(--tz-bg);
+  color: var(--tz-text);
+  font-family: var(--tz-font-body);
+  font-size: var(--tz-text-md);
+  line-height: var(--tz-leading-body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+.tz-app *, .tz-app *::before, .tz-app *::after { box-sizing: border-box; }
+.tz-app :focus-visible { outline: none; box-shadow: var(--tz-ring); border-radius: var(--tz-radius-sm); }
+.tz-app ::selection { background: var(--tz-maiz-300); color: var(--tz-ink); }
+
+.tz-display {
+  font-family: var(--tz-font-display);
+  font-weight: var(--tz-weight-black);
+  font-variation-settings: "opsz" 96;
+  letter-spacing: var(--tz-tracking-display);
+  line-height: var(--tz-leading-tight);
+  margin: 0;
+}
+.tz-h1 { font: var(--tz-weight-bold) var(--tz-text-2xl)/var(--tz-leading-snug) var(--tz-font-display); letter-spacing: -0.02em; margin: 0; }
+.tz-h2 { font: var(--tz-weight-bold) var(--tz-text-xl)/var(--tz-leading-snug) var(--tz-font-display); letter-spacing: -0.015em; margin: 0; }
+.tz-h3 { font: var(--tz-weight-semi) var(--tz-text-lg)/var(--tz-leading-snug) var(--tz-font-body); margin: 0; }
+.tz-body { font-size: var(--tz-text-md); color: var(--tz-text); margin: 0; }
+.tz-muted { color: var(--tz-text-muted); }
+.tz-small { font-size: var(--tz-text-sm); }
+.tz-overline {
+  font: var(--tz-weight-semi) var(--tz-text-2xs)/1 var(--tz-font-body);
+  letter-spacing: var(--tz-tracking-overline);
+  text-transform: uppercase;
+  color: var(--tz-text-muted);
+}
+.tz-amount {
+  font-family: var(--tz-font-display);
+  font-weight: var(--tz-weight-bold);
+  font-variant-numeric: tabular-nums lining-nums;
+  font-variation-settings: "opsz" 72;
+  letter-spacing: -0.03em;
+}
+.tz-amount__unit { font-size: 0.45em; font-weight: var(--tz-weight-semi); letter-spacing: 0; margin-left: 0.25em; color: var(--tz-text-muted); }
+.tz-mono { font-family: var(--tz-font-mono); font-size: 0.875em; letter-spacing: -0.01em; word-break: break-all; }
+
+/* Layout helpers */
+.tz-column { width: 100%; max-width: var(--tz-column); margin-inline: auto; padding-inline: var(--tz-gutter); }
+.tz-stack { display: flex; flex-direction: column; gap: var(--tz-stack-gap, var(--tz-space-4)); }
+.tz-row { display: flex; align-items: center; gap: var(--tz-row-gap, var(--tz-space-3)); }
+.tz-spacer { flex: 1; }
+.tz-sr-only { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ---------------------------------------------------------------------
+   1. SIGNATURE TEXTILE ELEMENTS
+   The "tejido" (weave band) is Tezeo's most recognizable surface: an
+   aguayo-inspired stripe with a row of rombos (Andean diamonds).
+   The rombo row takes the creator accent; the rest stays Tezeo.
+   --------------------------------------------------------------------- */
+.tz-weave {
+  --_h: 64px;
+  position: relative;
+  height: var(--_h);
+  background:
+    linear-gradient(to bottom,
+      var(--tz-cochinilla-500) 0 14px,
+      var(--tz-cream) 14px 17px,
+      var(--tz-maiz-400) 17px 22px,
+      var(--tz-cream) 22px 25px,
+      var(--creator-accent-fill) 25px 39px,
+      var(--tz-cream) 39px 42px,
+      var(--tz-maiz-400) 42px 47px,
+      var(--tz-cream) 47px 50px,
+      var(--tz-cochinilla-500) 50px 100%);
+  overflow: hidden;
+}
+/* rombo row sits on the accent stripe */
+.tz-weave::before {
+  content: "";
+  position: absolute;
+  inset: 25px 0 auto 0;
+  height: 14px;
+  background: var(--tz-cream);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='14'%3E%3Cpath fill-rule='evenodd' d='M10 1 16 7 10 13 4 7Z M10 4.5 12.5 7 10 9.5 7.5 7Z'/%3E%3C/svg%3E") 0 0 / 20px 14px repeat-x;
+          mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='14'%3E%3Cpath fill-rule='evenodd' d='M10 1 16 7 10 13 4 7Z M10 4.5 12.5 7 10 9.5 7.5 7Z'/%3E%3C/svg%3E") 0 0 / 20px 14px repeat-x;
+}
+/* tiny zig-zag stitches on the outer cochinilla stripes */
+.tz-weave::after {
+  content: "";
+  position: absolute;
+  inset: 4px 0 auto 0;
+  height: 6px;
+  background: rgb(255 247 236 / 0.55);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='6'%3E%3Cpath d='M0 5 3 1 6 5 9 1 12 5' fill='none' stroke='%23000' stroke-width='1.4'/%3E%3C/svg%3E") 0 0 / 12px 6px repeat-x;
+          mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='6'%3E%3Cpath d='M0 5 3 1 6 5 9 1 12 5' fill='none' stroke='%23000' stroke-width='1.4'/%3E%3C/svg%3E") 0 0 / 12px 6px repeat-x;
+  box-shadow: 0 50px 0 rgb(255 247 236 / 0.55);
+}
+.tz-weave--slim { --_h: 10px; background: linear-gradient(to bottom, var(--tz-cochinilla-500) 0 4px, var(--tz-maiz-400) 4px 7px, var(--creator-accent-fill) 7px 100%); }
+.tz-weave--slim::before, .tz-weave--slim::after { display: none; }
+
+/* A single rombo, usable as bullet / icon / confetti */
+.tz-rombo {
+  display: inline-block;
+  width: var(--_s, 10px); height: var(--_s, 10px);
+  background: var(--_c, var(--tz-brand));
+  transform: rotate(45deg);
+  border-radius: 2px;
+  flex: none;
+}
+
+/* Running-stitch divider */
+.tz-stitch {
+  border: 0;
+  height: 2px;
+  margin: var(--tz-space-4) 0;
+  background: repeating-linear-gradient(90deg, var(--tz-border-strong) 0 8px, transparent 8px 14px);
+  border-radius: 2px;
+}
+
+/* ---------------------------------------------------------------------
+   2. BUTTONS — primary buttons are "stitched": a dashed inner seam.
+   --------------------------------------------------------------------- */
+.tz-btn {
+  --_bg: var(--tz-surface);
+  --_fg: var(--tz-text);
+  --_bd: var(--tz-border-strong);
+  position: relative;
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--tz-space-2);
+  min-height: var(--tz-tap);
+  padding: 0 var(--tz-space-5);
+  border: var(--tz-border-width) solid var(--_bd);
+  border-radius: var(--tz-radius-md);
+  background: var(--_bg);
+  color: var(--_fg);
+  font: var(--tz-weight-semi) var(--tz-text-md)/1 var(--tz-font-body);
+  text-decoration: none;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color var(--tz-dur-fast) var(--tz-ease-out),
+              border-color var(--tz-dur-fast) var(--tz-ease-out),
+              transform var(--tz-dur-instant) var(--tz-ease-out),
+              box-shadow var(--tz-dur-fast) var(--tz-ease-out);
+}
+.tz-btn:active { transform: translateY(1px) scale(0.985); }
+.tz-btn:disabled, .tz-btn[aria-disabled="true"] { opacity: 0.45; cursor: not-allowed; transform: none; box-shadow: none; }
+.tz-btn svg { width: 1.15em; height: 1.15em; flex: none; }
+
+.tz-btn--primary {
+  --_bg: var(--tz-brand); --_fg: var(--tz-on-brand); --_bd: var(--tz-brand);
+  box-shadow: var(--tz-shadow-brand);
+}
+.tz-btn--primary::after {           /* the stitch */
+  content: ""; position: absolute; inset: 4px;
+  border: 1.5px dashed color-mix(in srgb, var(--tz-on-brand) 38%, transparent);
+  border-radius: calc(var(--tz-radius-md) - 4px);
+  pointer-events: none;
+}
+.tz-btn--primary:hover { --_bg: var(--tz-brand-hover); --_bd: var(--tz-brand-hover); }
+.tz-btn--primary:active { --_bg: var(--tz-brand-press); }
+
+.tz-btn--secondary { --_bg: var(--tz-surface); --_fg: var(--tz-text); --_bd: var(--tz-border-strong); }
+.tz-btn--secondary:hover { --_bd: var(--tz-text); }
+
+.tz-btn--ghost { --_bg: transparent; --_bd: transparent; --_fg: var(--tz-brand-text); padding-inline: var(--tz-space-3); }
+.tz-btn--ghost:hover { --_bg: var(--tz-brand-soft); }
+
+/* Creator-branded CTA (use on creator page only, never on payment/status) */
+.tz-btn--creator { --_bg: var(--creator-accent-fill); --_fg: var(--creator-accent-ink); --_bd: var(--creator-accent-fill); }
+.tz-btn--creator:hover { filter: brightness(1.06); }
+
+.tz-btn--lg { min-height: 3.5rem; padding-inline: var(--tz-space-6); font-size: var(--tz-text-lg); border-radius: var(--tz-radius-lg); }
+.tz-btn--lg.tz-btn--primary::after { border-radius: calc(var(--tz-radius-lg) - 4px); }
+.tz-btn--block { display: flex; width: 100%; }
+.tz-btn--icon { width: var(--tz-tap); padding: 0; }
+
+/* ---------------------------------------------------------------------
+   3. CARDS
+   --------------------------------------------------------------------- */
+.tz-card {
+  background: var(--tz-surface);
+  border: var(--tz-border-width) solid var(--tz-border);
+  border-radius: var(--tz-radius-lg);
+  padding: var(--tz-space-5);
+  box-shadow: var(--tz-shadow-1);
+}
+.tz-card--raised { box-shadow: var(--tz-shadow-3); border-color: transparent; }
+.tz-card--sunken { background: var(--tz-bg-sunken); box-shadow: none; }
+.tz-card--stitched { position: relative; }
+.tz-card--stitched::after {
+  content: ""; position: absolute; inset: 6px;
+  border: 1.5px dashed var(--tz-border-strong);
+  border-radius: calc(var(--tz-radius-lg) - 6px);
+  pointer-events: none;
+}
+.tz-card__head { display: flex; align-items: center; gap: var(--tz-space-3); margin-bottom: var(--tz-space-4); }
+.tz-card--flush { padding: 0; overflow: hidden; }
+
+/* ---------------------------------------------------------------------
+   4. FORM FIELDS
+   --------------------------------------------------------------------- */
+.tz-field { display: grid; gap: var(--tz-space-2); }
+.tz-label { font: var(--tz-weight-semi) var(--tz-text-sm)/1.2 var(--tz-font-body); color: var(--tz-text); }
+.tz-hint { font-size: var(--tz-text-sm); color: var(--tz-text-muted); }
+.tz-input, .tz-textarea {
+  width: 100%;
+  min-height: var(--tz-tap);
+  padding: var(--tz-space-3) var(--tz-space-4);
+  background: var(--tz-surface);
+  border: var(--tz-border-width) solid var(--tz-border-strong);
+  border-radius: var(--tz-radius-md);
+  color: var(--tz-text);
+  font: var(--tz-weight-medium) var(--tz-text-md)/1.4 var(--tz-font-body);
+  transition: border-color var(--tz-dur-fast) var(--tz-ease-out), box-shadow var(--tz-dur-fast) var(--tz-ease-out);
+}
+.tz-textarea { min-height: 6rem; resize: vertical; }
+.tz-input::placeholder, .tz-textarea::placeholder { color: var(--tz-text-faint); }
+.tz-input:hover, .tz-textarea:hover { border-color: var(--tz-text-muted); }
+.tz-input:focus, .tz-textarea:focus { outline: none; border-color: var(--tz-brand); box-shadow: 0 0 0 4px color-mix(in srgb, var(--tz-brand) 18%, transparent); }
+.tz-input[aria-invalid="true"] { border-color: var(--tz-failed-line); box-shadow: 0 0 0 4px color-mix(in srgb, var(--tz-failed-line) 16%, transparent); }
+.tz-field__error { display: flex; gap: var(--tz-space-2); align-items: center; font-size: var(--tz-text-sm); font-weight: var(--tz-weight-medium); color: var(--tz-failed-fg); }
+.tz-counter { font-size: var(--tz-text-xs); color: var(--tz-text-muted); text-align: right; font-variant-numeric: tabular-nums; }
+
+/* Copy field (deposit address) */
+.tz-copy {
+  display: flex; align-items: center; gap: var(--tz-space-3);
+  padding: var(--tz-space-3) var(--tz-space-3) var(--tz-space-3) var(--tz-space-4);
+  background: var(--tz-bg-sunken);
+  border: var(--tz-border-width) dashed var(--tz-border-strong);
+  border-radius: var(--tz-radius-md);
+}
+.tz-copy .tz-mono { flex: 1; min-width: 0; color: var(--tz-text); }
+
+/* ---------------------------------------------------------------------
+   5. CHAIN / TOKEN CHIPS — select with aria-pressed="true"
+   Set --chip-color per chain for the little coin swatch.
+   --------------------------------------------------------------------- */
+.tz-chips { display: flex; flex-wrap: wrap; gap: var(--tz-space-2); }
+.tz-chips--scroll { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; margin-inline: calc(var(--tz-gutter) * -1); padding-inline: var(--tz-gutter); }
+.tz-chip {
+  --chip-color: var(--tz-text-muted);
+  display: inline-flex; align-items: center; gap: var(--tz-space-2);
+  min-height: 2.75rem;
+  padding: 0 var(--tz-space-4) 0 var(--tz-space-2);
+  background: var(--tz-surface);
+  border: var(--tz-border-width) solid var(--tz-border);
+  border-radius: var(--tz-radius-pill);
+  color: var(--tz-text);
+  font: var(--tz-weight-semi) var(--tz-text-sm)/1 var(--tz-font-body);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: border-color var(--tz-dur-fast) var(--tz-ease-out), background-color var(--tz-dur-fast) var(--tz-ease-out), transform var(--tz-dur-base) var(--tz-ease-spring);
+}
+.tz-chip:hover { border-color: var(--tz-border-strong); }
+.tz-chip__coin {
+  display: grid; place-items: center;
+  width: 1.75rem; height: 1.75rem; border-radius: 50%;
+  background: var(--chip-color); color: #fff;
+  font: 700 0.625rem/1 var(--tz-font-body); letter-spacing: 0.02em;
+}
+.tz-chip__meta { color: var(--tz-text-muted); font-weight: var(--tz-weight-medium); }
+.tz-chip[aria-pressed="true"], .tz-chip.is-selected {
+  border-color: var(--tz-brand);
+  background: var(--tz-brand-soft);
+  box-shadow: inset 0 0 0 1px var(--tz-brand);
+  transform: scale(1.02);
+}
+.tz-chip[aria-pressed="true"]::after, .tz-chip.is-selected::after {   /* little knot */
+  content: ""; width: 8px; height: 8px; margin-left: 2px;
+  background: var(--tz-brand); transform: rotate(45deg); border-radius: 1.5px;
+}
+
+/* ---------------------------------------------------------------------
+   6. AMOUNT PICKER — preset tiles + custom; selected uses creator accent
+   --------------------------------------------------------------------- */
+.tz-amounts { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--tz-space-2); }
+.tz-amount-opt {
+  position: relative;
+  display: grid; place-items: center; gap: 2px;
+  min-height: 4.5rem;
+  padding: var(--tz-space-3) var(--tz-space-2);
+  background: var(--tz-surface);
+  border: var(--tz-border-width) solid var(--tz-border);
+  border-radius: var(--tz-radius-md);
+  color: var(--tz-text);
+  cursor: pointer;
+  transition: transform var(--tz-dur-base) var(--tz-ease-spring), border-color var(--tz-dur-fast), background-color var(--tz-dur-fast);
+}
+.tz-amount-opt .tz-amount { font-size: 1.5rem; line-height: 1; }
+.tz-amount-opt small { font-size: var(--tz-text-xs); color: var(--tz-text-muted); }
+.tz-amount-opt:hover { border-color: var(--tz-border-strong); transform: translateY(-1px); }
+.tz-amount-opt[aria-pressed="true"] {
+  background: var(--creator-accent-fill);
+  border-color: var(--creator-accent-fill);
+  color: var(--creator-accent-ink);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px -10px var(--creator-accent-fill);
+}
+.tz-amount-opt[aria-pressed="true"] small { color: inherit; opacity: 0.85; }
+.tz-amount-custom { position: relative; }
+.tz-amount-custom .tz-input { padding-left: 2.25rem; font: var(--tz-weight-bold) var(--tz-text-xl)/1 var(--tz-font-display); min-height: 3.5rem; font-variant-numeric: tabular-nums; }
+.tz-amount-custom .tz-input::placeholder { font: var(--tz-weight-medium) var(--tz-text-md)/1 var(--tz-font-body); }
+.tz-amount-custom::before { content: "$"; position: absolute; left: var(--tz-space-4); top: 50%; translate: 0 -50%; font: var(--tz-weight-bold) var(--tz-text-xl)/1 var(--tz-font-display); color: var(--tz-text-muted); }
+
+/* ---------------------------------------------------------------------
+   7. QUOTE SUMMARY — "You send → fees → creator receives", stitched leaders
+   --------------------------------------------------------------------- */
+.tz-quote { display: grid; gap: var(--tz-space-3); margin: 0; }
+.tz-quote__row { display: flex; align-items: baseline; gap: var(--tz-space-2); font-size: var(--tz-text-md); }
+.tz-quote__row dt { color: var(--tz-text-muted); display: flex; align-items: center; gap: var(--tz-space-2); }
+.tz-quote__row dd { margin: 0; font-weight: var(--tz-weight-semi); font-variant-numeric: tabular-nums; text-align: right; }
+.tz-quote__row::after { content: none; }
+.tz-quote__lead { flex: 1; align-self: center; height: 2px; min-width: var(--tz-space-4); background: radial-gradient(circle, var(--tz-border-strong) 1px, transparent 1.5px) 0 0 / 6px 2px repeat-x; }
+.tz-quote__row--total {
+  margin-top: var(--tz-space-2);
+  padding: var(--tz-space-4);
+  border-radius: var(--tz-radius-md);
+  background: var(--creator-accent-soft);
+  align-items: center;
+}
+.tz-quote__row--total dt { color: var(--tz-text); font-weight: var(--tz-weight-semi); }
+.tz-quote__row--total dd { font: var(--tz-weight-bold) var(--tz-text-2xl)/1 var(--tz-font-display); letter-spacing: -0.02em; color: var(--creator-accent-text); }
+.tz-quote__note { font-size: var(--tz-text-xs); color: var(--tz-text-muted); display: flex; gap: var(--tz-space-2); align-items: center; }
+.tz-timer { font-variant-numeric: tabular-nums; font-weight: var(--tz-weight-semi); color: var(--tz-text); }
+
+/* ---------------------------------------------------------------------
+   8. STATUS PILL — data-status: pending | converting | received | failed | refunded
+   --------------------------------------------------------------------- */
+.tz-pill {
+  --_fg: var(--tz-text-muted); --_bg: var(--tz-surface-2); --_line: var(--tz-text-muted);
+  display: inline-flex; align-items: center; gap: 0.4em;
+  height: 1.75rem; padding: 0 0.7em 0 0.55em;
+  border-radius: var(--tz-radius-pill);
+  background: var(--_bg); color: var(--_fg);
+  font: var(--tz-weight-semi) var(--tz-text-xs)/1 var(--tz-font-body);
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+.tz-pill::before { content: ""; width: 7px; height: 7px; background: var(--_line); transform: rotate(45deg); border-radius: 1.5px; flex: none; }
+.tz-pill[data-status="pending"]    { --_fg: var(--tz-pending-fg);    --_bg: var(--tz-pending-bg);    --_line: var(--tz-pending-line); }
+.tz-pill[data-status="converting"] { --_fg: var(--tz-converting-fg); --_bg: var(--tz-converting-bg); --_line: var(--tz-converting-line); }
+.tz-pill[data-status="received"]   { --_fg: var(--tz-received-fg);   --_bg: var(--tz-received-bg);   --_line: var(--tz-received-line); }
+.tz-pill[data-status="failed"]     { --_fg: var(--tz-failed-fg);     --_bg: var(--tz-failed-bg);     --_line: var(--tz-failed-line); }
+.tz-pill[data-status="refunded"]   { --_fg: var(--tz-refunded-fg);   --_bg: var(--tz-refunded-bg);   --_line: var(--tz-refunded-line); }
+.tz-pill[data-status="pending"]::before    { animation: tz-pulse 1.6s var(--tz-ease-in-out) infinite; }
+.tz-pill[data-status="converting"]::before { animation: tz-spin-rombo 1.4s var(--tz-ease-in-out) infinite; }
+.tz-pill[data-status="failed"]::before     { transform: none; width: 8px; height: 2px; border-radius: 1px; box-shadow: 0 -3px 0 var(--_line), 0 3px 0 var(--_line); } /* frayed ≡ */
+.tz-pill[data-status="refunded"]::before   { border-radius: 50%; transform: none; background: transparent; border: 2px solid var(--_line); border-right-color: transparent; width: 9px; height: 9px; }
+
+/* ---------------------------------------------------------------------
+   9. PAYMENT STEPPER — "el hilo" (the thread)
+   <ol class="tz-steps" data-status="converting">
+     <li class="tz-step" data-state="done|active|todo|failed|refunded">
+   The connector between knots is a thread: solid when done, a moving
+   running-stitch when active, a faint dashed guide when todo, frayed when
+   failed, and a returning piedra thread when refunded.
+   --------------------------------------------------------------------- */
+.tz-steps { --_line: var(--tz-border-strong); list-style: none; margin: 0; padding: 0; display: grid; }
+.tz-steps[data-status="pending"]    { --_line: var(--tz-pending-line);    --_fg: var(--tz-pending-fg);    --_bg: var(--tz-pending-bg); }
+.tz-steps[data-status="converting"] { --_line: var(--tz-converting-line); --_fg: var(--tz-converting-fg); --_bg: var(--tz-converting-bg); }
+.tz-steps[data-status="received"]   { --_line: var(--tz-received-line);   --_fg: var(--tz-received-fg);   --_bg: var(--tz-received-bg); }
+.tz-steps[data-status="failed"]     { --_line: var(--tz-failed-line);     --_fg: var(--tz-failed-fg);     --_bg: var(--tz-failed-bg); }
+.tz-steps[data-status="refunded"]   { --_line: var(--tz-refunded-line);   --_fg: var(--tz-refunded-fg);   --_bg: var(--tz-refunded-bg); }
+
+.tz-step {
+  position: relative;
+  display: grid; grid-template-columns: 2rem 1fr; column-gap: var(--tz-space-4);
+  padding-bottom: var(--tz-space-6);
+  min-height: 3.5rem;
+}
+.tz-step:last-child { padding-bottom: 0; min-height: 0; }
+/* the thread to the next knot */
+.tz-step:not(:last-child)::before {
+  content: ""; position: absolute;
+  left: calc(1rem - var(--tz-thread) / 2); top: 2.25rem; bottom: 0.25rem;
+  width: var(--tz-thread); border-radius: var(--tz-thread);
+  background: repeating-linear-gradient(to bottom, var(--tz-border-strong) 0 4px, transparent 4px 9px);
+}
+.tz-step[data-state="done"]:not(:last-child)::before { background: var(--_line); }
+.tz-step[data-state="active"]:not(:last-child)::before {
+  background: repeating-linear-gradient(to bottom, var(--_line) 0 6px, transparent 6px 11px) 0 0 / 100% 22px;
+  animation: tz-stitch-run 0.9s linear infinite;
+}
+.tz-step__knot {
+  position: relative; z-index: 1;
+  display: grid; place-items: center;
+  width: 2rem; height: 2rem; border-radius: 50%;
+  background: var(--tz-surface);
+  border: 2px dashed var(--tz-border-strong);
+  color: var(--tz-text-faint);
+}
+.tz-step__knot svg { width: 16px; height: 16px; }
+.tz-step__body { padding-top: 0.25rem; }
+.tz-step__title { font: var(--tz-weight-semi) var(--tz-text-md)/1.3 var(--tz-font-body); margin: 0; color: var(--tz-text-muted); }
+.tz-step__desc { font-size: var(--tz-text-sm); color: var(--tz-text-muted); margin: 0.2rem 0 0; }
+.tz-step__time { font-size: var(--tz-text-xs); color: var(--tz-text-faint); font-variant-numeric: tabular-nums; }
+
+.tz-step[data-state="done"] .tz-step__knot { background: var(--_line); border: 0; color: var(--tz-surface); }
+.tz-step[data-state="done"] .tz-step__title { color: var(--tz-text); }
+/* in failed / refunded journeys, earlier "done" steps go neutral so only the problem carries colour */
+.tz-steps:is([data-status="failed"], [data-status="refunded"]) .tz-step[data-state="done"] .tz-step__knot { background: var(--tz-text-muted); }
+.tz-steps:is([data-status="failed"], [data-status="refunded"]) .tz-step[data-state="done"]:not(:last-child)::before { background: var(--tz-text-muted); }
+.tz-step[data-state="active"] .tz-step__knot {
+  border: 2px solid var(--_line); background: var(--_bg); color: var(--_fg);
+  animation: tz-knot-breathe 1.8s var(--tz-ease-in-out) infinite;
+}
+.tz-step[data-state="active"] .tz-step__knot::after {   /* the shuttle rombo */
+  content: ""; width: 9px; height: 9px; background: var(--_line); transform: rotate(45deg); border-radius: 2px;
+  animation: tz-spin-rombo 1.4s var(--tz-ease-in-out) infinite;
+}
+.tz-step[data-state="active"] .tz-step__title { color: var(--tz-text); font-weight: var(--tz-weight-bold); }
+.tz-step[data-state="active"] .tz-step__desc { color: var(--tz-text); }
+.tz-step[data-state="failed"] .tz-step__knot { background: var(--tz-failed-line); border: 0; color: var(--tz-surface); }
+.tz-step[data-state="failed"] .tz-step__title { color: var(--tz-failed-fg); font-weight: var(--tz-weight-bold); }
+.tz-step[data-state="failed"] .tz-step__desc { color: var(--tz-text); }
+/* frayed thread above a failed knot: the previous connector gets a broken end */
+.tz-step:has(+ .tz-step[data-state="failed"])::before {
+  background: linear-gradient(to bottom, var(--tz-border-strong) 0 55%, transparent 55% 70%, var(--tz-failed-line) 70% 100%) !important;
+}
+.tz-step[data-state="refunded"] .tz-step__knot { background: var(--tz-refunded-line); border: 0; color: var(--tz-surface); }
+.tz-step[data-state="refunded"] .tz-step__title { color: var(--tz-refunded-fg); font-weight: var(--tz-weight-bold); }
+.tz-step[data-state="refunded"] .tz-step__desc { color: var(--tz-text); }
+.tz-step[data-state="skipped"] { opacity: 0.5; }
+.tz-step[data-state="skipped"] .tz-step__title { text-decoration: line-through; text-decoration-color: var(--tz-text-faint); }
+
+/* Horizontal compact variant (dashboard rows, receipts) */
+.tz-steps--inline { display: flex; align-items: center; gap: 0; }
+.tz-steps--inline .tz-step { display: block; padding: 0; min-height: 0; flex: 1; }
+.tz-steps--inline .tz-step:last-child { flex: 0; }
+.tz-steps--inline .tz-step__body { display: none; }
+.tz-steps--inline .tz-step__knot { width: 1rem; height: 1rem; border-width: 1.5px; }
+.tz-steps--inline .tz-step__knot svg { width: 10px; height: 10px; }
+.tz-steps--inline .tz-step:not(:last-child)::before { left: 1rem; right: 0; top: calc(0.5rem - 1.5px); bottom: auto; width: auto; height: 3px;
+  background: repeating-linear-gradient(90deg, var(--tz-border-strong) 0 4px, transparent 4px 8px); }
+.tz-steps--inline .tz-step[data-state="done"]:not(:last-child)::before { background: var(--_line); }
+
+/* ---------------------------------------------------------------------
+   10. THE LOOM — signature "payment in progress" loader.
+   Three source threads (any chain) braid into one USDC thread.
+   Markup: see preview.html (#loom). Threads are <path class="tz-loom__t">.
+   --------------------------------------------------------------------- */
+.tz-loom { display: block; width: 100%; max-width: 360px; height: auto; margin-inline: auto; overflow: visible; }
+.tz-loom__t { fill: none; stroke-width: 5; stroke-linecap: round; stroke-dasharray: 14 10; animation: tz-thread-flow var(--tz-dur-weave) linear infinite; }
+.tz-loom__t--1 { stroke: var(--tz-maiz-400); }
+.tz-loom__t--2 { stroke: var(--tz-anil-500); animation-delay: -0.3s; }
+.tz-loom__t--3 { stroke: var(--tz-cochinilla-400); animation-delay: -0.6s; }
+.tz-loom__out { fill: none; stroke: var(--tz-brand); stroke-width: 7; stroke-linecap: round; stroke-dasharray: 22 8; animation: tz-thread-flow calc(var(--tz-dur-weave) * 0.8) linear infinite; }
+.tz-loom__eye { fill: var(--tz-surface); stroke: var(--tz-text); stroke-width: 3; transform-box: fill-box; transform-origin: center; animation: tz-eye 1.8s var(--tz-ease-in-out) infinite; }
+.tz-loom__shuttle { fill: var(--tz-gold); transform-box: fill-box; transform-origin: center; animation: tz-shuttle var(--tz-dur-weave) var(--tz-ease-in-out) infinite; }
+.tz-loom__label { font: 700 11px/1 var(--tz-font-body); fill: var(--tz-text-muted); letter-spacing: 0.06em; }
+.tz-loom[data-status="pending"] .tz-loom__t { animation-duration: calc(var(--tz-dur-weave) * 2); }
+.tz-loom[data-status="pending"] .tz-loom__out { stroke: var(--tz-border-strong); animation: none; stroke-dasharray: 4 8; }
+.tz-loom[data-status="received"] .tz-loom__t, .tz-loom[data-status="received"] .tz-loom__out { animation: none; stroke-dasharray: none; }
+.tz-loom[data-status="received"] .tz-loom__out { stroke: var(--tz-received-line); }
+.tz-loom[data-status="received"] .tz-loom__shuttle { display: none; }
+
+/* ---------------------------------------------------------------------
+   11. THANK-YOU MOMENT — "el nudo" (the knot)
+   The two threads of the logo draw in, cross, the tile springs, and a
+   burst of rombos scatters. Add .is-playing to (re)trigger.
+   --------------------------------------------------------------------- */
+.tz-knot { position: relative; width: 112px; height: 112px; margin-inline: auto; }
+.tz-knot svg { width: 100%; height: 100%; overflow: visible; }
+.tz-knot__tile { transform-origin: 32px 32px; transform: scale(0.6); opacity: 0; }
+.tz-knot__thread { stroke-dasharray: 80; stroke-dashoffset: 80; }
+.tz-knot.is-playing .tz-knot__tile { animation: tz-knot-pop 700ms var(--tz-ease-spring) 80ms forwards; }
+.tz-knot.is-playing .tz-knot__thread { animation: tz-draw 650ms var(--tz-ease-out) forwards; }
+.tz-knot.is-playing .tz-knot__thread--a { animation-delay: 300ms; }
+.tz-knot.is-playing .tz-knot__gap { animation: tz-fade-in 1ms linear 640ms both; }
+.tz-knot.is-playing .tz-knot__thread--b { animation-delay: 650ms; }
+.tz-burst { position: absolute; inset: 50% auto auto 50%; width: 0; height: 0; pointer-events: none; }
+.tz-burst i {
+  position: absolute; left: -5px; top: -5px;
+  width: 10px; height: 10px; border-radius: 2px;
+  background: var(--_c, var(--tz-brand));
+  opacity: 0;
+  transform: rotate(45deg);
+}
+.tz-knot.is-playing .tz-burst i { animation: tz-burst 1100ms var(--tz-ease-out) calc(1000ms + var(--d, 0ms)) forwards; }
+.tz-burst i:nth-child(3n)   { --_c: var(--tz-maiz-400); }
+.tz-burst i:nth-child(3n+1) { --_c: var(--tz-cochinilla-400); }
+.tz-burst i:nth-child(3n+2) { --_c: var(--creator-accent-fill); }
+
+.tz-rise { opacity: 0; transform: translateY(12px); }
+.is-playing .tz-rise, .tz-rise.is-playing { animation: tz-rise var(--tz-dur-slow) var(--tz-ease-out) forwards; animation-delay: var(--d, 1100ms); }
+
+/* Failure: a frayed thread — static, calm, no shaking */
+.tz-fray { width: 112px; height: 112px; margin-inline: auto; display: block; overflow: visible; }
+.tz-fray__fibre { transform-box: fill-box; transform-origin: 0% 50%; animation: tz-fibre 3.2s var(--tz-ease-in-out) infinite alternate; }
+
+/* ---------------------------------------------------------------------
+   12. TOAST
+   --------------------------------------------------------------------- */
+.tz-toast {
+  --_line: var(--tz-brand);
+  display: flex; align-items: flex-start; gap: var(--tz-space-3);
+  max-width: 26rem;
+  padding: var(--tz-space-3) var(--tz-space-4) var(--tz-space-3) var(--tz-space-5);
+  background: var(--tz-surface-inverse);
+  color: var(--tz-text-inverse);
+  border-radius: var(--tz-radius-md);
+  box-shadow: var(--tz-shadow-3);
+  position: relative; overflow: hidden;
+  font-size: var(--tz-text-sm);
+  animation: tz-toast-in var(--tz-dur-slow) var(--tz-ease-spring) both;
+}
+.tz-toast::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 5px;
+  background: repeating-linear-gradient(to bottom, var(--_line) 0 8px, color-mix(in srgb, var(--_line) 55%, transparent) 8px 11px); }
+.tz-toast strong { display: block; font-weight: var(--tz-weight-bold); margin-bottom: 2px; }
+.tz-toast__body { flex: 1; }
+.tz-toast__action { color: inherit; font-weight: var(--tz-weight-bold); text-decoration: underline; text-underline-offset: 3px; background: none; border: 0; cursor: pointer; font: inherit; padding: 0; }
+.tz-toast[data-status="received"] { --_line: var(--tz-hierba-300); }
+.tz-toast[data-status="failed"]   { --_line: var(--tz-arcilla-300); }
+.tz-toast[data-status="converting"] { --_line: var(--tz-anil-300); }
+.tz-toast[data-status="refunded"] { --_line: var(--tz-piedra-300); }
+
+/* ---------------------------------------------------------------------
+   13. AVATAR — creator photo inside a stitched accent ring
+   --------------------------------------------------------------------- */
+.tz-avatar {
+  --_s: 96px;
+  position: relative;
+  width: var(--_s); height: var(--_s);
+  border-radius: 50%;
+  padding: 5px;
+  background: conic-gradient(from 0deg, var(--creator-accent-fill), var(--tz-maiz-400), var(--tz-cochinilla-500), var(--creator-accent-fill));
+  flex: none;
+}
+.tz-avatar > img, .tz-avatar > span {
+  width: 100%; height: 100%; border-radius: 50%;
+  border: 3px solid var(--tz-surface);
+  object-fit: cover; display: grid; place-items: center;
+  background: var(--creator-accent-soft); color: var(--creator-accent-text);
+  font: 800 calc(var(--_s) * 0.36)/1 var(--tz-font-display);
+}
+.tz-avatar--sm { --_s: 40px; padding: 2.5px; }
+.tz-avatar--sm > img, .tz-avatar--sm > span { border-width: 2px; }
+
+/* ---------------------------------------------------------------------
+   14. MEMBERSHIP PASS (Phase 2) — a woven ticket
+   --------------------------------------------------------------------- */
+.tz-pass {
+  position: relative;
+  display: grid; grid-template-columns: 1fr auto; gap: var(--tz-space-4);
+  padding: var(--tz-space-5) var(--tz-space-5) var(--tz-space-5) calc(var(--tz-space-5) + 18px);
+  border-radius: var(--tz-radius-lg);
+  background:
+    radial-gradient(120% 140% at 100% 0%, color-mix(in srgb, var(--creator-accent-fill) 55%, transparent), transparent 60%),
+    var(--tz-obsidiana-900);
+  color: var(--tz-cream);
+  overflow: hidden;
+  box-shadow: var(--tz-shadow-3);
+  isolation: isolate;
+}
+.tz-pass::before {        /* woven selvedge on the left edge */
+  content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 18px;
+  background: linear-gradient(90deg, var(--tz-cochinilla-500) 0 6px, var(--tz-maiz-400) 6px 9px, var(--creator-accent-fill) 9px 18px);
+}
+.tz-pass::after {         /* rombos on the selvedge */
+  content: ""; position: absolute; left: 9px; top: 0; bottom: 0; width: 9px;
+  background: var(--tz-cream);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='14'%3E%3Cpath d='M4.5 3 8 7 4.5 11 1 7Z'/%3E%3C/svg%3E") 0 0 / 9px 14px repeat-y;
+          mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='14'%3E%3Cpath d='M4.5 3 8 7 4.5 11 1 7Z'/%3E%3C/svg%3E") 0 0 / 9px 14px repeat-y;
+}
+.tz-pass .tz-overline { color: var(--tz-maiz-300); }
+.tz-pass__title { font: 800 var(--tz-text-xl)/1.1 var(--tz-font-display); letter-spacing: -0.02em; margin: 4px 0 2px; }
+.tz-pass__meta { font-size: var(--tz-text-sm); color: rgb(255 247 236 / 0.75); }
+.tz-pass__meter { grid-column: 1 / -1; height: 8px; border-radius: 8px; background: rgb(255 247 236 / 0.14); overflow: hidden; }
+.tz-pass__meter > span { display: block; height: 100%; width: var(--_p, 50%); border-radius: inherit;
+  background: repeating-linear-gradient(90deg, var(--tz-maiz-400) 0 10px, var(--tz-maiz-300) 10px 12px); }
+.tz-pass__days { font: 800 var(--tz-text-2xl)/1 var(--tz-font-display); text-align: right; font-variant-numeric: tabular-nums; }
+.tz-pass__days small { display: block; font: 600 var(--tz-text-2xs)/1.4 var(--tz-font-body); letter-spacing: var(--tz-tracking-overline); text-transform: uppercase; opacity: 0.75; }
+.tz-pass[data-state="expired"] { filter: grayscale(0.85); }
+.tz-pass[data-state="expired"] .tz-pass__meter > span { width: 0; }
+
+/* Inline badge (next to a fan name, in tip lists) */
+.tz-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  height: 1.5rem; padding: 0 0.55rem 0 0.45rem;
+  border-radius: var(--tz-radius-xs);
+  background: var(--tz-obsidiana-900); color: var(--tz-maiz-300);
+  font: 700 var(--tz-text-2xs)/1 var(--tz-font-body); letter-spacing: 0.06em; text-transform: uppercase;
+  box-shadow: inset 3px 0 0 var(--tz-cochinilla-500);
+}
+.tz-badge::before { content: ""; width: 7px; height: 7px; background: var(--tz-maiz-400); transform: rotate(45deg); border-radius: 1px; }
+:root[data-theme="dark"] .tz-badge { background: var(--tz-cream); color: var(--tz-cochinilla-700); }
+:root[data-theme="dark"] .tz-badge::before { background: var(--tz-cochinilla-500); }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .tz-badge { background: var(--tz-cream); color: var(--tz-cochinilla-700); }
+  :root:not([data-theme="light"]) .tz-badge::before { background: var(--tz-cochinilla-500); }
+}
+
+/* ---------------------------------------------------------------------
+   15. EMPTY STATE — a loose thread waiting to be woven
+   --------------------------------------------------------------------- */
+.tz-empty { display: grid; justify-items: center; text-align: center; gap: var(--tz-space-3); padding: var(--tz-space-10) var(--tz-space-6); border: 2px dashed var(--tz-border-strong); border-radius: var(--tz-radius-lg); }
+.tz-empty svg { width: 120px; height: 64px; color: var(--tz-brand); }
+.tz-empty__title { font: 700 var(--tz-text-lg)/1.3 var(--tz-font-display); margin: 0; }
+.tz-empty p { margin: 0; max-width: 28ch; color: var(--tz-text-muted); font-size: var(--tz-text-sm); }
+
+/* ---------------------------------------------------------------------
+   16. DASHBOARD PIECES — stat tiles + tip table
+   --------------------------------------------------------------------- */
+.tz-stat { display: grid; gap: var(--tz-space-1); }
+.tz-stat__value { font: 800 var(--tz-text-3xl)/1 var(--tz-font-display); letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+.tz-stat__delta { font-size: var(--tz-text-sm); font-weight: var(--tz-weight-semi); color: var(--tz-received-fg); }
+.tz-table { width: 100%; border-collapse: collapse; font-size: var(--tz-text-sm); }
+.tz-table th { text-align: left; font: 600 var(--tz-text-2xs)/1 var(--tz-font-body); letter-spacing: var(--tz-tracking-overline); text-transform: uppercase; color: var(--tz-text-muted); padding: 0 var(--tz-space-3) var(--tz-space-3); }
+.tz-table td { padding: var(--tz-space-3); border-top: 1px solid var(--tz-border); vertical-align: middle; }
+.tz-table td.num, .tz-table th.num { text-align: right; font-variant-numeric: tabular-nums; }
+.tz-table tbody tr { transition: background-color var(--tz-dur-fast); }
+.tz-table tbody tr:hover { background: var(--tz-bg-sunken); }
+/* Mobile: rows become stacked cards */
+@media (max-width: 640px) {
+  .tz-table--stack thead { display: none; }
+  .tz-table--stack tr { display: grid; grid-template-columns: 1fr auto; gap: 2px var(--tz-space-3); padding: var(--tz-space-3) 0; border-top: 1px solid var(--tz-border); }
+  .tz-table--stack td { border: 0; padding: 0; }
+  .tz-table--stack td[data-col="amount"] { grid-row: 1; grid-column: 2; text-align: right; font-size: var(--tz-text-md); }
+  .tz-table--stack td[data-col="status"] { grid-column: 2; text-align: right; }
+  .tz-table--stack td[data-col="chain"] { display: none; }
+}
+
+/* QR frame — rombos in the corners instead of generic brackets */
+.tz-qr { position: relative; padding: var(--tz-space-4); background: #fff; border-radius: var(--tz-radius-lg); width: max-content; }
+.tz-qr::before, .tz-qr::after { content: ""; position: absolute; width: 12px; height: 12px; background: var(--creator-accent-fill); transform: rotate(45deg); border-radius: 2px; }
+.tz-qr::before { left: -6px; top: -6px; }
+.tz-qr::after { right: -6px; bottom: -6px; background: var(--tz-cochinilla-500); }
+
+/* ---------------------------------------------------------------------
+   17. KEYFRAMES
+   --------------------------------------------------------------------- */
+@keyframes tz-thread-flow { to { stroke-dashoffset: -96; } }
+@keyframes tz-stitch-run  { to { background-position: 0 22px; } }
+@keyframes tz-pulse       { 0%, 100% { opacity: 1; scale: 1; } 50% { opacity: 0.35; scale: 0.7; } }
+@keyframes tz-spin-rombo  { 0% { rotate: 0deg; } 60%, 100% { rotate: 180deg; } }
+@keyframes tz-knot-breathe { 0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--_line) 40%, transparent); } 50% { box-shadow: 0 0 0 7px color-mix(in srgb, var(--_line) 0%, transparent); } }
+@keyframes tz-eye         { 0%, 100% { scale: 1; } 50% { scale: 1.18; } }
+@keyframes tz-shuttle     { 0% { translate: 0 0; } 50% { translate: 56px 0; } 100% { translate: 0 0; } }
+@keyframes tz-draw        { to { stroke-dashoffset: 0; } }
+@keyframes tz-fade-in     { from { opacity: 0; } to { opacity: 1; } }
+@keyframes tz-knot-pop    { 0% { transform: scale(0.6) rotate(-8deg); opacity: 0; } 100% { transform: scale(1) rotate(0deg); opacity: 1; } }
+@keyframes tz-burst {
+  0%   { opacity: 0; transform: translate(0, 0) rotate(45deg) scale(0.4); }
+  15%  { opacity: 1; }
+  100% { opacity: 0; transform: translate(var(--x, 60px), var(--y, -60px)) rotate(calc(45deg + var(--r, 180deg))) scale(1); }
+}
+@keyframes tz-rise        { to { opacity: 1; transform: none; } }
+@keyframes tz-fibre       { from { rotate: -4deg; } to { rotate: 5deg; } }
+@keyframes tz-toast-in    { from { opacity: 0; transform: translateY(12px) scale(0.98); } }
+
+/* ---------------------------------------------------------------------
+   18. REDUCED MOTION — every loop stops; meaning is carried by the
+   static state (colour + icon + words), never by motion alone.
+   --------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .tz-loom__t, .tz-loom__out, .tz-loom__eye, .tz-loom__shuttle,
+  .tz-pill::before, .tz-step__knot, .tz-step__knot::after, .tz-step::before,
+  .tz-fray__fibre, .tz-toast { animation: none !important; }
+  .tz-knot__tile { transform: none; opacity: 1; }
+  .tz-knot__thread { stroke-dashoffset: 0; }
+  .tz-knot.is-playing .tz-knot__tile, .tz-knot.is-playing .tz-knot__thread, .tz-knot.is-playing .tz-knot__gap { animation: none; }
+  .tz-burst { display: none; }
+  .tz-rise { opacity: 1; transform: none; animation: none !important; }
+  .tz-btn, .tz-chip, .tz-amount-opt { transition: none; }
+  .tz-btn:active { transform: none; }
+}

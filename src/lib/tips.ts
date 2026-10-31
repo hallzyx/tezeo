@@ -15,6 +15,8 @@ export interface TipRow {
   app_fee_bps: number; deposit_address: string; deposit_memo: string | null; refund_to: string;
   deadline: string; settlement_tx: string | null; fan_name: string; fan_message: string;
   is_pass: number; pass_token: string | null; pass_expires_at: string | null;
+  /** Why it failed/refunded, e.g. "underpaid" or Aurora's refund reason. Support-only, never shown raw. */
+  detail?: string | null;
   created_at: string; updated_at: string;
 }
 
@@ -73,7 +75,7 @@ export async function createTip(creator: CreatorRow, input: {
     app_fee_bps: quote.appFeeBps, deposit_address: quote.depositAddress, deposit_memo: quote.depositMemo ?? null,
     refund_to: input.refundTo, deadline: quote.deadline, settlement_tx: null,
     fan_name: (input.fanName ?? "").slice(0, 40), fan_message: (input.fanMessage ?? "").slice(0, 280),
-    is_pass: input.isPass ? 1 : 0, pass_token: null, pass_expires_at: null,
+    is_pass: input.isPass ? 1 : 0, pass_token: null, pass_expires_at: null, detail: null,
     created_at: now, updated_at: now,
   };
   db().prepare(
@@ -81,6 +83,12 @@ export async function createTip(creator: CreatorRow, input: {
      VALUES (@id,@creator_id,@status,@origin_asset_id,@origin_chain,@origin_symbol,@amount_in,@amount_out_usdc,@final_out_usdc,@app_fee_bps,@deposit_address,@deposit_memo,@refund_to,@deadline,@settlement_tx,@fan_name,@fan_message,@is_pass,@pass_token,@pass_expires_at,@created_at,@updated_at)`,
   ).run(row);
   return row;
+}
+
+export function setTipNote(id: string, fanName: string, fanMessage: string): TipRow | undefined {
+  db().prepare("UPDATE tips SET fan_name=?, fan_message=?, updated_at=? WHERE id=?")
+    .run(fanName.slice(0, 40), fanMessage.slice(0, 280), new Date().toISOString(), id);
+  return getTip(id);
 }
 
 /**
@@ -101,6 +109,9 @@ export async function refreshTip(tip: TipRow): Promise<TipRow> {
   if (next === tip.status && !res.settlementTx) return tip;
 
   const patch: Partial<TipRow> = { status: next };
+  if (next === "failed" || next === "refunded") {
+    patch.detail = res.status === "INCOMPLETE_DEPOSIT" ? "underpaid" : (res.detail ?? null);
+  }
   if (next === "received") {
     patch.settlement_tx = res.settlementTx ?? null;
     patch.final_out_usdc = res.amountOutUsdc ?? tip.amount_out_usdc;
@@ -116,7 +127,7 @@ function save(tip: TipRow, patch: Partial<TipRow>): TipRow {
   const next = { ...tip, ...patch, updated_at: new Date().toISOString() };
   db().prepare(
     `UPDATE tips SET status=@status, final_out_usdc=@final_out_usdc, settlement_tx=@settlement_tx,
-       pass_token=@pass_token, pass_expires_at=@pass_expires_at, updated_at=@updated_at WHERE id=@id`,
-  ).run(next);
+       pass_token=@pass_token, pass_expires_at=@pass_expires_at, detail=@detail, updated_at=@updated_at WHERE id=@id`,
+  ).run({ ...next, detail: next.detail ?? null });
   return next;
 }

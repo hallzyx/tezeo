@@ -28,6 +28,10 @@ export async function POST(req: Request) {
   const units = toUnits(b.amount, asset.decimals);
   if (!units) return NextResponse.json({ error: "Enter a valid amount." }, { status: 400 });
 
+  const usdValue = (Number(units) / 10 ** asset.decimals) * (asset.usdPrice ?? 0);
+  if (asset.usdPrice && usdValue < 1)
+    return NextResponse.json({ error: "The smallest tip is $1. Network fees would eat the rest." }, { status: 422 });
+
   try {
     const tip = await createTip(creator, {
       originAssetId: asset.assetId, amountIn: units, refundTo: b.refundTo,
