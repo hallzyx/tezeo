@@ -4,7 +4,7 @@ import { POST as createCreatorRoute } from "@/app/api/creators/route";
 import { POST as createTipRoute } from "@/app/api/tips/route";
 import { PATCH as patchTip } from "@/app/api/tips/[id]/route";
 
-const WALLET = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v";
+const WALLET = "GBR7vwX5Thj7GzMLYHDUS21rnyTFhGciaz59Bm7jwMrJ";
 const json = (body: unknown) => new Request("http://x", { method: "POST", body: JSON.stringify(body) });
 beforeEach(() => resetDbForTests());
 afterEach(() => resetDbForTests());

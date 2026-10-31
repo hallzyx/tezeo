@@ -3,7 +3,9 @@ import { clampFeeBps, fromUnits, isValidSolanaAddress, mapStatus, normalizeHandl
 
 describe("domain", () => {
   it("validates Solana addresses", () => {
-    expect(isValidSolanaAddress("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v")).toBe(true);
+    expect(isValidSolanaAddress("GBR7vwX5Thj7GzMLYHDUS21rnyTFhGciaz59Bm7jwMrJ")).toBe(true);
+    // The USDC mint is a valid key but a token mint, not a wallet: Aurora rejects it and funds would be lost.
+    expect(isValidSolanaAddress("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v")).toBe(false);
     expect(isValidSolanaAddress("0xde0B295669a9FD93d5F28D9Ec85E40f4cb697BAe")).toBe(false);
     expect(isValidSolanaAddress("short")).toBe(false);
     expect(isValidSolanaAddress("")).toBe(false);

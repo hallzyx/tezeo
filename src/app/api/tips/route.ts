@@ -40,6 +40,9 @@ export async function POST(req: Request) {
     return NextResponse.json(tipView(tip), { status: 201 });
   } catch (e) {
     const msg = e instanceof Error ? e.message : "Could not create the quote.";
-    return NextResponse.json({ error: msg }, { status: msg.startsWith("Pass") ? 422 : 502 });
+    if (msg.startsWith("Pass")) return NextResponse.json({ error: msg }, { status: 422 });
+    // Aurora rejects bad refund addresses with a clear message; anything else is ours to hide.
+    const refund = /refundTo/i.test(msg);
+    return NextResponse.json({ error: refund ? "refundTo is not valid" : "We couldn't get a quote right now. Try again in a moment." }, { status: refund ? 422 : 502 });
   }
 }

@@ -35,7 +35,7 @@ button.tzs-mini { cursor: pointer; }
 .tzs-desktop-qr { display: none; }
 @media (min-width: 900px) {
   .tzs-creator-layout { display: grid; grid-template-columns: minmax(0, var(--tz-column)) 260px; gap: var(--tz-space-8); justify-content: center; align-items: start; }
-  .tzs-desktop-qr { display: grid; gap: var(--tz-space-3); justify-items: center; position: sticky; top: 120px; margin-top: 160px; text-align: center; }
+  .tzs-desktop-qr { display: grid; gap: var(--tz-space-3); justify-items: center; position: sticky; top: 120px; margin-top: 48px; text-align: center; }
   .tzs-share-mobile { display: none !important; }
 }
 .tzs-qr svg { display: block; width: 168px; height: 168px; }
@@ -83,3 +83,18 @@ button.tzs-mini { cursor: pointer; }
 .tzs-preview > div { border-radius: var(--tz-radius-lg); padding: var(--tz-space-3); background: var(--tz-bg); color: var(--tz-text); border: 1px solid var(--tz-border); display: grid; gap: 8px; justify-items: start; }
 .tzs-sheet { position: fixed; inset: 0; background: rgba(18, 13, 24, .55); display: grid; align-items: end; z-index: 60; }
 .tzs-sheet > div { background: var(--tz-surface); border-radius: var(--tz-radius-xl, 28px) var(--tz-radius-xl, 28px) 0 0; padding: var(--tz-space-5); max-height: 80dvh; overflow: auto; max-width: var(--tz-column); width: 100%; margin-inline: auto; display: grid; gap: var(--tz-space-3); }
+
+/* Dark preview panel: tokens only flip from :root, so restate the dark values for this subtree. */
+.tzs-preview > [data-theme="dark"] {
+  --tz-bg: var(--tz-obsidiana-900); --tz-text: #F7EFE6; --tz-border: #3a2f43;
+  --creator-accent-ink: var(--tz-obsidiana-900);
+  --creator-accent-fill: var(--creator-accent);
+  --creator-accent-text: var(--creator-accent);
+}
+@supports (color: oklch(from red l c h)) {
+  .tzs-preview > [data-theme="dark"] {
+    --creator-accent-fill: oklch(from var(--creator-accent) max(l, 0.76) min(c, 0.17) h);
+    --creator-accent-text: oklch(from var(--creator-accent) max(l, 0.78) min(c, 0.17) h);
+  }
+}
+.tzs-fullbleed { width: 100%; }

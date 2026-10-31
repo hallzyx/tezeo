@@ -17,9 +17,12 @@ export function mapStatus(p: ProviderStatus): TipStatus {
   }
 }
 
+/** Token mints are valid keys but never someone's wallet; Aurora rejects the USDC mint as a recipient. */
+const NOT_WALLETS = new Set(["EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"]);
+
 /** RF-2: a Solana address must be a valid base58 32-byte ed25519-sized key. */
 export function isValidSolanaAddress(addr: string): boolean {
-  if (typeof addr !== "string" || addr.length < 32 || addr.length > 44) return false;
+  if (typeof addr !== "string" || addr.length < 32 || addr.length > 44 || NOT_WALLETS.has(addr)) return false;
   try {
     return new PublicKey(addr).toBytes().length === 32;
   } catch {

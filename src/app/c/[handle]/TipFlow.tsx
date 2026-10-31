@@ -122,6 +122,7 @@ export function TipFlow({ creator, qrSvg, pageUrl }: { creator: PublicCreator; q
   const cryptoAmount = useMemo(() => {
     const a = data?.assets.find((x) => x.assetId === assetId);
     if (!a?.usdPrice) return null;
+    if (a.stable) return amountNow.toFixed(2); // dollar coins: ask for the exact dollar amount, not a price-drift fraction
     const dp = Math.min(a.decimals, 8);
     const m = 10 ** dp;
     return (Math.ceil((amountNow / a.usdPrice) * m) / m).toFixed(dp);
@@ -174,7 +175,6 @@ export function TipFlow({ creator, qrSvg, pageUrl }: { creator: PublicCreator; q
   if (step === "amount") {
     body = (
       <>
-        <div className="tzs-bleed"><Weave height={96} /></div>
         <div className="tzs-id">
           <Avatar name={creator.displayName} src={creator.avatarUrl} />
           <h1>{creator.displayName}</h1>
@@ -268,6 +268,7 @@ export function TipFlow({ creator, qrSvg, pageUrl }: { creator: PublicCreator; q
         <ThemeToggle />
       </div>}
       {isThanks && <Weave slim />}
+      {step === "amount" && <Weave height={96} />}
       <div className="tzs-creator-layout">
         <main className={`tzs-main${step === "amount" ? " tzs-main--flush" : ""}`} aria-live="off">{body}</main>
         {step === "amount" && (

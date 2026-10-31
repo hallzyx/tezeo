@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { resetDbForTests } from "@/lib/db";
 import { createCreator, createTip, getTip, listTips, refreshTip } from "@/lib/tips";
 
-const WALLET = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v";
+const WALLET = "GBR7vwX5Thj7GzMLYHDUS21rnyTFhGciaz59Bm7jwMrJ";
 
 beforeEach(() => { vi.useFakeTimers(); vi.setSystemTime(new Date("2026-11-01T00:00:00Z")); });
 afterEach(() => { vi.useRealTimers(); resetDbForTests(); });
