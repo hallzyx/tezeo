@@ -1,0 +1,804 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tezeo Brand System</title>
+<link rel="icon" href="logo-mark.svg" type="image/svg+xml">
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="components.css">
+<style>
+  /* ---- Preview-page-only layout (not part of the system) ---- */
+  .pv-wrap { max-width: 1200px; margin: 0 auto; padding: 0 var(--tz-gutter); }
+  .pv-top { position: sticky; top: 0; z-index: var(--tz-z-sticky); background: color-mix(in srgb, var(--tz-bg) 86%, transparent); backdrop-filter: blur(12px); border-bottom: 1px solid var(--tz-border); }
+  .pv-top .pv-wrap { display: flex; align-items: center; gap: var(--tz-space-4); height: 64px; }
+  .pv-top img, .pv-top .pv-logo { height: 30px; display: block; }
+  .pv-nav { display: flex; gap: var(--tz-space-4); font-size: var(--tz-text-sm); font-weight: 600; }
+  .pv-nav a { color: var(--tz-text-muted); text-decoration: none; }
+  .pv-nav a:hover { color: var(--tz-text); }
+  .pv-theme { display: inline-flex; padding: 3px; gap: 2px; border: 1.5px solid var(--tz-border); border-radius: 999px; background: var(--tz-surface); }
+  .pv-theme button { border: 0; background: none; color: var(--tz-text-muted); font: 600 var(--tz-text-xs)/1 var(--tz-font-body); padding: 8px 12px; border-radius: 999px; cursor: pointer; }
+  .pv-theme button[aria-pressed="true"] { background: var(--tz-text); color: var(--tz-bg); }
+
+  .pv-hero { position: relative; overflow: hidden; padding: var(--tz-space-16) 0 var(--tz-space-12); }
+  .pv-hero h1 { font-size: clamp(3rem, 1.6rem + 7vw, 7.5rem); max-width: 11ch; }
+  .pv-hero h1 em { font-style: normal; color: var(--tz-brand-text); position: relative; white-space: nowrap; }
+  .pv-hero h1 em::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0.02em; height: 0.12em; background: repeating-linear-gradient(90deg, var(--tz-maiz-400) 0 0.32em, transparent 0.32em 0.44em); border-radius: 4px; }
+  .pv-hero p.lede { font-size: var(--tz-text-xl); max-width: 36ch; color: var(--tz-text-muted); margin: var(--tz-space-6) 0 0; line-height: 1.4; }
+  .pv-hero p.lede b { color: var(--tz-text); font-weight: 600; }
+  .pv-hero-art { position: absolute; right: -40px; top: 40px; width: 520px; opacity: 1; pointer-events: none; }
+  @media (max-width: 900px) { .pv-hero-art { position: static; width: 100%; max-width: 440px; margin: var(--tz-space-8) 0 0 auto; display: block; } }
+
+  .pv-sec { padding: var(--tz-space-16) 0; border-top: 1px solid var(--tz-border); }
+  .pv-sec-head { display: grid; grid-template-columns: auto 1fr; gap: var(--tz-space-2) var(--tz-space-5); align-items: baseline; margin-bottom: var(--tz-space-10); }
+  .pv-num { font: 800 var(--tz-text-sm)/1 var(--tz-font-mono); color: var(--tz-brand-text); }
+  .pv-sec-head h2 { font-size: var(--tz-text-3xl); }
+  .pv-sec-head p { grid-column: 2; margin: 0; color: var(--tz-text-muted); max-width: 60ch; }
+  @media (max-width: 640px) { .pv-sec-head { grid-template-columns: 1fr; } .pv-sec-head p { grid-column: 1; } }
+
+  .pv-grid { display: grid; gap: var(--tz-space-5); grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); }
+  .pv-grid--2 { grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); }
+  .pv-label { font: 600 var(--tz-text-2xs)/1 var(--tz-font-body); letter-spacing: var(--tz-tracking-overline); text-transform: uppercase; color: var(--tz-text-muted); margin: 0 0 var(--tz-space-3); }
+
+  /* logo plates */
+  .pv-plate { border-radius: var(--tz-radius-xl); padding: var(--tz-space-8); display: grid; place-items: center; min-height: 220px; position: relative; }
+  .pv-plate small { position: absolute; left: 20px; bottom: 16px; font: 600 var(--tz-text-2xs)/1 var(--tz-font-body); letter-spacing: .1em; text-transform: uppercase; opacity: .7; }
+  .pv-plate--paper { background: #FBF6EE; color: #1C1424; border: 1.5px solid var(--tz-border); }
+  .pv-plate--night { background: #120D18; color: #F7EFE6; }
+  .pv-plate--brand { background: #D1245A; color: #FFF7EC; }
+  .pv-plate--gold { background: #FFC23D; color: #1C1424; }
+  .pv-plate svg { display: block; }
+  .pv-favs { display: flex; align-items: end; gap: 18px; }
+  .pv-construct { background-image: linear-gradient(var(--tz-border) 1px, transparent 1px), linear-gradient(90deg, var(--tz-border) 1px, transparent 1px); background-size: 12.5% 12.5%; background-color: var(--tz-surface); }
+
+  /* swatches */
+  .pv-swatches { display: grid; gap: var(--tz-space-4); grid-template-columns: repeat(auto-fill, minmax(min(100%, 170px), 1fr)); }
+  .pv-sw { border-radius: var(--tz-radius-lg); overflow: hidden; border: 1.5px solid var(--tz-border); background: var(--tz-surface); }
+  .pv-sw__chip { height: 108px; padding: 12px; display: flex; align-items: flex-end; justify-content: space-between; font: 700 var(--tz-text-sm)/1 var(--tz-font-body); }
+  .pv-sw__meta { padding: 12px; display: grid; gap: 3px; font-size: var(--tz-text-xs); color: var(--tz-text-muted); }
+  .pv-sw__meta b { font: 700 var(--tz-text-md)/1.2 var(--tz-font-display); color: var(--tz-text); }
+  .pv-ramp { display: grid; grid-template-columns: repeat(10, 1fr); height: 40px; border-radius: var(--tz-radius-sm); overflow: hidden; margin-top: var(--tz-space-4); }
+
+  .pv-status-grid { display: grid; gap: var(--tz-space-3); grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr)); }
+  .pv-status { border-radius: var(--tz-radius-md); padding: var(--tz-space-4); display: grid; gap: var(--tz-space-2); }
+
+  /* type */
+  .pv-type-row { display: grid; grid-template-columns: 140px 1fr; gap: var(--tz-space-5); align-items: baseline; padding: var(--tz-space-4) 0; border-bottom: 1px dashed var(--tz-border); }
+  @media (max-width: 640px) { .pv-type-row { grid-template-columns: 1fr; gap: 4px; } }
+
+  /* phones */
+  .pv-phones { display: grid; gap: var(--tz-space-8) var(--tz-space-6); grid-template-columns: repeat(auto-fill, minmax(min(100%, 360px), 1fr)); align-items: start; }
+  .pv-phone-wrap > .pv-label { display: flex; gap: 8px; align-items: center; }
+  .pv-phone { background: var(--tz-bg); border: 1.5px solid var(--tz-border-strong); border-radius: 40px; overflow: hidden; box-shadow: var(--tz-shadow-3); position: relative; }
+  .pv-phone__bar { height: 34px; display: flex; align-items: center; justify-content: space-between; padding: 0 26px; font: 700 12px/1 var(--tz-font-body); color: var(--tz-text); }
+  .pv-phone__bar i { width: 90px; height: 22px; background: #0C0810; border-radius: 20px; }
+  .pv-phone__url { margin: 0 14px 8px; padding: 7px 12px; border-radius: 12px; background: var(--tz-surface-2); font: 600 12px/1 var(--tz-font-body); color: var(--tz-text-muted); display: flex; gap: 6px; align-items: center; justify-content: center; }
+  .pv-phone__url b { color: var(--tz-text); }
+  .pv-screen { padding: var(--tz-space-5) var(--tz-space-4) var(--tz-space-6); display: grid; gap: var(--tz-space-5); }
+  .pv-screen--flush { padding-top: 0; }
+  @media (max-width: 480px) {
+    .pv-phone { border-radius: 28px; }
+  }
+
+  .pv-topnav { display: flex; align-items: center; gap: 8px; }
+  .pv-back { width: 40px; height: 40px; border-radius: 12px; border: 1.5px solid var(--tz-border); display: grid; place-items: center; background: var(--tz-surface); color: var(--tz-text); }
+  .pv-back svg { width: 18px; height: 18px; }
+  .pv-progress { display: flex; gap: 4px; flex: 1; justify-content: flex-end; }
+  .pv-progress span { width: 22px; height: 6px; border-radius: 3px; background: var(--tz-border); }
+  .pv-progress span.on { background: var(--tz-brand); }
+
+  .pv-mini-creator { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: var(--tz-radius-md); background: var(--creator-accent-soft); }
+  .pv-mini-creator b { display: block; font-size: var(--tz-text-sm); }
+  .pv-mini-creator span { font-size: var(--tz-text-xs); color: var(--tz-text-muted); }
+
+  .pv-creator-head { margin: 0 -16px; }
+  .pv-creator-id { display: grid; justify-items: center; text-align: center; gap: 6px; margin-top: -52px; position: relative; }
+  .pv-creator-id h3 { font: 800 var(--tz-text-2xl)/1.05 var(--tz-font-display); letter-spacing: -0.025em; margin: 6px 0 0; }
+  .pv-handle { font: 600 var(--tz-text-sm)/1 var(--tz-font-body); color: var(--creator-accent-text); }
+  .pv-quote-msg { position: relative; margin: 0; padding: var(--tz-space-4) var(--tz-space-5); background: var(--tz-surface); border: 1.5px solid var(--tz-border); border-radius: var(--tz-radius-lg); font-size: var(--tz-text-md); line-height: 1.45; }
+  .pv-quote-msg::before { content: ""; position: absolute; left: 50%; top: -8px; width: 14px; height: 14px; background: var(--tz-surface); border-left: 1.5px solid var(--tz-border); border-top: 1.5px solid var(--tz-border); transform: translateX(-50%) rotate(45deg); }
+  .pv-trust { display: flex; gap: 8px; align-items: center; justify-content: center; font-size: var(--tz-text-xs); color: var(--tz-text-muted); text-align: center; }
+  .pv-trust svg { width: 14px; height: 14px; flex: none; }
+  .pv-footer-mark { display: flex; justify-content: center; align-items: center; gap: 6px; font: 600 11px/1 var(--tz-font-body); color: var(--tz-text-faint); letter-spacing: .04em; }
+  .pv-footer-mark svg { width: 16px; height: 16px; }
+
+  .pv-big-moment { text-align: center; display: grid; gap: var(--tz-space-3); justify-items: center; padding-top: var(--tz-space-4); }
+  .pv-big-moment h3.tz-display { font-size: var(--tz-text-4xl); }
+  .pv-big-moment h3.tz-h1 { font-size: var(--tz-text-2xl); }
+  .pv-grid--5 { grid-template-columns: repeat(auto-fill, minmax(min(100%, 208px), 1fr)); }
+  .pv-fan-note { background: var(--creator-accent-soft); border-radius: var(--tz-radius-lg); padding: var(--tz-space-4); text-align: left; display: grid; gap: 6px; width: 100%; }
+  .pv-fan-note p { margin: 0; font-size: var(--tz-text-sm); }
+
+  .pv-browser { border: 1.5px solid var(--tz-border-strong); border-radius: var(--tz-radius-xl); overflow: hidden; background: var(--tz-bg); box-shadow: var(--tz-shadow-3); }
+  .pv-browser__bar { display: flex; gap: 6px; align-items: center; padding: 12px 16px; background: var(--tz-surface-2); border-bottom: 1px solid var(--tz-border); }
+  .pv-browser__bar i { width: 11px; height: 11px; border-radius: 50%; background: var(--tz-border-strong); }
+  .pv-dash { display: grid; grid-template-columns: 220px 1fr; min-height: 560px; }
+  .pv-dash aside { border-right: 1px solid var(--tz-border); padding: var(--tz-space-5); display: grid; align-content: start; gap: 4px; background: var(--tz-surface); }
+  .pv-dash aside a { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 12px; color: var(--tz-text-muted); text-decoration: none; font-weight: 600; font-size: var(--tz-text-sm); }
+  .pv-dash aside a.on { background: var(--tz-brand-soft); color: var(--tz-brand-text); }
+  .pv-dash aside a svg { width: 18px; height: 18px; }
+  .pv-dash main { padding: var(--tz-space-6); display: grid; gap: var(--tz-space-5); align-content: start; min-width: 0; }
+  .pv-stats { display: grid; gap: var(--tz-space-4); grid-template-columns: repeat(3, 1fr); }
+  @media (max-width: 860px) { .pv-dash { grid-template-columns: 1fr; } .pv-dash aside { display: none; } }
+  @media (max-width: 640px) { .pv-stats { grid-template-columns: 1fr 1fr; } .pv-stats > :first-child { grid-column: 1 / -1; } .pv-dash main { padding: var(--tz-space-4); } }
+  .pv-fan { display: flex; align-items: center; gap: 10px; }
+  .pv-fan .pv-dot { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; font: 800 12px/1 var(--tz-font-display); color: #fff; flex: none; }
+  .pv-fan b { display: block; font-weight: 600; }
+  .pv-fan small { color: var(--tz-text-muted); }
+  .pv-spark { height: 72px; width: 100%; display: block; }
+
+  .pv-accent-picker { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .pv-accent-picker button { width: 34px; height: 34px; border-radius: 50%; border: 3px solid var(--tz-surface); box-shadow: 0 0 0 1.5px var(--tz-border-strong); cursor: pointer; }
+  .pv-accent-picker button[aria-pressed="true"] { box-shadow: 0 0 0 2.5px var(--tz-text); }
+
+  .pv-voice { display: grid; gap: var(--tz-space-3); }
+  .pv-voice-row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--tz-space-3); }
+  .pv-voice-row > div { padding: var(--tz-space-4); border-radius: var(--tz-radius-md); font-size: var(--tz-text-sm); }
+  .pv-voice-row .no { background: var(--tz-bg-sunken); color: var(--tz-text-muted); text-decoration: line-through; text-decoration-color: var(--tz-failed-line); }
+  .pv-voice-row .yes { background: var(--tz-brand-soft); color: var(--tz-text); font-weight: 600; }
+  @media (max-width: 640px) { .pv-voice-row { grid-template-columns: 1fr; } }
+
+  .pv-footer { padding: var(--tz-space-12) 0; border-top: 1px solid var(--tz-border); color: var(--tz-text-muted); font-size: var(--tz-text-sm); }
+</style>
+</head>
+<body class="tz-app">
+
+<!-- ================= ICON SPRITE ================= -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5 10 17.5 19 7" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M7 7 17 17M17 7 7 17" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></symbol>
+  <symbol id="i-return" viewBox="0 0 24 24"><path d="M9 6 4 11l5 5M4 11h10a5 5 0 0 1 0 10h-3" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 5.5A2.5 2.5 0 0 0 13.5 3H6a3 3 0 0 0-3 3v7.5A2.5 2.5 0 0 0 5.5 16" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+  <symbol id="i-back" viewBox="0 0 24 24"><path d="M15 5 8 12l7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 4.5 6v5.5c0 4.6 3.2 8.3 7.5 9.5 4.3-1.2 7.5-4.9 7.5-9.5V6L12 3Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="m8.5 12 2.5 2.5 4.5-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7.5V12l3 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-share" viewBox="0 0 24 24"><path d="M12 15V4m0 0L8 8m4-4 4 4M5 13v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20s-7.5-4.4-7.5-10.1A4.4 4.4 0 0 1 12 7a4.4 4.4 0 0 1 7.5 2.9C19.5 15.6 12 20 12 20Z" fill="currentColor"/></symbol>
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 11 12 4l8 7v8a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1v-8Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+  <symbol id="i-list" viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="m4.5 4.5 1.5 1.5-1.5 1.5L3 6zM4.5 10.5 6 12l-1.5 1.5L3 12zM4.5 16.5 6 18l-1.5 1.5L3 18z" fill="currentColor"/></symbol>
+  <symbol id="i-brush" viewBox="0 0 24 24"><path d="M14 4 20 10l-8 8H6v-6l8-8Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+  <symbol id="i-pass" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="m12 9 3 3-3 3-3-3z" fill="currentColor"/></symbol>
+  <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M9.6 9.5a2.5 2.5 0 1 1 3.4 2.3c-.6.3-1 .8-1 1.5v.4M12 16.8v.2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <!-- the mark, for inline reuse -->
+  <symbol id="tz-mark" viewBox="0 0 64 64"><rect width="64" height="64" rx="16" fill="#D1245A"/><path d="M9.5 19H22c9 0 15.5 6 15.5 14v19.5" fill="none" stroke="#FFC23D" stroke-width="7.5" stroke-linecap="round"/><path d="M42 19c-9 0-15.5 6-15.5 14" fill="none" stroke="#D1245A" stroke-width="13.5"/><path d="M54.5 19H42c-9 0-15.5 6-15.5 14v19.5" fill="none" stroke="#FFF7EC" stroke-width="7.5" stroke-linecap="round"/></symbol>
+  <symbol id="tz-mono" viewBox="0 0 64 64"><mask id="pvgap" maskUnits="userSpaceOnUse" x="0" y="0" width="64" height="64"><rect width="64" height="64" fill="#fff"/><path d="M42 19c-9 0-15.5 6-15.5 14" fill="none" stroke="#000" stroke-width="13.5"/></mask><g fill="none" stroke="currentColor" stroke-width="7.5" stroke-linecap="round"><path mask="url(#pvgap)" d="M9.5 19H22c9 0 15.5 6 15.5 14v19.5"/><path d="M54.5 19H42c-9 0-15.5 6-15.5 14v19.5"/></g></symbol>
+  <symbol id="tz-letters" viewBox="82 4 154 56"><mask id="pvtgap" maskUnits="userSpaceOnUse" x="82" y="4" width="40" height="56"><rect x="82" y="4" width="40" height="56" fill="#fff"/><path d="M93.5 19V36" stroke="#000" stroke-width="11"/></mask><g fill="none" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" stroke="currentColor"><path mask="url(#pvtgap)" d="M84 27.5H105.5" style="stroke:var(--pv-t, currentColor)"/><path d="M93.5 13V41c0 5 2.5 7.5 7.5 7.5h3"/><path d="M116 38H137A10.5 10.5 0 1 0 133.92 45.42"/><path d="M149 27.5H166L149 48.5H166"/><path d="M178 38H199A10.5 10.5 0 1 0 195.92 45.42"/><circle cx="221.5" cy="38" r="10.5"/></g></symbol>
+</svg>
+
+<!-- ================= TOP BAR ================= -->
+<header class="pv-top">
+  <div class="pv-wrap">
+    <svg class="pv-logo" viewBox="0 0 240 64" style="--pv-t: var(--tz-brand); color: var(--tz-text)" role="img" aria-label="Tezeo"><use href="#tz-mark" width="64" height="64"/><use href="#tz-letters" x="82" y="4" width="154" height="56"/></svg>
+    <nav class="pv-nav" aria-label="Sections" style="margin-left:auto">
+      <a href="#logo" class="hide-sm">Logo</a><a href="#color">Color</a><a href="#type">Type</a><a href="#components">Components</a><a href="#screens">Screens</a>
+    </nav>
+    <div class="pv-theme" role="group" aria-label="Theme">
+      <button type="button" data-set-theme="light" aria-pressed="true">Light</button>
+      <button type="button" data-set-theme="dark" aria-pressed="false">Dark</button>
+    </div>
+  </div>
+</header>
+<style>@media (max-width: 720px) { .pv-nav { display: none; } .pv-theme { margin-left: auto; } }</style>
+
+<main>
+<!-- ================= HERO ================= -->
+<section class="pv-hero">
+  <div class="pv-wrap">
+    <p class="tz-overline" style="margin:0 0 var(--tz-space-5)">Brand system · v1.0 · Lima / CDMX / Bogotá</p>
+    <h1 class="tz-display">Every tip is a <em>thread.</em></h1>
+    <p class="lede">Fans pay from <b>any chain</b>. Creators always get <b>USDC on Solana</b>. Tezeo is the loom in between — and it should feel like a hug, not a bank.</p>
+    <div class="tz-row" style="margin-top:var(--tz-space-8);flex-wrap:wrap">
+      <a class="tz-btn tz-btn--primary tz-btn--lg" href="#screens">See the screens</a>
+      <a class="tz-btn tz-btn--secondary tz-btn--lg" href="#logo">The mark</a>
+    </div>
+  </div>
+  <svg class="pv-hero-art" viewBox="0 0 520 360" aria-hidden="true">
+    <g fill="none" stroke-linecap="round">
+      <path d="M-10 60 C140 60 180 180 300 180" stroke="#FFC23D" stroke-width="14" class="tz-loom__t" style="stroke-dasharray:none"/>
+      <path d="M-10 180 C120 140 200 220 300 180" stroke="#5B4FE0" stroke-width="14"/>
+      <path d="M-10 300 C140 300 180 180 300 180" stroke="#FF5C8F" stroke-width="14"/>
+      <path d="M300 180 H540" stroke="#D1245A" stroke-width="22"/>
+      <path d="M300 180 H540" stroke="#FFF7EC" stroke-width="2.5" stroke-dasharray="10 8" opacity=".75"/>
+    </g>
+    <circle cx="300" cy="180" r="24" fill="var(--tz-bg)" stroke="var(--tz-text)" stroke-width="5"/>
+    <path d="M300 168 312 180 300 192 288 180Z" fill="#FFC23D"/>
+    <g font-family="Instrument Sans" font-weight="700" font-size="13" fill="var(--tz-text-muted)" letter-spacing="1.2">
+      <text x="10" y="42">ETH</text><text x="10" y="162">BTC</text><text x="10" y="282">BASE</text>
+      <text x="372" y="156" fill="var(--tz-text)">USDC · SOLANA</text>
+    </g>
+  </svg>
+</section>
+
+<!-- ================= 01 CONCEPT ================= -->
+<section class="pv-sec" id="concept">
+  <div class="pv-wrap">
+    <div class="pv-sec-head"><span class="pv-num">01</span><h2 class="tz-h1">Concept &amp; voice</h2>
+      <p><b>Tezeo</b> = <i>tejer</i> (to weave) + <i>-eo</i>, the Spanish suffix for a rhythm that never stops (<i>goteo</i>, <i>tecleo</i>, <i>zapateo</i>). The steady weaving of small acts of support. The <b>z</b> is a zig-zag stitch.</p></div>
+    <div class="pv-grid pv-grid--2">
+      <div class="tz-card tz-card--stitched" style="padding:var(--tz-space-6);align-self:start">
+        <p class="pv-label">Personality</p>
+        <div class="tz-stack" style="--tz-stack-gap:12px">
+          <div class="tz-row"><span class="tz-rombo" style="--_c:var(--tz-cochinilla-500)"></span><b>Warm, like a neighbour</b><span class="tz-muted tz-small">— not like a bank</span></div>
+          <div class="tz-row"><span class="tz-rombo" style="--_c:var(--tz-maiz-400)"></span><b>Crafted</b><span class="tz-muted tz-small">— handmade details, never ornate</span></div>
+          <div class="tz-row"><span class="tz-rombo" style="--_c:var(--tz-anil-500)"></span><b>Calm under pressure</b><span class="tz-muted tz-small">— errors are explained, never blamed</span></div>
+          <div class="tz-row"><span class="tz-rombo" style="--_c:var(--tz-hierba-500)"></span><b>Proudly Latin American</b><span class="tz-muted tz-small">— the region's colour, not a stereotype</span></div>
+        </div>
+      </div>
+      <div class="pv-voice">
+        <p class="pv-label">Voice — say it like a person</p>
+        <div class="pv-voice-row"><div class="no">Transaction initiated. Awaiting on-chain confirmation.</div><div class="yes">Got it! We're waiting for your payment to show up.</div></div>
+        <div class="pv-voice-row"><div class="no">Swap execution failed (slippage exceeded).</div><div class="yes">The price moved too fast, so we stopped. Your money is safe and on its way back.</div></div>
+        <div class="pv-voice-row"><div class="no">Payment successful.</div><div class="yes">You just made Vale's day.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 02 LOGO ================= -->
+<section class="pv-sec" id="logo">
+  <div class="pv-wrap">
+    <div class="pv-sec-head"><span class="pv-num">02</span><h2 class="tz-h1">The mark: <i>El Cruce</i></h2>
+      <p>Two threads arrive from opposite sides — a fan and a creator, any chain and Solana — cross over-under, and become one T. One crossing, one gap: that gap is the whole brand.</p></div>
+    <div class="pv-grid">
+      <div class="pv-plate pv-plate--paper pv-construct"><svg width="128" height="128"><use href="#tz-mark"/></svg><small>Primary mark</small></div>
+      <div class="pv-plate pv-plate--night"><svg width="132" height="132" style="color:#FFF7EC"><use href="#tz-mono"/></svg><small>Mono on night</small></div>
+      <div class="pv-plate pv-plate--brand"><svg width="132" height="132" style="color:#FFF7EC"><use href="#tz-mono"/></svg><small>Mono on cochinilla</small></div>
+      <div class="pv-plate pv-plate--gold"><svg width="132" height="132" style="color:#1C1424"><use href="#tz-mono"/></svg><small>Mono on maíz</small></div>
+    </div>
+    <div class="pv-grid pv-grid--2" style="margin-top:var(--tz-space-5)">
+      <div class="pv-plate pv-plate--paper"><svg viewBox="0 0 240 64" width="300" style="--pv-t:#D1245A;color:#1C1424;max-width:100%"><use href="#tz-mark" width="64" height="64"/><use href="#tz-letters" x="82" y="4" width="154" height="56"/></svg><small>Lockup · light</small></div>
+      <div class="pv-plate pv-plate--night"><svg viewBox="0 0 240 64" width="300" style="--pv-t:#FF5C8F;color:#F7EFE6;max-width:100%"><use href="#tz-mark" width="64" height="64"/><use href="#tz-letters" x="82" y="4" width="154" height="56"/></svg><small>Lockup · dark</small></div>
+      <div class="pv-plate pv-plate--paper" style="background:var(--tz-surface)"><div class="pv-favs"><svg width="64" height="64"><use href="#tz-mark"/></svg><svg width="48" height="48"><use href="#tz-mark"/></svg><svg width="32" height="32"><use href="#tz-mark"/></svg><svg width="16" height="16"><use href="#tz-mark"/></svg></div><small>Holds at 16px</small></div>
+      <div class="pv-plate pv-plate--paper" style="background:var(--tz-surface)">
+        <div style="display:flex;gap:28px;align-items:center;flex-wrap:wrap;justify-content:center">
+          <div style="position:relative;padding:16px;border:1.5px dashed var(--tz-cochinilla-300);border-radius:12px"><svg width="64" height="64"><use href="#tz-mark"/></svg><span style="position:absolute;top:-9px;left:50%;translate:-50% 0;background:var(--tz-surface);padding:0 6px;font:600 10px/1 var(--tz-font-mono);color:var(--tz-brand-text)">¼</span></div>
+          <div style="font-size:var(--tz-text-sm);max-width:22ch;color:var(--tz-text-muted)">Clear space = ¼ of the mark. Never recolour the threads, never rotate, never add a third thread.</div>
+        </div><small>Clear space</small></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 03 COLOR ================= -->
+<section class="pv-sec" id="color">
+  <div class="pv-wrap">
+    <div class="pv-sec-head"><span class="pv-num">03</span><h2 class="tz-h1">Natural dyes, digital light</h2>
+      <p>Named after the dyes and fibres of the region. Cochinilla leads; maíz celebrates; añil means "in motion". Neutrals are cotton and obsidian — warm, never grey.</p></div>
+    <div class="pv-swatches">
+      <div class="pv-sw"><div class="pv-sw__chip" style="background:#D1245A;color:#fff"><span>Aa</span><span>5.11</span></div><div class="pv-sw__meta"><b>Cochinilla</b>#D1245A · brand</div></div>
+      <div class="pv-sw"><div class="pv-sw__chip" style="background:#FFC23D;color:#1C1424"><span>Aa</span><span>11.1</span></div><div class="pv-sw__meta"><b>Maíz</b>#FFC23D · celebrate</div></div>
+      <div class="pv-sw"><div class="pv-sw__chip" style="background:#5B4FE0;color:#fff"><span>Aa</span><span>5.4</span></div><div class="pv-sw__meta"><b>Añil</b>#5B4FE0 · in motion</div></div>
+      <div class="pv-sw"><div class="pv-sw__chip" style="background:#FBF6EE;color:#1C1424;border-bottom:1px solid var(--tz-border)"><span>Aa</span><span>16.6</span></div><div class="pv-sw__meta"><b>Algodón</b>#FBF6EE · page</div></div>
+      <div class="pv-sw"><div class="pv-sw__chip" style="background:#120D18;color:#F7EFE6"><span>Aa</span><span>16.8</span></div><div class="pv-sw__meta"><b>Obsidiana</b>#120D18 · night</div></div>
+      <div class="pv-sw"><div class="pv-sw__chip" style="background:#1C1424;color:#FFF7EC"><span>Aa</span><span>16.5</span></div><div class="pv-sw__meta"><b>Tinta</b>#1C1424 · ink</div></div>
+    </div>
+    <div class="pv-ramp" aria-label="Cochinilla ramp">
+      <span style="background:#FFF0F4"></span><span style="background:#FFDCE6"></span><span style="background:#FFB3C9"></span><span style="background:#FF85A8"></span><span style="background:#FF5C8F"></span><span style="background:#D1245A"></span><span style="background:#B0184A"></span><span style="background:#8C0F3A"></span><span style="background:#5E0A27"></span><span style="background:#33051A"></span>
+    </div>
+
+    <p class="pv-label" style="margin-top:var(--tz-space-10)">Payment status — every state has its own colour, shape and words</p>
+    <div class="pv-status-grid">
+      <div class="pv-status" style="background:var(--tz-pending-bg)"><span class="tz-pill" data-status="pending" style="background:var(--tz-surface)">Waiting for payment</span><span class="tz-small" style="color:var(--tz-pending-fg);font-weight:600">Maíz · pulsing rombo</span></div>
+      <div class="pv-status" style="background:var(--tz-converting-bg)"><span class="tz-pill" data-status="converting" style="background:var(--tz-surface)">Weaving into USDC</span><span class="tz-small" style="color:var(--tz-converting-fg);font-weight:600">Añil · turning rombo</span></div>
+      <div class="pv-status" style="background:var(--tz-received-bg)"><span class="tz-pill" data-status="received" style="background:var(--tz-surface)">Received</span><span class="tz-small" style="color:var(--tz-received-fg);font-weight:600">Hierba · solid rombo</span></div>
+      <div class="pv-status" style="background:var(--tz-failed-bg)"><span class="tz-pill" data-status="failed" style="background:var(--tz-surface)">Didn't go through</span><span class="tz-small" style="color:var(--tz-failed-fg);font-weight:600">Arcilla · frayed ≡</span></div>
+      <div class="pv-status" style="background:var(--tz-refunded-bg)"><span class="tz-pill" data-status="refunded" style="background:var(--tz-surface)">Refunded</span><span class="tz-small" style="color:var(--tz-refunded-fg);font-weight:600">Piedra · return loop</span></div>
+    </div>
+
+    <div class="tz-card" style="margin-top:var(--tz-space-8);display:grid;gap:var(--tz-space-4)">
+      <div class="tz-row" style="flex-wrap:wrap"><h3 class="tz-h3">Creator accent</h3><span class="tz-muted tz-small">The creator picks one colour. Tezeo clamps it so it's always readable — try neon yellow.</span></div>
+      <div class="pv-accent-picker" role="group" aria-label="Creator accent">
+        <button type="button" style="background:#1A9E8F" data-accent="#1A9E8F" aria-label="Turquesa" aria-pressed="true"></button>
+        <button type="button" style="background:#7C3AED" data-accent="#7C3AED" aria-label="Violet"></button>
+        <button type="button" style="background:#0EA5E9" data-accent="#0EA5E9" aria-label="Sky"></button>
+        <button type="button" style="background:#F97316" data-accent="#F97316" aria-label="Orange"></button>
+        <button type="button" style="background:#E8FF3A" data-accent="#E8FF3A" aria-label="Neon yellow"></button>
+        <button type="button" style="background:#111111" data-accent="#111111" aria-label="Black"></button>
+      </div>
+      <div class="tz-creator pv-accent-demo" style="display:flex;gap:12px;flex-wrap:wrap;align-items:center">
+        <span class="tz-btn tz-btn--creator">Accent fill</span>
+        <span style="font-weight:700;color:var(--creator-accent-text)">@valecodes text</span>
+        <span style="padding:8px 14px;border-radius:12px;background:var(--creator-accent-soft);font-weight:600">Soft tint</span>
+        <div class="tz-weave" style="flex:1;min-width:160px;border-radius:12px"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 04 TYPE ================= -->
+<section class="pv-sec" id="type">
+  <div class="pv-wrap">
+    <div class="pv-sec-head"><span class="pv-num">04</span><h2 class="tz-h1">Type with a handmade edge</h2>
+      <p><b>Bricolage Grotesque</b> for display &amp; amounts — its ink-trap quirks feel cut by hand. <b>Instrument Sans</b> for everything you read. <b>JetBrains Mono</b> only for addresses and IDs.</p></div>
+    <div>
+      <div class="pv-type-row"><span class="tz-overline">Display · 800</span><span class="tz-display" style="font-size:var(--tz-text-4xl)">¡Gracias, Ana!</span></div>
+      <div class="pv-type-row"><span class="tz-overline">Amount · 700</span><span class="tz-amount" style="font-size:var(--tz-text-3xl)">4.72<span class="tz-amount__unit">USDC</span></span></div>
+      <div class="pv-type-row"><span class="tz-overline">H1 · 700</span><span class="tz-h1">Choose how you'll pay</span></div>
+      <div class="pv-type-row"><span class="tz-overline">H2 · 700</span><span class="tz-h2">Your tip is on its way</span></div>
+      <div class="pv-type-row"><span class="tz-overline">Body · 400</span><span class="tz-body" style="max-width:56ch">Send from any wallet, on any chain. We'll turn it into dollars and deliver it to Vale in about a minute. No account needed.</span></div>
+      <div class="pv-type-row"><span class="tz-overline">Mono · 500</span><span class="tz-mono">0x8f3C…9a21c · bc1qxy2k…x0wlh</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 05 COMPONENTS ================= -->
+<section class="pv-sec" id="components">
+  <div class="pv-wrap">
+    <div class="pv-sec-head"><span class="pv-num">05</span><h2 class="tz-h1">Components</h2>
+      <p>Stitched buttons, rombo knots, threaded timelines. Every piece carries a bit of the weave so the brand survives without a logo on screen.</p></div>
+
+    <div class="pv-grid pv-grid--2">
+      <div class="tz-card tz-stack">
+        <p class="pv-label">Buttons</p>
+        <div class="tz-row" style="flex-wrap:wrap">
+          <button class="tz-btn tz-btn--primary">Send $5</button>
+          <button class="tz-btn tz-btn--secondary">Change chain</button>
+          <button class="tz-btn tz-btn--ghost">Need help?</button>
+          <button class="tz-btn tz-btn--primary" disabled>Send</button>
+        </div>
+        <button class="tz-btn tz-btn--primary tz-btn--lg tz-btn--block">Send $5 to Vale</button>
+      </div>
+
+      <div class="tz-card tz-stack">
+        <p class="pv-label">Chain &amp; token chips</p>
+        <div class="tz-chips">
+          <button class="tz-chip" aria-pressed="true" style="--chip-color:#627EEA"><span class="tz-chip__coin">ETH</span>Ethereum</button>
+          <button class="tz-chip" aria-pressed="false" style="--chip-color:#0052FF"><span class="tz-chip__coin">B</span>Base</button>
+          <button class="tz-chip" aria-pressed="false" style="--chip-color:#28A0F0"><span class="tz-chip__coin">ARB</span>Arbitrum</button>
+          <button class="tz-chip" aria-pressed="false" style="--chip-color:#F7931A"><span class="tz-chip__coin">₿</span>Bitcoin</button>
+          <button class="tz-chip" aria-pressed="false" style="--chip-color:#8247E5"><span class="tz-chip__coin">POL</span>Polygon</button>
+        </div>
+        <div class="tz-chips">
+          <button class="tz-chip" aria-pressed="true" style="--chip-color:#627EEA"><span class="tz-chip__coin">ETH</span>ETH <span class="tz-chip__meta">0.42</span></button>
+          <button class="tz-chip" aria-pressed="false" style="--chip-color:#2775CA"><span class="tz-chip__coin">$</span>USDC <span class="tz-chip__meta">120.00</span></button>
+        </div>
+      </div>
+
+      <div class="tz-card tz-stack tz-creator">
+        <p class="pv-label">Amount picker (uses creator accent)</p>
+        <div class="tz-amounts" role="group" aria-label="Tip amount">
+          <button class="tz-amount-opt" aria-pressed="false"><span class="tz-amount">$3</span><small>a cafecito</small></button>
+          <button class="tz-amount-opt" aria-pressed="true"><span class="tz-amount">$5</span><small>lunch</small></button>
+          <button class="tz-amount-opt" aria-pressed="false"><span class="tz-amount">$15</span><small>big hug</small></button>
+        </div>
+        <label class="tz-amount-custom"><span class="tz-sr-only">Custom amount</span><input class="tz-input" inputmode="decimal" placeholder="Other amount" value=""></label>
+      </div>
+
+      <div class="tz-card tz-stack">
+        <p class="pv-label">Inputs</p>
+        <div class="tz-field"><label class="tz-label" for="pv-name">Your name <span class="tz-muted" style="font-weight:400">(optional)</span></label><input id="pv-name" class="tz-input" value="Ana"></div>
+        <div class="tz-field"><label class="tz-label" for="pv-amt">Amount</label><input id="pv-amt" class="tz-input" aria-invalid="true" value="0.40" aria-describedby="pv-amt-err"><span class="tz-field__error" id="pv-amt-err"><svg width="16" height="16"><use href="#i-x"/></svg>The smallest tip is $1 — network fees would eat the rest.</span></div>
+      </div>
+
+      <div class="tz-card tz-stack tz-creator">
+        <p class="pv-label">Quote summary</p>
+        <dl class="tz-quote">
+          <div class="tz-quote__row"><dt>You send</dt><span class="tz-quote__lead"></span><dd>0.00213 ETH</dd></div>
+          <div class="tz-quote__row"><dt>Network &amp; swap</dt><span class="tz-quote__lead"></span><dd>−$0.18</dd></div>
+          <div class="tz-quote__row"><dt>Tezeo (2%)</dt><span class="tz-quote__lead"></span><dd>−$0.10</dd></div>
+          <div class="tz-quote__row tz-quote__row--total"><dt>Vale receives</dt><span class="tz-spacer"></span><dd>4.72 USDC</dd></div>
+        </dl>
+        <p class="tz-quote__note"><svg width="14" height="14"><use href="#i-clock"/></svg>Price held for <span class="tz-timer">0:58</span></p>
+      </div>
+
+      <div class="tz-card tz-stack">
+        <p class="pv-label">Status pills · toast</p>
+        <div class="tz-row" style="flex-wrap:wrap;gap:8px">
+          <span class="tz-pill" data-status="pending">Pending</span>
+          <span class="tz-pill" data-status="converting">Converting</span>
+          <span class="tz-pill" data-status="received">Received</span>
+          <span class="tz-pill" data-status="failed">Failed</span>
+          <span class="tz-pill" data-status="refunded">Refunded</span>
+        </div>
+        <div class="tz-toast" data-status="received" role="status"><div class="tz-toast__body"><strong>New tip from Ana · 4.72 USDC</strong>"Your Solana course got me my first job!"</div></div>
+        <div class="tz-toast" data-status="failed" role="alert"><div class="tz-toast__body"><strong>Couldn't copy the address</strong>Long-press it to copy manually.</div><button class="tz-toast__action">Retry</button></div>
+      </div>
+
+      <div class="tz-stack tz-creator" style="--creator-accent:#7C3AED">
+        <p class="pv-label">Membership pass (Phase 2)</p>
+        <div class="tz-pass" style="--_p:70%">
+          <div><span class="tz-overline">Membership pass</span><p class="tz-pass__title">Mateo's Crew</p><span class="tz-pass__meta">Ana · since Oct 3</span></div>
+          <div class="tz-pass__days">21<small>days left</small></div>
+          <div class="tz-pass__meter"><span></span></div>
+        </div>
+        <div class="tz-row"><span class="tz-badge">Pass</span><span class="tz-small tz-muted">Inline badge next to a fan's name</span></div>
+      </div>
+
+      <div class="tz-stack">
+        <p class="pv-label">Empty state</p>
+        <div class="tz-empty">
+          <svg viewBox="0 0 120 64" aria-hidden="true"><path d="M6 44c14 0 18-24 34-24s16 24 32 24 16-14 26-14" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-dasharray="1 0"/><path d="M98 30c6 0 10 2 12 6" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-dasharray="2 9"/><path d="m106 44 6 6 6-6-6-6z" fill="var(--tz-gold)"/></svg>
+          <p class="tz-empty__title">Your first thread is on its way</p>
+          <p>Share your page and the first tip will show up here, live.</p>
+          <button class="tz-btn tz-btn--secondary">Copy my link</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loader + knot -->
+    <div class="pv-grid pv-grid--2" style="margin-top:var(--tz-space-5)">
+      <div class="tz-card tz-stack">
+        <p class="pv-label">Signature loader · "the loom"</p>
+        <svg class="tz-loom" viewBox="0 0 300 120" role="img" aria-label="Converting your payment into USDC">
+          <text class="tz-loom__label" x="0" y="24">ETH</text><text class="tz-loom__label" x="0" y="64">BTC</text><text class="tz-loom__label" x="0" y="104">BASE</text>
+          <path class="tz-loom__t tz-loom__t--1" d="M40 20 C110 20 130 60 190 60"/>
+          <path class="tz-loom__t tz-loom__t--2" d="M40 60 C80 40 130 80 190 60"/>
+          <path class="tz-loom__t tz-loom__t--3" d="M40 100 C110 100 130 60 190 60"/>
+          <path class="tz-loom__out" d="M190 60 H258"/>
+          <circle class="tz-loom__eye" cx="190" cy="60" r="10"/>
+          <path class="tz-loom__shuttle" d="M206 54 212 60 206 66 200 60Z"/>
+          <text class="tz-loom__label" x="266" y="64" style="fill:var(--tz-text)">USDC</text>
+        </svg>
+        <p class="tz-small tz-muted" style="margin:0">Many threads in, one thread out. Loops while converting; freezes into a solid hierba thread on success.</p>
+      </div>
+      <div class="tz-card tz-stack" style="text-align:center">
+        <p class="pv-label" style="text-align:left">Signature moment · "the knot"</p>
+        <div class="tz-knot is-playing" id="knot-demo">
+          <svg viewBox="0 0 64 64" aria-hidden="true">
+            <rect class="tz-knot__tile" width="64" height="64" rx="16" fill="#D1245A"/>
+            <path class="tz-knot__thread tz-knot__thread--a" pathLength="80" d="M9.5 19H22c9 0 15.5 6 15.5 14v19.5" fill="none" stroke="#FFC23D" stroke-width="7.5" stroke-linecap="round"/>
+            <path class="tz-knot__gap" d="M42 19c-9 0-15.5 6-15.5 14" fill="none" stroke="#D1245A" stroke-width="13.5"/>
+            <path class="tz-knot__thread tz-knot__thread--b" pathLength="80" d="M54.5 19H42c-9 0-15.5 6-15.5 14v19.5" fill="none" stroke="#FFF7EC" stroke-width="7.5" stroke-linecap="round"/>
+          </svg>
+          <div class="tz-burst" aria-hidden="true">
+            <i style="--x:-70px;--y:-50px;--r:200deg"></i><i style="--x:70px;--y:-56px;--r:-160deg;--d:40ms"></i><i style="--x:-86px;--y:10px;--r:120deg;--d:80ms"></i><i style="--x:88px;--y:6px;--r:-220deg"></i><i style="--x:-40px;--y:-84px;--r:260deg;--d:60ms"></i><i style="--x:44px;--y:-90px;--r:-140deg;--d:20ms"></i><i style="--x:-58px;--y:62px;--r:180deg;--d:100ms"></i><i style="--x:60px;--y:66px;--r:-200deg;--d:50ms"></i><i style="--x:0px;--y:-100px;--r:90deg;--d:30ms"></i>
+          </div>
+        </div>
+        <button class="tz-btn tz-btn--ghost" style="justify-self:center" data-replay="knot-demo">Replay</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 06 STATUS TIMELINE ================= -->
+<section class="pv-sec" id="timeline">
+  <div class="pv-wrap">
+    <div class="pv-sec-head"><span class="pv-num">06</span><h2 class="tz-h1">The thread, in every state</h2>
+      <p>The status timeline is one thread. It stitches forward while we work, turns solid when it's done, frays when something breaks, and loops back home on a refund.</p></div>
+    <div class="pv-grid pv-grid--5">
+      <div class="tz-card tz-stack"><span class="tz-pill" data-status="pending">Pending</span>
+        <ol class="tz-steps" data-status="pending">
+          <li class="tz-step" data-state="active"><span class="tz-step__knot"></span><div class="tz-step__body"><p class="tz-step__title">Waiting for your payment</p><p class="tz-step__desc">Send 0.00213 ETH to the address above.</p></div></li>
+          <li class="tz-step" data-state="todo"><span class="tz-step__knot"></span><div class="tz-step__body"><p class="tz-step__title">Weaving it into USDC</p></div></li>
+          <li class="tz-step" data-state="todo"><span class="tz-step__knot"></span><div class="tz-step__body"><p class="tz-step__title">Delivered to Vale</p></div></li>
+        </ol></div>
+      <div class="tz-card tz-stack"><span class="tz-pill" data-status="converting">Converting</span>
+        <ol class="tz-steps" data-status="converting">
+          <li class="tz-step" data-state="done"><span class="tz-step__knot"><svg><use href="#i-check"/></svg></span><div class="tz-step__body"><p class="tz-step__title">Payment received</p><span class="tz-step__time">7:42 pm</span></div></li>
+          <li class="tz-step" data-state="active"><span class="tz-step__knot"></span><div class="tz-step__body"><p class="tz-step__title">Weaving it into USDC</p><p class="tz-step__desc">Usually under a minute.</p></div></li>
+          <li class="tz-step" data-state="todo"><span class="tz-step__knot"></span><div class="tz-step__body"><p class="tz-step__title">Delivered to Vale</p></div></li>
+        </ol></div>
+      <div class="tz-card tz-stack"><span class="tz-pill" data-status="received">Received</span>
+        <ol class="tz-steps" data-status="received">
+          <li class="tz-step" data-state="done"><span class="tz-step__knot"><svg><use href="#i-check"/></svg></span><div class="tz-step__body"><p class="tz-step__title">Payment received</p><span class="tz-step__time">7:42 pm</span></div></li>
+          <li class="tz-step" data-state="done"><span class="tz-step__knot"><svg><use href="#i-check"/></svg></span><div class="tz-step__body"><p class="tz-step__title">Woven into USDC</p><span class="tz-step__time">7:43 pm</span></div></li>
+          <li class="tz-step" data-state="done"><span class="tz-step__knot"><svg><use href="#i-check"/></svg></span><div class="tz-step__body"><p class="tz-step__title">Delivered to Vale · 4.72 USDC</p><span class="tz-step__time">7:43 pm</span></div></li>
+        </ol></div>
+      <div class="tz-card tz-stack"><span class="tz-pill" data-status="failed">Didn't go through</span>
+        <ol class="tz-steps" data-status="failed">
+          <li class="tz-step" data-state="done"><span class="tz-step__knot"><svg><use href="#i-check"/></svg></span><div class="tz-step__body"><p class="tz-step__title">Payment received</p><span class="tz-step__time">7:42 pm</span></div></li>
+          <li class="tz-step" data-state="failed"><span class="tz-step__knot"><svg><use href="#i-x"/></svg></span><div class="tz-step__body"><p class="tz-step__title">The thread snapped</p><p class="tz-step__desc">The price moved too much. Your money is safe.</p></div></li>
+          <li class="tz-step" data-state="active" style="--_line:var(--tz-refunded-line);--_bg:var(--tz-refunded-bg);--_fg:var(--tz-refunded-fg)"><span class="tz-step__knot"></span><div class="tz-step__body"><p class="tz-step__title">Sending it back to you</p><p class="tz-step__desc">Automatic. ~5 minutes.</p></div></li>
+        </ol></div>
+      <div class="tz-card tz-stack"><span class="tz-pill" data-status="refunded">Refunded</span>
+        <ol class="tz-steps" data-status="refunded">
+          <li class="tz-step" data-state="done"><span class="tz-step__knot"><svg><use href="#i-check"/></svg></span><div class="tz-step__body"><p class="tz-step__title">Payment received</p><span class="tz-step__time">7:42 pm</span></div></li>
+          <li class="tz-step" data-state="skipped"><span class="tz-step__knot"><svg><use href="#i-x"/></svg></span><div class="tz-step__body"><p class="tz-step__title">Weaving into USDC</p></div></li>
+          <li class="tz-step" data-state="refunded"><span class="tz-step__knot"><svg><use href="#i-return"/></svg></span><div class="tz-step__body"><p class="tz-step__title">Back in your wallet</p><p class="tz-step__desc">0.00209 ETH returned · 7:49 pm</p></div></li>
+        </ol></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 07 SCREENS ================= -->
+<section class="pv-sec" id="screens">
+  <div class="pv-wrap">
+    <div class="pv-sec-head"><span class="pv-num">07</span><h2 class="tz-h1">The fan flow</h2>
+      <p>Five steps, zero jargon. The creator owns the first screen; Tezeo owns the money moments. The weave ties them together.</p></div>
+
+    <div class="pv-phones tz-creator" id="flow">
+
+      <!-- A. Creator page -->
+      <div class="pv-phone-wrap"><p class="pv-label"><span class="tz-rombo" style="--_s:7px"></span>A · Creator page</p>
+      <div class="pv-phone">
+        <div class="pv-phone__bar"><span>7:41</span><i></i><span>5G</span></div>
+        <div class="pv-phone__url">tezeo.app/<b>@valecodes</b></div>
+        <div class="pv-screen pv-screen--flush">
+          <div class="pv-creator-head"><div class="tz-weave" style="--_h:96px"></div></div>
+          <div class="pv-creator-id">
+            <div class="tz-avatar"><span>V</span></div>
+            <h3>Valentina Ríos</h3>
+            <span class="pv-handle">@valecodes</span>
+            <span class="tz-small tz-muted">Teaches web dev in Spanish · Lima, PE</span>
+          </div>
+          <p class="pv-quote-msg">"I make free Solana &amp; React classes for LatAm devs. Every tip buys another live hour. ¡Gracias!"</p>
+          <div class="tz-stack" style="--tz-stack-gap:10px">
+            <span class="tz-overline">Send Vale a tip</span>
+            <div class="tz-amounts" role="group" aria-label="Tip amount">
+              <button class="tz-amount-opt" aria-pressed="false"><span class="tz-amount">$3</span><small>a cafecito</small></button>
+              <button class="tz-amount-opt" aria-pressed="true"><span class="tz-amount">$5</span><small>lunch</small></button>
+              <button class="tz-amount-opt" aria-pressed="false"><span class="tz-amount">$15</span><small>big hug</small></button>
+            </div>
+          </div>
+          <button class="tz-btn tz-btn--primary tz-btn--lg tz-btn--block">Send $5 to Vale</button>
+          <p class="pv-trust"><svg><use href="#i-shield"/></svg>Pay from any wallet, any chain. Vale gets dollars.</p>
+          <div class="pv-footer-mark"><svg><use href="#tz-mark"/></svg>woven by tezeo</div>
+        </div>
+      </div></div>
+
+      <!-- B. Chain selection -->
+      <div class="pv-phone-wrap"><p class="pv-label"><span class="tz-rombo" style="--_s:7px"></span>B · Choose how to pay</p>
+      <div class="pv-phone">
+        <div class="pv-phone__bar"><span>7:41</span><i></i><span>5G</span></div>
+        <div class="pv-screen">
+          <div class="pv-topnav"><span class="pv-back"><svg><use href="#i-back"/></svg></span><div class="pv-progress"><span class="on"></span><span class="on"></span><span></span><span></span></div></div>
+          <div class="pv-mini-creator"><div class="tz-avatar tz-avatar--sm"><span>V</span></div><div><b>$5 for Vale</b><span>Change amount</span></div></div>
+          <h3 class="tz-h1">Where's your money?</h3>
+          <div class="tz-stack" style="--tz-stack-gap:10px">
+            <span class="tz-overline">Network</span>
+            <div class="tz-chips">
+              <button class="tz-chip" aria-pressed="true" style="--chip-color:#627EEA"><span class="tz-chip__coin">ETH</span>Ethereum</button>
+              <button class="tz-chip" style="--chip-color:#0052FF"><span class="tz-chip__coin">B</span>Base</button>
+              <button class="tz-chip" style="--chip-color:#28A0F0"><span class="tz-chip__coin">ARB</span>Arbitrum</button>
+              <button class="tz-chip" style="--chip-color:#F7931A"><span class="tz-chip__coin">₿</span>Bitcoin</button>
+              <button class="tz-chip" style="--chip-color:#8247E5"><span class="tz-chip__coin">POL</span>Polygon</button>
+              <button class="tz-chip" style="--chip-color:#5E5266"><span class="tz-chip__coin">+9</span>More</button>
+            </div>
+          </div>
+          <div class="tz-stack" style="--tz-stack-gap:10px">
+            <span class="tz-overline">Coin</span>
+            <div class="tz-chips">
+              <button class="tz-chip" aria-pressed="true" style="--chip-color:#627EEA"><span class="tz-chip__coin">ETH</span>ETH</button>
+              <button class="tz-chip" style="--chip-color:#2775CA"><span class="tz-chip__coin">$</span>USDC</button>
+              <button class="tz-chip" style="--chip-color:#26A17B"><span class="tz-chip__coin">₮</span>USDT</button>
+            </div>
+          </div>
+          <p class="tz-small tz-muted" style="margin:0">Not sure? Pick the network your wallet app shows at the top. You can't pick wrong — we'll check before you send.</p>
+          <button class="tz-btn tz-btn--primary tz-btn--lg tz-btn--block">See the quote</button>
+        </div>
+      </div></div>
+
+      <!-- C. Quote + deposit -->
+      <div class="pv-phone-wrap"><p class="pv-label"><span class="tz-rombo" style="--_s:7px"></span>C · Quote &amp; deposit</p>
+      <div class="pv-phone">
+        <div class="pv-phone__bar"><span>7:42</span><i></i><span>5G</span></div>
+        <div class="pv-screen">
+          <div class="pv-topnav"><span class="pv-back"><svg><use href="#i-back"/></svg></span><div class="pv-progress"><span class="on"></span><span class="on"></span><span class="on"></span><span></span></div></div>
+          <h3 class="tz-h1">Here's the deal</h3>
+          <dl class="tz-quote">
+            <div class="tz-quote__row"><dt>You send</dt><span class="tz-quote__lead"></span><dd>0.00213 ETH</dd></div>
+            <div class="tz-quote__row"><dt>Network &amp; swap</dt><span class="tz-quote__lead"></span><dd>−$0.18</dd></div>
+            <div class="tz-quote__row"><dt>Tezeo (2%)</dt><span class="tz-quote__lead"></span><dd>−$0.10</dd></div>
+            <div class="tz-quote__row tz-quote__row--total"><dt>Vale receives</dt><span class="tz-spacer"></span><dd>4.72 USDC</dd></div>
+          </dl>
+          <div class="tz-card tz-card--sunken tz-stack" style="--tz-stack-gap:12px;padding:var(--tz-space-4)">
+            <div class="tz-row" style="align-items:flex-start">
+              <div class="tz-qr" style="padding:8px;border-radius:12px"><canvas class="pv-qr" width="84" height="84" style="display:block;width:84px;height:84px"></canvas></div>
+              <div style="font-size:var(--tz-text-sm)"><b>Send exactly<br><span class="tz-amount" style="font-size:1.35rem">0.00213 ETH</span></b><br><span class="tz-muted">on Ethereum, to:</span></div>
+            </div>
+            <div class="tz-copy"><span class="tz-mono">0x8f3C2b71E0aD4c9b5E7f61a0C3d29e4B5079a21c</span><button class="tz-btn tz-btn--secondary tz-btn--icon" style="min-height:40px;width:40px" aria-label="Copy address"><svg><use href="#i-copy"/></svg></button></div>
+          </div>
+          <p class="tz-quote__note"><svg width="14" height="14"><use href="#i-clock"/></svg><span>Price held for <span class="tz-timer">0:58</span>. If it runs out, we'll refresh it, no harm done.</span></p>
+          <button class="tz-btn tz-btn--primary tz-btn--lg tz-btn--block">I've sent it</button>
+        </div>
+      </div></div>
+
+      <!-- D. Status (converting) -->
+      <div class="pv-phone-wrap"><p class="pv-label"><span class="tz-rombo" style="--_s:7px"></span>D · Tracking (converting)</p>
+      <div class="pv-phone">
+        <div class="pv-phone__bar"><span>7:43</span><i></i><span>5G</span></div>
+        <div class="pv-screen">
+          <div class="tz-row"><span class="tz-pill" data-status="converting">Converting</span><span class="tz-spacer"></span><span class="tz-small tz-muted">~40 s left</span></div>
+          <h3 class="tz-h1">We're weaving your ETH into dollars for Vale</h3>
+          <svg class="tz-loom" viewBox="0 0 300 120" role="img" aria-label="Converting your payment into USDC">
+            <text class="tz-loom__label" x="0" y="64">ETH</text>
+            <path class="tz-loom__t tz-loom__t--1" d="M40 20 C110 20 130 60 190 60"/>
+            <path class="tz-loom__t tz-loom__t--2" d="M40 60 C80 40 130 80 190 60"/>
+            <path class="tz-loom__t tz-loom__t--3" d="M40 100 C110 100 130 60 190 60"/>
+            <path class="tz-loom__out" d="M190 60 H258"/>
+            <circle class="tz-loom__eye" cx="190" cy="60" r="10"/>
+            <path class="tz-loom__shuttle" d="M206 54 212 60 206 66 200 60Z"/>
+            <text class="tz-loom__label" x="266" y="64" style="fill:var(--tz-text)">USDC</text>
+          </svg>
+          <ol class="tz-steps" data-status="converting">
+            <li class="tz-step" data-state="done"><span class="tz-step__knot"><svg><use href="#i-check"/></svg></span><div class="tz-step__body"><p class="tz-step__title">Got your 0.00213 ETH</p><span class="tz-step__time">7:42 pm</span></div></li>
+            <li class="tz-step" data-state="active"><span class="tz-step__knot"></span><div class="tz-step__body"><p class="tz-step__title">Weaving it into USDC</p><p class="tz-step__desc">You can close this tab — we'll keep going.</p></div></li>
+            <li class="tz-step" data-state="todo"><span class="tz-step__knot"></span><div class="tz-step__body"><p class="tz-step__title">Delivered to Vale</p></div></li>
+          </ol>
+          <div class="tz-field"><label class="tz-label" for="pv-msg">While you wait — leave Vale a note?</label><textarea id="pv-msg" class="tz-textarea" style="min-height:4.5rem">Your Solana course got me my first dev job. ¡Gracias!</textarea><span class="tz-counter">52 / 140</span></div>
+        </div>
+      </div></div>
+
+      <!-- E. Thank-you -->
+      <div class="pv-phone-wrap"><p class="pv-label"><span class="tz-rombo" style="--_s:7px"></span>E · Thank-you moment</p>
+      <div class="pv-phone">
+        <div class="pv-phone__bar"><span>7:43</span><i></i><span>5G</span></div>
+        <div class="tz-weave tz-weave--slim"></div>
+        <div class="pv-screen is-playing" id="thanks">
+          <div class="pv-big-moment">
+            <div class="tz-knot is-playing" id="knot-thanks">
+              <svg viewBox="0 0 64 64" aria-hidden="true">
+                <rect class="tz-knot__tile" width="64" height="64" rx="16" fill="#D1245A"/>
+                <path class="tz-knot__thread tz-knot__thread--a" pathLength="80" d="M9.5 19H22c9 0 15.5 6 15.5 14v19.5" fill="none" stroke="#FFC23D" stroke-width="7.5" stroke-linecap="round"/>
+                <path class="tz-knot__gap" d="M42 19c-9 0-15.5 6-15.5 14" fill="none" stroke="#D1245A" stroke-width="13.5"/>
+                <path class="tz-knot__thread tz-knot__thread--b" pathLength="80" d="M54.5 19H42c-9 0-15.5 6-15.5 14v19.5" fill="none" stroke="#FFF7EC" stroke-width="7.5" stroke-linecap="round"/>
+              </svg>
+              <div class="tz-burst" aria-hidden="true"><i style="--x:-70px;--y:-50px;--r:200deg"></i><i style="--x:70px;--y:-56px;--r:-160deg;--d:40ms"></i><i style="--x:-86px;--y:10px;--r:120deg;--d:80ms"></i><i style="--x:88px;--y:6px;--r:-220deg"></i><i style="--x:-40px;--y:-84px;--r:260deg;--d:60ms"></i><i style="--x:44px;--y:-90px;--r:-140deg;--d:20ms"></i><i style="--x:-58px;--y:62px;--r:180deg;--d:100ms"></i><i style="--x:60px;--y:66px;--r:-200deg;--d:50ms"></i></div>
+            </div>
+            <span class="tz-pill tz-rise" data-status="received" style="--d:1000ms">Delivered</span>
+            <h3 class="tz-display tz-rise" style="--d:1150ms">You just made Vale's day.</h3>
+            <p class="tz-rise tz-muted" style="--d:1250ms;margin:0;max-width:30ch"><b style="color:var(--tz-text)">4.72 USDC</b> just landed in Vale's wallet. Your thread is part of her story now.</p>
+          </div>
+          <div class="pv-fan-note tz-rise" style="--d:1400ms">
+            <span class="tz-overline">Your note</span>
+            <p>"Your Solana course got me my first dev job. ¡Gracias!" — Ana</p>
+          </div>
+          <div class="tz-stack tz-rise" style="--d:1500ms;--tz-stack-gap:10px">
+            <button class="tz-btn tz-btn--primary tz-btn--lg tz-btn--block"><svg><use href="#i-share"/></svg>Tell your friends about Vale</button>
+            <button class="tz-btn tz-btn--ghost tz-btn--block" data-replay="knot-thanks">Back to Vale's page</button>
+          </div>
+        </div>
+      </div></div>
+
+      <!-- F. Failed -->
+      <div class="pv-phone-wrap"><p class="pv-label"><span class="tz-rombo" style="--_s:7px;--_c:var(--tz-failed-line)"></span>F · Failed → refund in progress</p>
+      <div class="pv-phone">
+        <div class="pv-phone__bar"><span>7:44</span><i></i><span>5G</span></div>
+        <div class="pv-screen">
+          <div class="pv-big-moment">
+            <svg class="tz-fray" viewBox="0 0 112 112" aria-hidden="true">
+              <circle cx="56" cy="56" r="52" fill="var(--tz-failed-bg)"/>
+              <g fill="none" stroke-linecap="round">
+                <path d="M4 58 C24 58 30 52 44 55" stroke="#FFC23D" stroke-width="7"/>
+                <g stroke="var(--tz-failed-line)" stroke-width="2.5"><path class="tz-fray__fibre" d="M44 55 l9 -8"/><path class="tz-fray__fibre" d="M44 55 l11 1" style="animation-delay:-1s"/><path class="tz-fray__fibre" d="M44 55 l8 9" style="animation-delay:-2s"/></g>
+                <path d="M108 56 C88 56 82 62 70 59" stroke="var(--tz-brand)" stroke-width="7"/>
+                <g stroke="var(--tz-failed-line)" stroke-width="2.5"><path class="tz-fray__fibre" d="M70 59 l-8 -9" style="animation-delay:-.5s"/><path class="tz-fray__fibre" d="M70 59 l-10 0"/><path class="tz-fray__fibre" d="M70 59 l-8 8" style="animation-delay:-1.5s"/></g>
+              </g>
+            </svg>
+            <span class="tz-pill" data-status="failed">Didn't go through</span>
+            <h3 class="tz-h1">The thread snapped — but your money is safe.</h3>
+            <p class="tz-muted" style="margin:0;max-width:32ch">The price of ETH moved too fast while we were converting, so we stopped before anything was lost. We're sending it back automatically.</p>
+          </div>
+          <ol class="tz-steps" data-status="failed">
+            <li class="tz-step" data-state="done"><span class="tz-step__knot"><svg><use href="#i-check"/></svg></span><div class="tz-step__body"><p class="tz-step__title">Got your 0.00213 ETH</p><span class="tz-step__time">7:42 pm</span></div></li>
+            <li class="tz-step" data-state="failed"><span class="tz-step__knot"><svg><use href="#i-x"/></svg></span><div class="tz-step__body"><p class="tz-step__title">Couldn't convert</p><p class="tz-step__desc">Price moved more than 1%.</p></div></li>
+            <li class="tz-step" data-state="active" style="--_line:var(--tz-refunded-line);--_bg:var(--tz-refunded-bg);--_fg:var(--tz-refunded-fg)"><span class="tz-step__knot"></span><div class="tz-step__body"><p class="tz-step__title">Sending it back to you</p><p class="tz-step__desc">To 0x71…e4B0 · about 5 min</p></div></li>
+          </ol>
+          <div class="tz-stack" style="--tz-stack-gap:10px">
+            <button class="tz-btn tz-btn--primary tz-btn--lg tz-btn--block">Try again with a fresh quote</button>
+            <button class="tz-btn tz-btn--ghost tz-btn--block"><svg><use href="#i-help"/></svg>Talk to a human</button>
+          </div>
+        </div>
+      </div></div>
+
+      <!-- G. Refunded -->
+      <div class="pv-phone-wrap"><p class="pv-label"><span class="tz-rombo" style="--_s:7px;--_c:var(--tz-refunded-line)"></span>G · Refunded</p>
+      <div class="pv-phone">
+        <div class="pv-phone__bar"><span>7:49</span><i></i><span>5G</span></div>
+        <div class="pv-screen">
+          <div class="pv-big-moment">
+            <svg viewBox="0 0 112 112" width="112" height="112" aria-hidden="true">
+              <circle cx="56" cy="56" r="52" fill="var(--tz-refunded-bg)"/>
+              <path d="M10 44 H70 C90 44 90 74 70 74 H38" fill="none" stroke="#FFC23D" stroke-width="7" stroke-linecap="round"/>
+              <path d="M44 64 34 74 44 84" fill="none" stroke="var(--tz-refunded-line)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span class="tz-pill" data-status="refunded">Refunded</span>
+            <h3 class="tz-h1">Your money is back home.</h3>
+            <p class="tz-muted" style="margin:0;max-width:32ch">We returned <b style="color:var(--tz-text)">0.00209 ETH</b> to the wallet it came from. The network kept 0.00004 ETH (about $0.08) in fees — we couldn't get that part back.</p>
+          </div>
+          <div class="tz-card tz-card--sunken" style="padding:var(--tz-space-4)">
+            <dl class="tz-quote">
+              <div class="tz-quote__row"><dt>You sent</dt><span class="tz-quote__lead"></span><dd>0.00213 ETH</dd></div>
+              <div class="tz-quote__row"><dt>Network fee</dt><span class="tz-quote__lead"></span><dd>−0.00004 ETH</dd></div>
+              <div class="tz-quote__row"><dt>Returned</dt><span class="tz-quote__lead"></span><dd style="color:var(--tz-refunded-fg)">0.00209 ETH</dd></div>
+              <div class="tz-quote__row"><dt>To</dt><span class="tz-quote__lead"></span><dd class="tz-mono">0x71…e4B0</dd></div>
+            </dl>
+          </div>
+          <div class="tz-stack" style="--tz-stack-gap:10px">
+            <button class="tz-btn tz-btn--primary tz-btn--lg tz-btn--block">Try again</button>
+            <button class="tz-btn tz-btn--ghost tz-btn--block">View the refund transaction</button>
+          </div>
+        </div>
+      </div></div>
+
+      <!-- H. Membership pass -->
+      <div class="pv-phone-wrap"><p class="pv-label"><span class="tz-rombo" style="--_s:7px;--_c:var(--tz-gold)"></span>H · Membership pass (Phase 2)</p>
+      <div class="pv-phone">
+        <div class="pv-phone__bar"><span>7:50</span><i></i><span>5G</span></div>
+        <div class="pv-screen">
+          <div class="pv-mini-creator"><div class="tz-avatar tz-avatar--sm"><span>V</span></div><div><b>Vale's Pass</b><span>30 days of being part of the crew</span></div></div>
+          <div class="tz-pass" style="--_p:100%">
+            <div><span class="tz-overline">Membership pass</span><p class="tz-pass__title">Vale's Crew</p><span class="tz-pass__meta">Ana · active until Nov 30</span></div>
+            <div class="tz-pass__days">30<small>days</small></div>
+            <div class="tz-pass__meter"><span></span></div>
+          </div>
+          <ul class="tz-stack" style="--tz-stack-gap:10px;list-style:none;margin:0;padding:0">
+            <li class="tz-row"><span class="tz-rombo" style="--_c:var(--creator-accent-fill);--_s:8px"></span>Pass badge next to your name in Vale's chat</li>
+            <li class="tz-row"><span class="tz-rombo" style="--_c:var(--creator-accent-fill);--_s:8px"></span>Your note pinned on Vale's page</li>
+            <li class="tz-row"><span class="tz-rombo" style="--_c:var(--creator-accent-fill);--_s:8px"></span>No auto-renew. We'll remind you on day 27.</li>
+          </ul>
+          <div class="tz-field"><label class="tz-label" for="pv-note2">Message with your pass</label><input id="pv-note2" class="tz-input" value="Saludos desde Medellín!"></div>
+          <button class="tz-btn tz-btn--primary tz-btn--lg tz-btn--block">Get the pass · $12</button>
+        </div>
+      </div></div>
+    </div>
+
+    <!-- Dashboard -->
+    <p class="pv-label" style="margin-top:var(--tz-space-16)"><span class="tz-rombo" style="--_s:7px"></span> I · Creator dashboard</p>
+    <div class="pv-browser tz-creator">
+      <div class="pv-browser__bar"><i></i><i></i><i></i><span class="tz-small tz-muted" style="margin-left:12px">tezeo.app/dashboard</span></div>
+      <div class="pv-dash">
+        <aside>
+          <svg viewBox="0 0 240 64" style="height:28px;margin:4px 8px 20px;--pv-t:var(--tz-brand);color:var(--tz-text)"><use href="#tz-mark" width="64" height="64"/><use href="#tz-letters" x="82" y="4" width="154" height="56"/></svg>
+          <a class="on" href="#"><svg><use href="#i-home"/></svg>Home</a>
+          <a href="#"><svg><use href="#i-list"/></svg>Tips</a>
+          <a href="#"><svg><use href="#i-pass"/></svg>Passes</a>
+          <a href="#"><svg><use href="#i-brush"/></svg>My page</a>
+        </aside>
+        <main>
+          <div class="tz-row" style="flex-wrap:wrap">
+            <div><span class="tz-overline">Saturday, Oct 31</span><h3 class="tz-h1" style="margin-top:6px">Good evening, Vale</h3></div>
+            <span class="tz-spacer"></span>
+            <button class="tz-btn tz-btn--secondary"><svg><use href="#i-share"/></svg>Share my page</button>
+          </div>
+          <div class="pv-stats">
+            <div class="tz-card tz-stat" style="background:var(--tz-surface-inverse);color:var(--tz-text-inverse);border:0;position:relative;overflow:hidden">
+              <span class="tz-overline" style="color:inherit;opacity:.7">Received this month</span>
+              <span class="tz-stat__value">342.18<span class="tz-amount__unit" style="color:inherit;opacity:.7">USDC</span></span>
+              <svg class="pv-spark" viewBox="0 0 300 72" preserveAspectRatio="none" aria-hidden="true"><path d="M0 60 C30 58 40 40 70 44 S110 20 140 30 190 12 220 22 270 6 300 8" fill="none" stroke="#F2A900" stroke-width="3" stroke-linecap="round" vector-effect="non-scaling-stroke"/><path d="M0 60 C30 58 40 40 70 44 S110 20 140 30 190 12 220 22 270 6 300 8 V72 H0Z" fill="#FFC23D" opacity=".12"/></svg>
+            </div>
+            <div class="tz-card tz-stat"><span class="tz-overline">Tips</span><span class="tz-stat__value">57</span><span class="tz-stat__delta">+12 vs September</span></div>
+            <div class="tz-card tz-stat"><span class="tz-overline">Active passes</span><span class="tz-stat__value">12</span><span class="tz-small tz-muted">3 renew this week</span></div>
+          </div>
+          <div class="tz-card" style="padding:var(--tz-space-5) var(--tz-space-3) var(--tz-space-3)">
+            <div class="tz-row" style="padding:0 var(--tz-space-3) var(--tz-space-4)"><h4 class="tz-h2" style="font-size:var(--tz-text-lg)">Latest tips</h4><span class="tz-spacer"></span><span class="tz-pill" data-status="converting">1 on its way</span></div>
+            <table class="tz-table tz-table--stack">
+              <thead><tr><th>Fan</th><th>Date</th><th>Paid with</th><th class="num">You got</th><th>Status</th></tr></thead>
+              <tbody>
+                <tr><td><div class="pv-fan"><span class="pv-dot" style="background:#D1245A">A</span><div><b>Ana <span class="tz-badge">Pass</span></b><small>"Your Solana course got me…"</small></div></div></td><td data-col="date" class="tz-muted">Today, 7:43 pm</td><td data-col="chain">ETH · Ethereum</td><td data-col="amount" class="num"><b>4.72 USDC</b></td><td data-col="status"><span class="tz-pill" data-status="received">Received</span></td></tr>
+                <tr><td><div class="pv-fan"><span class="pv-dot" style="background:#5B4FE0">J</span><div><b>Jorge</b><small>"Para el próximo stream"</small></div></div></td><td data-col="date" class="tz-muted">Today, 7:40 pm</td><td data-col="chain">ETH · Base</td><td data-col="amount" class="num"><b>9.80 USDC</b></td><td data-col="status"><span class="tz-pill" data-status="converting">Converting</span></td></tr>
+                <tr><td><div class="pv-fan"><span class="pv-dot" style="background:#1A9E8F">L</span><div><b>Lucía</b><small>No message</small></div></div></td><td data-col="date" class="tz-muted">Oct 30</td><td data-col="chain">BTC · Bitcoin</td><td data-col="amount" class="num"><b>24.51 USDC</b></td><td data-col="status"><span class="tz-pill" data-status="received">Received</span></td></tr>
+                <tr><td><div class="pv-fan"><span class="pv-dot" style="background:#F2A900;color:#1C1424">?</span><div><b>Someone kind</b><small>Anonymous</small></div></div></td><td data-col="date" class="tz-muted">Oct 29</td><td data-col="chain">USDC · Arbitrum</td><td data-col="amount" class="num tz-muted">—</td><td data-col="status"><span class="tz-pill" data-status="refunded">Refunded</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </main>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="pv-footer"><div class="pv-wrap tz-row" style="flex-wrap:wrap"><svg width="28" height="28"><use href="#tz-mark"/></svg><span>Tezeo brand system v1.0 · tokens.css · components.css · DESIGN.md</span><span class="tz-spacer"></span><span>Hecho con cariño en LatAm</span></div></footer>
+
+<script>
+  // theme toggle (and ?theme=dark for screenshots)
+  const root = document.documentElement;
+  const setTheme = t => { root.dataset.theme = t; document.querySelectorAll('[data-set-theme]').forEach(b => b.setAttribute('aria-pressed', b.dataset.setTheme === t)); };
+  const q = new URLSearchParams(location.search).get('theme');
+  setTheme(q || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
+  document.querySelectorAll('[data-set-theme]').forEach(b => b.addEventListener('click', () => setTheme(b.dataset.setTheme)));
+
+  // creator accent picker
+  document.querySelectorAll('[data-accent]').forEach(b => b.addEventListener('click', () => {
+    document.querySelectorAll('[data-accent]').forEach(x => x.setAttribute('aria-pressed', x === b));
+    document.querySelectorAll('.tz-creator').forEach(el => { if (!el.style.getPropertyValue('--creator-accent') || el.dataset.follow !== 'no') el.style.setProperty('--creator-accent', b.dataset.accent); });
+  }));
+
+  // replay the knot
+  document.querySelectorAll('[data-replay]').forEach(b => b.addEventListener('click', () => {
+    const k = document.getElementById(b.dataset.replay); const scope = k.closest('.is-playing.pv-screen') || k;
+    [k, scope].forEach(el => el.classList.remove('is-playing')); void k.offsetWidth; [k, scope].forEach(el => el.classList.add('is-playing'));
+  }));
+
+  // decorative mock QR (deterministic, not scannable)
+  document.querySelectorAll('canvas.pv-qr').forEach(c => {
+    const x = c.getContext('2d'), n = 21, s = c.width / n; let seed = 7;
+    const r = () => (seed = (seed * 9301 + 49297) % 233280) / 233280;
+    x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height); x.fillStyle = '#1C1424';
+    for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) if (r() > 0.52) x.fillRect(i * s, j * s, s, s);
+    const eye = (a, b) => { x.fillStyle = '#1C1424'; x.fillRect(a*s, b*s, 7*s, 7*s); x.fillStyle = '#fff'; x.fillRect((a+1)*s, (b+1)*s, 5*s, 5*s); x.fillStyle = '#D1245A'; x.fillRect((a+2)*s, (b+2)*s, 3*s, 3*s); };
+    eye(0, 0); eye(n - 7, 0); eye(0, n - 7);
+  });
+</script>
+</body>
+</html>
