@@ -51,7 +51,7 @@ reach Postgres, and both services have health checks.
 npm ci
 cp .env.example .env.local      # set DATABASE_URL=postgres://user:pass@localhost:5432/tezeo
 npm run dev                     # http://localhost:3000
-npm run typecheck && npm test   # 64 tests, run on an embedded Postgres (PGlite): no server needed
+npm run typecheck && npm test   # 71 tests, run on an embedded Postgres (PGlite): no server needed
 npm run build && npm start
 ```
 
@@ -89,6 +89,7 @@ Simulator tricks (simulated mode only): a tip whose smallest-unit amount ends in
 | **1. Core UI** | Built and driven in a real browser (Playwright, mobile + desktop, light + dark). The full fan flow (amount → network/coin → quote → deposit → live tracking → thank-you / failure / refund) and the dashboard were exercised against the **simulator**. Against **live Aurora** we verified the asset list and quote creation through the app (no deposit made). |
 | **2. Membership pass** | Built and tested (unit tests with a stub provider + browser run on the simulator). The quote is sized and enforced so the guaranteed minimum covers the price; the pass is issued only once the payment is `received`. |
 | **Pay with wallet** | One-tap payment for EVM coins (MetaMask, Rabby, Coinbase Wallet…): switches chain and sends the exact transfer to Aurora's deposit address. Verified against **live Aurora quotes with a stub wallet** (the transaction's recipient, token contract, chain and amount were checked); **no real wallet was used and no funds moved**. Non-EVM coins (BTC, SOL, NEAR…) use the step-by-step manual flow. Mobile deep links (MetaMask / Coinbase) are not verified. |
+| **Refund address** | With a browser wallet the fan taps "Connect wallet": we read the address and network (no transaction), use the address as Aurora's refund address and preselect the network, so nothing is typed. Paying by hand shows the address field with an opt-in "Remember this address on this device" (localStorage only; one slot shared by all EVM chains, separate slots for other chains), "Use my saved address" and "Forget it". Aurora needs the refund address *before* it creates the deposit address, so it can't be read from the payment afterwards. Verified in a browser with a stub wallet against live Aurora quotes (the refund address Aurora received was the connected wallet's); real wallets not tested. |
 | **3. Extras (OBS alerts, goals, supporter wall)** | Built, tested (6 new tests) and driven in a browser on the simulator: OBS Browser Source page `/alerts/[token]` (own token, `?preview=1` to test the look), a funding goal with progress bar, and a public supporter wall (confirmed tips only; names and notes, never amounts or addresses). Not verified against live Aurora, like everything that depends on a confirmed payment. |
 
 ### Known gaps and decisions

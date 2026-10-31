@@ -20,6 +20,11 @@ export const EVM_CHAINS: Record<string, EvmChain> = {
   bera: { id: 80094, name: "Berachain", native: "BERA" },
 };
 
+/** Aurora chain slug for an EVM chain id (what a connected wallet reports), if we support it. */
+export function chainSlugById(id: number): string | undefined {
+  return Object.entries(EVM_CHAINS).find(([, c]) => c.id === id)?.[0];
+}
+
 export const isEvmAddress = (a: string) => /^0x[0-9a-fA-F]{40}$/.test(a);
 
 export interface WalletTx { chainId: number; chainName: string; to: string; data: string; value: string }

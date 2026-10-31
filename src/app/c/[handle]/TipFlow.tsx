@@ -4,9 +4,12 @@ import QRCode from "qrcode";
 import { Avatar, CopyBox, ErrorNote, Icon, Mark, ThemeToggle, TopBar, Weave } from "@/components/ui";
 import { clock, coin, shortAddr, usd } from "@/lib/money";
 import { PassCard } from "@/components/PassCard";
-import { walletTx } from "@/lib/evm";
+import { chainSlugById, walletTx, EVM_CHAINS } from "@/lib/evm";
+import { forgetRefund, loadRefund, looksValidRefund, saveRefund } from "@/lib/refund-store";
 import { chainIcon, coinIcon, isDarkLogo } from "@/lib/icons";
 import { WalletPay, type WalletState } from "./WalletPay";
+import { WalletConnect, type Connected } from "./WalletConnect";
+import { useWallets } from "./wallets";
 
 export interface PublicCreator {
   handle: string; displayName: string; message: string; avatarUrl: string; accent: string;
@@ -44,6 +47,12 @@ export function TipFlow({ creator, qrSvg, pageUrl, passMode = false, goal = null
   const [chain, setChain] = useState("");
   const [assetId, setAssetId] = useState("");
   const [refundTo, setRefundTo] = useState("");
+  const [connected, setConnected] = useState<Connected | null>(null); // wallet connected on the pay step
+  const [payByHand, setPayByHand] = useState(false);                   // fan chose to type the address themselves
+  const [remember, setRemember] = useState(false);                     // "remember this address on this device"
+  const [saved, setSaved] = useState<string | null>(null);             // address remembered on this device
+  const { wallets, checked: walletsChecked } = useWallets();
+  const lastFamily = useRef("");
   const [tip, setTip] = useState<Tip | null>(null);
   const [err, setErr] = useState("");
   const [busy, setBusy] = useState(false);
@@ -92,6 +101,30 @@ export function TipFlow({ creator, qrSvg, pageUrl, passMode = false, goal = null
     const i = setInterval(poll, step === "track" ? 5000 : 8000);
     return () => clearInterval(i);
   }, [tip, step]);
+
+  // ---------- refund address: connected wallet first, typed address as the fallback ----------
+  const isEvm = !!EVM_CHAINS[chain];
+  const walletRoute = wallets.length > 0 && isEvm && !payByHand;
+  const effectiveRefund = walletRoute ? (connected?.address ?? "") : refundTo.trim();
+  const refundOk = !!effectiveRefund && looksValidRefund(chain, effectiveRefund);
+  const kv = typeof window === "undefined" ? null : window.localStorage;
+
+  // Prefill the remembered address, once per address family (all EVM chains share one).
+  useEffect(() => {
+    if (!chain) return;
+    const family = EVM_CHAINS[chain] ? "evm" : chain;
+    if (lastFamily.current === family) return;
+    lastFamily.current = family;
+    const s = loadRefund(kv, chain);
+    setSaved(s); setRefundTo(s ?? ""); setRemember(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chain]);
+
+  function onWalletConnected(c: Connected) {
+    setConnected(c);
+    const slug = chainSlugById(c.chainId);   // the wallet is on a network we know: preselect it
+    if (slug && data?.assets.some((a) => a.chain === slug)) pickChain(slug);
+  }
 
   const amountNow = passMode ? creator.pass?.priceUsd ?? amountUsd : custom ? Number(custom) : amountUsd;
   const amountOk = Number.isFinite(amountNow) && amountNow >= 1 && amountNow <= 10_000;
@@ -144,11 +177,12 @@ export function TipFlow({ creator, qrSvg, pageUrl, passMode = false, goal = null
       const r = await fetch("/api/tips", {
         method: "POST", headers: { "content-type": "application/json" },
         body: JSON.stringify(passMode
-          ? { handle: creator.handle, originAssetId: assetId, pass: true, fanMessage: passNote, refundTo: refundTo.trim() }
-          : { handle: creator.handle, originAssetId: assetId, amount: cryptoAmount, refundTo: refundTo.trim() }),
+          ? { handle: creator.handle, originAssetId: assetId, pass: true, fanMessage: passNote, refundTo: effectiveRefund }
+          : { handle: creator.handle, originAssetId: assetId, amount: cryptoAmount, refundTo: effectiveRefund }),
       });
       const j = await r.json();
       if (!r.ok) return setErr(friendly(j.error));
+      if (!walletRoute && remember && refundOk) { saveRefund(kv, chain, effectiveRefund); setSaved(effectiveRefund); setRemember(false); }
       setTip(j); setStep("quote");
       history.replaceState(null, "", `?tip=${j.id}`);
     } catch { setErr("We couldn't reach the server. Try again in a moment."); }
@@ -158,7 +192,7 @@ export function TipFlow({ creator, qrSvg, pageUrl, passMode = false, goal = null
   const reset = () => { setTip(null); setStep("amount"); setErr(""); history.replaceState(null, "", location.pathname); };
   const retryFresh = async () => {
     if (!tip) return reset();
-    setAssetId(tip.originAssetId); setRefundTo(tip.refundTo); setChain(tip.originChain);
+    setAssetId(tip.originAssetId); setRefundTo(tip.refundTo); setPayByHand(true); setChain(tip.originChain);
     setTip(null); setStep("pay"); history.replaceState(null, "", location.pathname);
   };
 
@@ -276,15 +310,49 @@ export function TipFlow({ creator, qrSvg, pageUrl, passMode = false, goal = null
           </div>
         </div>
         <p className="tz-small tz-muted" style={{ margin: 0 }}>Not sure? Pick the network your wallet app shows at the top. You can't pick wrong. We'll check before you send.</p>
-        <div className="tz-field">
-          <label className="tz-label" htmlFor="refund">Your wallet address{cur ? ` on ${cur.label}` : ""}</label>
-          <input id="refund" className="tz-input tz-mono" value={refundTo} autoCapitalize="none" spellCheck={false} autoComplete="off" placeholder="So we can send it back if anything goes wrong"
-            onChange={(e) => setRefundTo(e.target.value.trim())} aria-describedby="refund-h" />
-          <span id="refund-h" className="tz-hint">Only used to return your money if something fails. It must be an address you control on {cur?.label ?? "this network"}.</span>
-        </div>
+        {walletRoute ? (
+          <section className="tz-stack" style={{ ["--tz-stack-gap" as string]: "10px" }} aria-label="Your wallet" data-testid="refund-wallet">
+            {connected ? (
+              <div className="tz-card tz-card--sunken tz-stack" style={{ ["--tz-stack-gap" as string]: "6px", padding: "var(--tz-space-4)" }}>
+                <span className="tz-overline">Connected wallet</span>
+                <b className="tz-mono" style={{ overflowWrap: "anywhere" }} data-testid="connected-address">{connected.address}</b>
+                <span className="tz-small tz-muted">{connected.walletName}. Your money goes back here if something fails.</span>
+                <button type="button" className="tzs-linkbtn" style={{ margin: 0 }} onClick={() => setConnected(null)}>Use another wallet</button>
+              </div>
+            ) : (
+              <WalletConnect wallets={wallets} checked={walletsChecked} onConnected={onWalletConnected} />
+            )}
+            <button type="button" className="tzs-linkbtn" style={{ margin: 0 }} onClick={() => setPayByHand(true)}>I'll pay by hand instead</button>
+          </section>
+        ) : (
+          <div className="tz-field" data-testid="refund-manual">
+            <label className="tz-label" htmlFor="refund">Your wallet address{cur ? ` on ${cur.label}` : ""}</label>
+            <input id="refund" className="tz-input tz-mono" value={refundTo} autoCapitalize="none" spellCheck={false} autoComplete="off" placeholder="So we can send it back if anything goes wrong"
+              aria-invalid={!!refundTo && !refundOk} aria-describedby="refund-h"
+              onChange={(e) => setRefundTo(e.target.value.trim())} />
+            <span id="refund-h" className={refundTo && !refundOk ? "tz-field__error" : "tz-hint"}>
+              {refundTo && !refundOk ? `That doesn't look like a valid address on ${cur?.label ?? "this network"}.` : `Only used to return your money if something fails. It must be an address you control on ${cur?.label ?? "this network"}.`}
+            </span>
+            {saved && refundTo === saved ? (
+              <div className="tz-row" style={{ flexWrap: "wrap" }} data-testid="refund-saved">
+                <span className="tz-small tz-muted">Saved on this device</span>
+                <button type="button" className="tzs-linkbtn" style={{ margin: 0 }} onClick={() => { forgetRefund(kv, chain); setSaved(null); setRefundTo(""); }}>Forget it</button>
+              </div>
+            ) : (
+              <>
+                <label className="tz-row" style={{ minHeight: 44, cursor: "pointer" }}>
+                  <input type="checkbox" checked={remember} onChange={(e) => setRemember(e.target.checked)} style={{ width: 22, height: 22 }} />
+                  <span className="tz-small">{saved ? "Make this my saved address on this device (replaces the current one)" : "Remember this address on this device"}</span>
+                </label>
+                {saved && <button type="button" className="tzs-linkbtn" style={{ margin: 0 }} onClick={() => { setRefundTo(saved); setRemember(false); }}>Use my saved address</button>}
+              </>
+            )}
+            {wallets.length > 0 && isEvm && <button type="button" className="tzs-linkbtn" style={{ margin: 0 }} onClick={() => setPayByHand(false)}>Connect a wallet instead</button>}
+          </div>
+        )}
         {err && <ErrorNote>{err}</ErrorNote>}
         {demo}
-        <button className="tz-btn tz-btn--primary tz-btn--lg tz-btn--block" onClick={requestQuote} disabled={busy || !assetId || !cryptoAmount || refundTo.length < 10}>{busy ? "Getting your quote…" : "See the quote"}</button>
+        <button className="tz-btn tz-btn--primary tz-btn--lg tz-btn--block" onClick={requestQuote} disabled={busy || !assetId || !cryptoAmount || !refundOk}>{busy ? "Getting your quote…" : "See the quote"}</button>
       </>
     );
   } else if (step === "quote" && tip && asset) {
