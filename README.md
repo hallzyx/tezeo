@@ -28,8 +28,8 @@ docker compose up --build     # app + PostgreSQL 16
 
 `docker-compose.yml` defines two services, `app` (Next.js standalone, internal port 3000) and `db`
 (`postgres:16-alpine` with a named volume). There are **no published ports**, so nothing is reachable from
-the host until a reverse proxy is attached; for a quick local look use
-`docker compose run --rm --service-ports` or add a temporary `ports: ["3000:3000"]` to `app` in a local override.
+the host until a reverse proxy is attached. For a quick local look, create an untracked
+`docker-compose.override.yml` with `services: { app: { ports: ["3000:3000"] } }` (Compose merges it automatically).
 The schema is created automatically on first start. `GET /api/health` returns 200 only when the app can
 reach Postgres, and both services have health checks.
 
