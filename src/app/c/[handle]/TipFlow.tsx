@@ -32,6 +32,18 @@ const CHAIN_COLOR: Record<string, string> = { eth: "#627EEA", base: "#0052FF", a
 const QUOTE_HOLD_MS = 5 * 60_000;
 const first = (n: string) => n.split(" ")[0];
 
+/** True from `px` wide (desktop two-pane layout). */
+function useWide(px = 1024) {
+  const [wide, setWide] = useState(false);
+  useEffect(() => {
+    const m = window.matchMedia(`(min-width:${px}px)`);
+    const f = () => setWide(m.matches);
+    f(); m.addEventListener("change", f);
+    return () => m.removeEventListener("change", f);
+  }, [px]);
+  return wide;
+}
+
 let assetCache: { mode: string; assets: Asset[] } | null = null;
 
 export interface PublicGoal { title: string; targetUsd: number; raisedUsd: number; pct: number }
@@ -395,8 +407,16 @@ export function TipFlow({ creator, qrSvg, pageUrl, passMode = false, goal = null
 
   const accentStyle = { ["--creator-accent" as string]: creator.accent };
   const isThanks = step === "track" && tip?.status === "received";
+  // Two panes on wide screens while the fan is paying (never shows fees or what the creator receives).
+  const twoPane = step === "pay" || step === "quote" || (step === "track" && !!tip && (tip.status === "pending" || tip.status === "converting"));
+  const dollars = usd(amountNow).replace(/\.00$/, "");
+  const sendLabel = tip && asset ? `${coin(tip.amountIn, asset.decimals, 8, asset.stable ? 2 : 0)} ${asset.symbol}` : "";
+  const sumAmount = step === "track" && sendLabel ? sendLabel : dollars;
+  const sumAmountSub = step === "track" && asset ? `sent on ${asset.chainLabel}` : passMode ? "Membership pass · 30 days" : "your tip";
+  const sumPaying = asset ? `${asset.symbol} on ${asset.chainLabel}` : null;
+  const sumRefund = step === "pay" ? (refundOk ? effectiveRefund : null) : tip?.refundTo ?? null;
   return (
-    <div className="tzs-page tz-creator" style={accentStyle}>
+    <div className={`tzs-page tz-creator${twoPane ? " tzs-page--shell" : ""}`} style={accentStyle}>
       {showDemo && <div className="tzs-demo" data-testid="demo-banner" role="note"><Icon name="clock" />Demo mode: payments here are simulated and no real money moves.</div>}
       {step === "amount" && !passMode && <div style={{ position: "absolute", top: 12, right: 12, zIndex: 5, display: "flex", gap: 8 }}>
         <button type="button" className="tz-btn tz-btn--secondary tz-btn--icon tzs-theme tzs-share-mobile" aria-label="Share this page" onClick={() => setSheet("share")}><Icon name="share" /></button>
@@ -404,6 +424,12 @@ export function TipFlow({ creator, qrSvg, pageUrl, passMode = false, goal = null
       </div>}
       {isThanks && <Weave slim />}
       {step === "amount" && !passMode && <Weave height={96} />}
+      {twoPane ? (
+        <div className="tzs-shell">
+          <SummaryPane creator={creator} amountText={sumAmount} amountSub={sumAmountSub} paying={sumPaying} refund={sumRefund} reference={step === "track" && tip ? tip.id.slice(0, 8) : null} closing={step === "track"} />
+          <main className="tzs-main tzs-stage" aria-live="off">{body}</main>
+        </div>
+      ) : (
       <div className={`tzs-creator-layout${step === "amount" && !passMode ? " tzs-creator-layout--qr" : ""}`}>
         <main className={`tzs-main${step === "amount" && !passMode ? " tzs-main--flush" : ""}`} aria-live="off">{body}</main>
         {step === "amount" && !passMode && (
@@ -413,6 +439,7 @@ export function TipFlow({ creator, qrSvg, pageUrl, passMode = false, goal = null
           </aside>
         )}
       </div>
+      )}
 
       {sheet === "share" && (
         <Sheet title={`Share ${name}'s page`} onClose={() => setSheet(null)}>
@@ -431,6 +458,31 @@ function friendly(e?: string) {
   if (/refundTo/i.test(e)) return "That wallet address doesn't look right for this network. Check it and try again.";
   if (/amount|minimum|too low|below/i.test(e)) return "That amount is too small to send on this network. Try a bit more.";
   return e.startsWith("Aurora") ? "We couldn't get a quote right now. Try again in a moment." : e;
+}
+
+/** Sticky "Your tip" pane (>=1024): who you're paying and what you chose. Deliberately no fees, no creator net. */
+function SummaryPane({ creator, amountText, amountSub, paying, refund, reference, closing }: {
+  creator: PublicCreator; amountText: string; amountSub: string; paying: string | null; refund: string | null; reference: string | null; closing: boolean;
+}) {
+  return (
+    <aside className="tzs-sum" aria-label="Your tip">
+      <div className="tzs-sum__card">
+        <Weave height={48} />
+        <div className="tzs-sum__id">
+          <div style={{ ["--_s" as string]: "68px" }}><Avatar name={creator.displayName} src={creator.avatarUrl} /></div>
+          <b>{creator.displayName}</b>
+          <span className="tzs-handle">@{creator.handle}</span>
+        </div>
+        <div className="tzs-sum__amt"><b>{amountText}</b><span>{amountSub}</span></div>
+        <dl className="tzs-sum__dl">
+          <div><dt>Paying with</dt><dd>{paying ?? <i>choose on the right</i>}</dd></div>
+          <div><dt>Refunds go to</dt><dd className="tz-mono">{refund ? shortAddr(refund) : <i>your wallet, next</i>}</dd></div>
+          {reference && <div><dt>Reference</dt><dd className="tz-mono">{reference}</dd></div>}
+        </dl>
+        <p className="tzs-trust"><Icon name="shield" />{closing ? "You can close this tab. We'll keep going." : "If anything fails, your money comes back to you."}</p>
+      </div>
+    </aside>
+  );
 }
 
 function Chip({ on, color, glyph, label, icon, onClick }: { on?: boolean; color?: string; glyph: string; label: string; icon?: string; onClick: () => void }) {
@@ -476,7 +528,8 @@ function QuoteStep({ tip, asset, name, now, bar, mini, demo, busy, mode, walletI
   const [qr, setQr] = useState("");
   const [wallet, setWallet] = useState<WalletState>("idle");
   const [refreshErr, setRefreshErr] = useState("");
-  useEffect(() => { QRCode.toDataURL(tip.depositAddress, { margin: 1, width: 168, color: { dark: "#1C1424", light: "#FFFFFF" } }).then(setQr).catch(() => {}); }, [tip.depositAddress]);
+  const wide = useWide();
+  useEffect(() => { QRCode.toDataURL(tip.depositAddress, { margin: 1, width: 336, color: { dark: "#1C1424", light: "#FFFFFF" } }).then(setQr).catch(() => {}); }, [tip.depositAddress]);
 
   // Counted from when the fan first sees this quote (their own clock), so server/browser clock skew can't expire it early.
   const start = useMemo(() => Date.now(), [tip.id]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -491,57 +544,69 @@ function QuoteStep({ tip, asset, name, now, bar, mini, demo, busy, mode, walletI
   const refresh = async () => { setRefreshErr(""); const e = await onRefresh(); if (e) setRefreshErr(e); };
 
   const manual = (
-    <div className="tz-stack" style={{ ["--tz-stack-gap" as string]: "14px" }}>
-      <ol className="tzs-howto">
-        <li>Open your wallet app, or your exchange's <b>withdraw</b> screen.</li>
-        <li>Choose <b>{asset.symbol}</b> on the <b>{asset.chainLabel}</b> network. <span className="tzs-howto__warn">Another network can lose your money.</span></li>
-        <li>Paste the address below, or scan the QR. <span className="tz-muted">The QR holds the address only, so type the amount yourself.</span></li>
-        <li>Send exactly <b className="tz-mono">{sendAmt} {asset.symbol}</b> and confirm.</li>
-        <li>Come back and tap <b>I've sent it</b>. We spot your payment by ourselves.</li>
-      </ol>
-      <div className="tz-card tz-card--sunken tz-stack" style={{ ["--tz-stack-gap" as string]: "12px", padding: "var(--tz-space-4)" }}>
-        <div className="tz-row" style={{ alignItems: "flex-start" }}>
-          <div className="tz-qr" style={{ padding: 8, borderRadius: 12 }}>{qr && /* eslint-disable-next-line @next/next/no-img-element */ <img src={qr} width={96} height={96} alt={`QR code for the ${asset.chainLabel} deposit address`} style={{ display: "block" }} />}</div>
-          <div style={{ fontSize: "var(--tz-text-sm)" }}>
-            <b>Send exactly<br /><span className="tz-amount" style={{ fontSize: "1.35rem" }}>{sendAmt} {asset.symbol}</span></b><br />
-            <span className="tz-muted">on {asset.chainLabel}, to:</span>
-          </div>
+    <div className="tzs-send" data-testid="manual-pay">
+      <div className="tzs-send__panel tz-card tz-card--sunken tz-stack" style={{ ["--tz-stack-gap" as string]: "12px" }}>
+        <div className="tz-qr" style={{ padding: 8, borderRadius: 12, margin: "0 auto" }}>{qr && /* eslint-disable-next-line @next/next/no-img-element */ <img src={qr} alt={`QR code for the ${asset.chainLabel} deposit address`} className="tzs-send__qr" />}</div>
+        <div style={{ textAlign: "center", fontSize: "var(--tz-text-sm)" }}>
+          <span className="tz-muted">Send exactly</span><br />
+          <b className="tz-amount" style={{ fontSize: "1.5rem" }}>{sendAmt} {asset.symbol}</b><br />
+          <span className="tz-muted">on {asset.chainLabel}, to:</span>
         </div>
         <CopyBox value={tip.depositAddress} />
         {tip.depositMemo && <p className="tz-small" style={{ margin: 0 }}>Include this memo: <b className="tz-mono">{tip.depositMemo}</b></p>}
       </div>
-      <div className="tzs-dock"><button className="tz-btn tz-btn--primary tz-btn--lg tz-btn--block" onClick={onSent} disabled={expired}>I've sent it</button></div>
+      <ol className="tzs-howto">
+        <li>Open your wallet app, or your exchange's <b>withdraw</b> screen.</li>
+        <li>Choose <b>{asset.symbol}</b> on the <b>{asset.chainLabel}</b> network. <span className="tzs-howto__warn">Another network can lose your money.</span></li>
+        <li>Paste the address, or scan the QR. <span className="tz-muted">The QR holds the address only, so type the amount yourself.</span></li>
+        <li>Send exactly <b className="tz-mono">{sendAmt} {asset.symbol}</b> and confirm.</li>
+        <li>Come back and tap <b>I've sent it</b>. We spot your payment by ourselves.</li>
+      </ol>
+    </div>
+  );
+
+  const sent = (
+    <div className="tzs-dock">
+      <button className={`tz-btn ${tx ? "tz-btn--secondary" : "tz-btn--primary"} tz-btn--lg tz-btn--block`} onClick={onSent} disabled={expired}>I've sent it</button>
+      <p className="tzs-why">When the price runs out you can get a fresh quote, no harm done.</p>
     </div>
   );
 
   return (
     <>
       {bar(3)}{mini}
-      <h1 className="tz-h1">Your payment</h1>
-      <dl className="tz-quote" data-testid="quote">
-        <div className="tz-quote__row tz-quote__row--total"><dt>You send</dt><span className="tz-spacer" /><dd>{sendAmt} {asset.symbol}</dd></div>
-      </dl>
+      <section className="tzs-payhero" data-testid="quote" aria-label="Your payment">
+        <span className="tz-overline">You send</span>
+        <div className="tzs-payhero__amt">{sendAmt}<small>{asset.symbol}</small></div>
+        <div className="tzs-tags">
+          <span className="tzs-tag">on {asset.chainLabel}</span>
+          <span className="tzs-tag"><Icon name="clock" size={14} />Price held for <b className="tz-timer">{clock(left)}</b></span>
+        </div>
+      </section>
 
       {tx ? (
         <>
-          <section className="tz-stack" style={{ ["--tz-stack-gap" as string]: "10px" }} aria-label="Pay with your wallet">
+          <section className="tzs-onetap tz-stack" style={{ ["--tz-stack-gap" as string]: "10px" }} aria-label="Pay with your wallet">
+            <span className="tz-overline">Pay in one tap</span>
             <WalletPay tx={tx} tipId={tip.id} symbol={asset.symbol} amountLabel={`${sendAmt} ${asset.symbol}`} walletId={walletId} onSent={onSent} onState={setWallet} />
             <p className="tz-small tz-muted" style={{ margin: 0 }}>Your wallet opens and asks you to confirm. We fill in the address and the exact amount, so there's nothing to copy.</p>
           </section>
-          <details className="tzs-manual">
-            <summary>Or pay it yourself, step by step</summary>
-            {manual}
-          </details>
+          <div className="tzs-or" role="separator"><span>or pay it yourself</span></div>
+          {wide ? manual : (
+            <details className="tzs-manual">
+              <summary>Pay it yourself, step by step</summary>
+              {manual}
+            </details>
+          )}
         </>
       ) : (
-        <section className="tz-stack" style={{ ["--tz-stack-gap" as string]: "10px" }} aria-label="How to pay">
+        <section className="tz-stack" style={{ ["--tz-stack-gap" as string]: "12px" }} aria-label="How to pay">
           <h2 className="tz-h2" style={{ fontSize: "var(--tz-text-lg)" }}>How to pay</h2>
           {manual}
         </section>
       )}
 
-      <p className="tz-quote__note"><Icon name="clock" size={14} /><span>Price held for <span className="tz-timer">{clock(left)}</span>. When it runs out you can get a fresh quote, no harm done.</span></p>
-      {demo}
+      {sent}
       <span className="tz-sr-only" role="status">{left > 0 && left <= 10_000 ? "Ten seconds left on this price." : ""}</span>
 
       {expired && (

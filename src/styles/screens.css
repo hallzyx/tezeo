@@ -177,3 +177,43 @@ input[type="checkbox"] { accent-color: var(--tz-brand); }
 
 /* supporter wall: compact, with "Show N more" */
 .tzs-more { background: none; border: 0; padding: 10px 0; min-height: 44px; color: var(--tz-brand-text); font: 600 var(--tz-text-sm)/1 var(--tz-font-body); cursor: pointer; text-align: left; text-decoration: underline; text-underline-offset: 3px; }
+
+/* ===== quote step: pay hero, one-tap card, manual block ===== */
+.tzs-payhero { display: grid; gap: 10px; padding: var(--tz-space-5); border-radius: var(--tz-radius-lg); background: var(--creator-accent-soft); }
+.tzs-payhero__amt { font: 800 clamp(36px, 9vw, 52px)/1 var(--tz-font-display); letter-spacing: -0.03em; color: var(--creator-accent-text); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.tzs-payhero__amt small { font-size: 0.45em; margin-left: 8px; letter-spacing: 0; }
+.tzs-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+.tzs-tag { display: inline-flex; align-items: center; gap: 6px; min-height: 28px; padding: 0 12px; border-radius: 999px; background: var(--tz-surface); border: 1.5px solid var(--tz-border); font: 600 var(--tz-text-xs)/1 var(--tz-font-body); }
+.tzs-tag .tz-timer { font-variant-numeric: tabular-nums; }
+.tzs-onetap { padding: var(--tz-space-4); border-radius: var(--tz-radius-lg); border: 1.5px solid var(--creator-accent-fill); background: var(--tz-surface); }
+.tzs-or { display: flex; align-items: center; gap: 12px; color: var(--tz-text-muted); font: 600 var(--tz-text-xs)/1 var(--tz-font-body); text-transform: uppercase; letter-spacing: .08em; }
+.tzs-or::before, .tzs-or::after { content: ""; flex: 1; border-top: 2px dashed var(--tz-border); }
+.tzs-send { display: grid; gap: var(--tz-space-4); }
+.tzs-send__qr { display: block; width: 144px; height: 144px; }
+.tzs-send__panel { padding: var(--tz-space-4); }
+@media (min-width: 1024px) {
+  .tzs-send { grid-template-columns: minmax(0, 15rem) minmax(0, 1fr); align-items: start; gap: var(--tz-space-6); }
+  .tzs-send__qr { width: 168px; height: 168px; }
+}
+
+/* ===== two-pane shell (>=1024): sticky "Your tip" pane + a raised step card ===== */
+.tzs-sum { display: none; }
+@media (min-width: 1024px) {
+  .tzs-page--shell .tzs-shell { display: grid; grid-template-columns: minmax(18rem, 22rem) minmax(0, 40rem); gap: clamp(1.5rem, 4vw, 3rem); justify-content: center; align-items: start; padding: 40px var(--tz-gutter) 64px; width: 100%; max-width: 78rem; margin-inline: auto; }
+  .tzs-sum { display: block; position: sticky; top: 24px; }
+  .tzs-sum__card { overflow: hidden; border-radius: var(--tz-radius-xl); background: var(--tz-surface); border: 1.5px solid var(--tz-border); box-shadow: var(--tz-shadow-2); padding-bottom: var(--tz-space-5); display: grid; gap: var(--tz-space-4); }
+  .tzs-sum__id { display: grid; justify-items: center; gap: 4px; margin-top: -34px; text-align: center; padding-inline: var(--tz-space-4); }
+  .tzs-sum__id b { font: 800 var(--tz-text-xl)/1.1 var(--tz-font-display); letter-spacing: -0.02em; margin-top: 6px; overflow-wrap: anywhere; }
+  .tzs-sum__amt { margin-inline: var(--tz-space-5); padding: var(--tz-space-4); border-radius: var(--tz-radius-md); background: var(--creator-accent-soft); display: grid; gap: 2px; }
+  .tzs-sum__amt b { font: 800 var(--tz-text-3xl)/1 var(--tz-font-display); letter-spacing: -0.03em; color: var(--creator-accent-text); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+  .tzs-sum__amt span { font-size: var(--tz-text-xs); color: var(--tz-text-muted); }
+  .tzs-sum__dl { margin: 0 var(--tz-space-5); display: grid; gap: 10px; font-size: var(--tz-text-sm); }
+  .tzs-sum__dl > div { display: flex; justify-content: space-between; gap: 12px; }
+  .tzs-sum__dl dt { color: var(--tz-text-muted); }
+  .tzs-sum__dl dd { margin: 0; font-weight: 600; text-align: right; overflow-wrap: anywhere; }
+  .tzs-sum__dl dd i { font-weight: 400; color: var(--tz-text-faint); }
+  .tzs-sum .tzs-trust { margin-inline: var(--tz-space-5); }
+  .tzs-stage { max-width: none; margin: 0; background: var(--tz-surface); border: 1.5px solid var(--tz-border); border-radius: var(--tz-radius-xl); box-shadow: var(--tz-shadow-2); padding: clamp(20px, 3vw, 40px); gap: var(--tz-space-6); }
+  .tzs-page--shell .tzs-shell .tzs-mini { display: none; }   /* the summary pane replaces the little chip */
+  .tzs-stage h1.tz-h1 { font-size: var(--tz-text-3xl); letter-spacing: -0.03em; }
+}
