@@ -66,7 +66,6 @@ export function Onboarding() {
     );
   }
 
-  const first = f.displayName.split(" ")[0] || "you";
   return (
     <form className="tz-stack tz-creator" style={{ ["--creator-accent" as string]: f.accent, ["--tz-stack-gap" as string]: "20px" }} onSubmit={submit} noValidate>
       <div><span className="tz-overline">Create your page</span><h1 className="tz-h1" style={{ marginTop: 6 }}>Let's weave your page</h1></div>
@@ -131,7 +130,7 @@ export function Onboarding() {
       </div>
 
       {err && !err.field && <ErrorNote>{err.msg}</ErrorNote>}
-      <button className="tz-btn tz-btn--primary tz-btn--lg tz-btn--block" disabled={busy || !f.displayName || !f.handle || !f.wallet}>{busy ? "Creating…" : `Create ${first}'s page`}</button>
+      <button className="tz-btn tz-btn--primary tz-btn--lg tz-btn--block" disabled={busy || !f.displayName || !f.handle || !f.wallet}>{busy ? "Creating…" : "Create my page"}</button>
       <p className="tzs-trust"><Icon name="shield" />We check your wallet address before saving it.</p>
     </form>
   );

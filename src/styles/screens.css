@@ -132,3 +132,48 @@ button.tzs-mini { cursor: pointer; }
 .tzs-wallet img { width: 20px; height: 20px; border-radius: 6px; flex: none; }
 .tzs-wallet small { color: var(--tz-text-muted); font-weight: 500; font-size: var(--tz-text-xs); }
 .tzs-wallet__dot { width: 20px; height: 20px; border-radius: 6px; background: var(--tz-border); flex: none; }
+
+/* ===== flow polish (design/FLOW.md) ===== */
+/* money never wraps mid-value; checkboxes use the brand colour */
+.tz-quote dd { white-space: nowrap; }
+input[type="checkbox"] { accent-color: var(--tz-brand); }
+.tz-table--stack td[data-col="fan"], .tzs-fan { min-width: 0; }
+.tzs-fan > div { min-width: 0; overflow-wrap: anywhere; }
+@media (max-width: 640px) {
+  .tz-table--stack tr[data-detail] { display: block; padding: 0 0 var(--tz-space-3); border-top: 0; }
+  .tz-table--stack tr[data-detail] td { display: block; }
+}
+
+/* slim demo strip (one, at the very top, instead of a card above every button) */
+.tzs-demo { position: sticky; top: 0; z-index: 40; min-height: 36px; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 6px var(--tz-gutter); background: var(--tz-pending-bg); color: var(--tz-pending-fg); font: 600 var(--tz-text-xs)/1.3 var(--tz-font-body); text-align: center; }
+.tzs-demo svg { width: 14px; height: 14px; flex: none; }
+
+/* step bar with a real text label: "Step 2 of 4 · Where's your money" */
+.tzs-bar { display: flex; align-items: center; gap: 10px; }
+.tzs-prog { flex: 1; min-width: 0; display: grid; gap: 6px; }
+.tzs-prog__label { font: 500 var(--tz-text-xs)/1.2 var(--tz-font-body); color: var(--tz-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tzs-prog__label b { color: var(--tz-text); font-weight: 700; }
+.tzs-prog__segs { display: flex; gap: 4px; }
+.tzs-prog__segs span { flex: 1; height: 6px; border-radius: 3px; background: var(--tz-border); }
+.tzs-prog__segs span.on { background: var(--tz-brand); }
+.tzs-prog__segs span.now { background: repeating-linear-gradient(90deg, var(--tz-brand) 0 8px, transparent 8px 12px); animation: tz-stitch-run 1.2s linear infinite; background-size: 12px 100%; }
+@media (prefers-reduced-motion: reduce) { .tzs-prog__segs span.now { animation: none; background: var(--tz-brand); } }
+
+/* sticky primary button on phones (safe-area aware); static on desktop */
+.tzs-dock { position: sticky; bottom: 0; z-index: 15; display: grid; gap: 8px; margin-inline: calc(var(--tz-gutter) * -1); padding: 24px var(--tz-gutter) calc(12px + env(safe-area-inset-bottom)); background: linear-gradient(to bottom, transparent, var(--tz-bg) 28%); }
+.tz-input, .tz-textarea { scroll-margin-bottom: 150px; }
+.tzs-why { margin: 0; font-size: var(--tz-text-sm); color: var(--tz-text-muted); text-align: center; }
+@media (min-width: 1024px) { .tzs-dock { position: static; margin: 0; padding: 0; background: none; } }
+
+/* tablet (768-1023): a wider column, bigger tiles, pickers as an even grid */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .tzs-main { max-width: 36rem; }
+  .tz-amount-opt { min-height: 96px; }
+}
+@media (min-width: 768px) {
+  .tzs-pickgroup { display: grid; grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr)); gap: 10px; }
+  .tzs-pickgroup .tz-chip { min-height: 52px; justify-content: flex-start; }
+}
+
+/* supporter wall: compact, with "Show N more" */
+.tzs-more { background: none; border: 0; padding: 10px 0; min-height: 44px; color: var(--tz-brand-text); font: 600 var(--tz-text-sm)/1 var(--tz-font-body); cursor: pointer; text-align: left; text-decoration: underline; text-underline-offset: 3px; }

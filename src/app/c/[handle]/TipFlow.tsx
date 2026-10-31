@@ -42,6 +42,7 @@ export function TipFlow({ creator, qrSvg, pageUrl, passMode = false, goal = null
   const [step, setStep] = useState<Step>("amount");
   const [amountUsd, setAmountUsd] = useState(passMode ? creator.pass?.priceUsd ?? 5 : 5);
   const [passNote, setPassNote] = useState("");
+  const [wallOpen, setWallOpen] = useState(false);
   const [custom, setCustom] = useState("");
   const [data, setData] = useState<{ mode: string; assets: Asset[] } | null>(assetCache);
   const [chain, setChain] = useState("");
@@ -127,6 +128,12 @@ export function TipFlow({ creator, qrSvg, pageUrl, passMode = false, goal = null
     if (slug && data?.assets.some((a) => a.chain === slug)) pickChain(slug);
   }
 
+  // Why the main button is disabled (shown under it, so the fan knows what is missing).
+  const whyDisabled = busy || refundOk ? "" : !assetId ? "Pick a network and a coin to continue."
+    : walletRoute ? "Connect your wallet to see the quote."
+    : !refundTo.trim() ? "Add your wallet address to see the quote."
+    : `That address doesn't look right for ${data?.assets.find((a) => a.chain === chain)?.chainLabel ?? "this network"}.`;
+
   const amountNow = passMode ? creator.pass?.priceUsd ?? amountUsd : custom ? Number(custom) : amountUsd;
   const amountOk = Number.isFinite(amountNow) && amountNow >= 1 && amountNow <= 10_000;
 
@@ -198,10 +205,14 @@ export function TipFlow({ creator, qrSvg, pageUrl, passMode = false, goal = null
   };
 
   // ---------- render ----------
+  const STEP_LABEL = ["", "", "Where's your money", "Your payment", "On its way"];
   const bar = (n: number) => (
-    <div className="tzs-topnav">
-      <button type="button" className="tzs-back" aria-label="Back" onClick={() => (step === "pay" ? setStep("amount") : step === "quote" ? (setStep("pay"), setTip(null)) : reset())}><Icon name="back" /></button>
-      <div className="tzs-progress" aria-label={`Step ${n} of 4`} role="img">{[1, 2, 3, 4].map((i) => <span key={i} className={i <= n ? "on" : ""} />)}</div>
+    <div className="tzs-bar">
+      <button type="button" className="tzs-back" aria-label={step === "track" ? `Back to ${name}'s page` : "Back"} onClick={() => (step === "pay" ? setStep("amount") : step === "quote" ? (setStep("pay"), setTip(null)) : reset())}><Icon name="back" /></button>
+      <div className="tzs-prog">
+        <span className="tzs-prog__label"><b>Step {n} of 4</b> · {STEP_LABEL[n]}</span>
+        <div className="tzs-prog__segs" aria-hidden="true">{[1, 2, 3, 4].map((i) => <span key={i} className={i < n ? "on" : i === n ? "now" : ""} />)}</div>
+      </div>
       <ThemeToggle />
     </div>
   );
@@ -212,11 +223,8 @@ export function TipFlow({ creator, qrSvg, pageUrl, passMode = false, goal = null
     </button>
   );
 
-  const demo = data?.mode === "simulated" && (
-    <p className="tzs-error" style={{ background: "var(--tz-pending-bg)", color: "var(--tz-pending-fg)" }} data-testid="demo-banner">
-      <Icon name="clock" />Demo mode: payments here are simulated and no real money moves.
-    </p>
-  );
+  const demo: React.ReactNode = null; // the demo notice is one slim strip at the top of the page (see below)
+  const showDemo = data?.mode === "simulated";
 
   let body: React.ReactNode;
   if (step === "amount" && passMode) {
@@ -278,9 +286,10 @@ export function TipFlow({ creator, qrSvg, pageUrl, passMode = false, goal = null
         {wall.length > 0 && (
           <section className="tz-stack" style={{ ["--tz-stack-gap" as string]: "10px" }} aria-label="Supporters" data-testid="wall">
             <span className="tz-overline">Recent supporters</span>
-            <ul className="tzs-wall">{wall.map((w) => (
+            <ul className="tzs-wall">{(wallOpen ? wall : wall.slice(0, 3)).map((w) => (
               <li key={w.id}><b>{w.name}{w.isPass && <span className="tz-badge">Pass</span>}</b>{w.message && <span>“{w.message}”</span>}</li>
             ))}</ul>
+            {wall.length > 3 && <button type="button" className="tzs-more" onClick={() => setWallOpen(!wallOpen)} aria-expanded={wallOpen}>{wallOpen ? "Show less" : `Show ${wall.length - 3} more`}</button>}
           </section>
         )}
         <div className="tzs-foot"><Mark />woven by tezeo</div>
@@ -296,7 +305,7 @@ export function TipFlow({ creator, qrSvg, pageUrl, passMode = false, goal = null
         <h1 className="tz-h1">Where's your money?</h1>
         <div className="tz-stack" style={{ ["--tz-stack-gap" as string]: "10px" }}>
           <span className="tz-overline" id="net-l">Network</span>
-          <div className="tz-chips" role="group" aria-labelledby="net-l">
+          <div className="tz-chips tzs-pickgroup" role="group" aria-labelledby="net-l">
             {topChains.map((c) => <Chip key={c.id} on={chain === c.id} color={CHAIN_COLOR[c.id]} glyph={c.label.slice(0, 3).toUpperCase()} icon={chainIcon(c.id)} label={c.label} onClick={() => pickChain(c.id)} />)}
             {chain && !topChains.some((c) => c.id === chain) && cur && <Chip on color={CHAIN_COLOR[chain]} glyph={cur.label.slice(0, 3).toUpperCase()} icon={chainIcon(chain)} label={cur.label} onClick={() => {}} />}
             {moreChains.length > 0 && <Chip color="#5E5266" glyph={`+${moreChains.length}`} label="More" onClick={() => setSheet("chain")} />}
@@ -304,7 +313,7 @@ export function TipFlow({ creator, qrSvg, pageUrl, passMode = false, goal = null
         </div>
         <div className="tz-stack" style={{ ["--tz-stack-gap" as string]: "10px" }}>
           <span className="tz-overline" id="coin-l">Coin</span>
-          <div className="tz-chips" role="group" aria-labelledby="coin-l">
+          <div className="tz-chips tzs-pickgroup" role="group" aria-labelledby="coin-l">
             {topCoins.map((c) => <Chip key={c.assetId} on={assetId === c.assetId} color={c.stable ? "#2775CA" : CHAIN_COLOR[c.chain] ?? "#5E5266"} glyph={c.symbol.slice(0, 3)} icon={coinIcon(c.symbol)} label={c.symbol} onClick={() => setAssetId(c.assetId)} />)}
             {assetId && !topCoins.some((c) => c.assetId === assetId) && <Chip on color="#5E5266" glyph="•" icon={coinIcon(coins.find((c) => c.assetId === assetId)?.symbol ?? "")} label={coins.find((c) => c.assetId === assetId)?.symbol ?? ""} onClick={() => {}} />}
             {moreCoins.length > 0 && <Chip color="#5E5266" glyph={`+${moreCoins.length}`} label="More" onClick={() => setSheet("coin")} />}
@@ -355,14 +364,16 @@ export function TipFlow({ creator, qrSvg, pageUrl, passMode = false, goal = null
           </div>
         )}
         {err && <ErrorNote>{err}</ErrorNote>}
-        {demo}
-        <button className="tz-btn tz-btn--primary tz-btn--lg tz-btn--block" onClick={requestQuote} disabled={busy || !assetId || !cryptoAmount || !refundOk}>{busy ? "Getting your quote…" : "See the quote"}</button>
+        <div className="tzs-dock">
+          <button className="tz-btn tz-btn--primary tz-btn--lg tz-btn--block" onClick={requestQuote} disabled={busy || !assetId || !cryptoAmount || !refundOk} aria-describedby={whyDisabled ? "why-disabled" : undefined}>{busy ? "Getting your quote…" : "See the quote"}</button>
+          {whyDisabled && <p id="why-disabled" className="tzs-why">{whyDisabled}</p>}
+        </div>
       </>
     );
   } else if (step === "quote" && tip && asset) {
     body = <QuoteStep {...{ tip, asset, name, now, bar, mini, demo, busy }} walletId={connected?.walletId} mode={data?.mode ?? ""} onSent={() => setStep("track")} onRefresh={() => requestQuoteFor(tip)} onBack={reset} />;
   } else if (step === "track" && tip && asset) {
-    body = <TrackStep {...{ tip, asset, creator, name, pageUrl, demo }} onAgain={retryFresh} onHome={reset} onTip={setTip} onShare={() => setSheet("share")} />;
+    body = <TrackStep {...{ tip, asset, creator, name, pageUrl, demo, bar }} onAgain={retryFresh} onHome={reset} onTip={setTip} onShare={() => setSheet("share")} />;
   } else {
     body = <p className="tz-muted" role="status">Loading your tip…</p>;
   }
@@ -386,6 +397,7 @@ export function TipFlow({ creator, qrSvg, pageUrl, passMode = false, goal = null
   const isThanks = step === "track" && tip?.status === "received";
   return (
     <div className="tzs-page tz-creator" style={accentStyle}>
+      {showDemo && <div className="tzs-demo" data-testid="demo-banner" role="note"><Icon name="clock" />Demo mode: payments here are simulated and no real money moves.</div>}
       {step === "amount" && !passMode && <div style={{ position: "absolute", top: 12, right: 12, zIndex: 5, display: "flex", gap: 8 }}>
         <button type="button" className="tz-btn tz-btn--secondary tz-btn--icon tzs-theme tzs-share-mobile" aria-label="Share this page" onClick={() => setSheet("share")}><Icon name="share" /></button>
         <ThemeToggle />
@@ -498,7 +510,7 @@ function QuoteStep({ tip, asset, name, now, bar, mini, demo, busy, mode, walletI
         <CopyBox value={tip.depositAddress} />
         {tip.depositMemo && <p className="tz-small" style={{ margin: 0 }}>Include this memo: <b className="tz-mono">{tip.depositMemo}</b></p>}
       </div>
-      <button className="tz-btn tz-btn--primary tz-btn--lg tz-btn--block" onClick={onSent} disabled={expired}>I've sent it</button>
+      <div className="tzs-dock"><button className="tz-btn tz-btn--primary tz-btn--lg tz-btn--block" onClick={onSent} disabled={expired}>I've sent it</button></div>
     </div>
   );
 
@@ -552,8 +564,8 @@ function QuoteStep({ tip, asset, name, now, bar, mini, demo, busy, mode, walletI
 }
 
 // ======================= D–G. Tracking & outcomes =======================
-function TrackStep({ tip, asset, creator, name, pageUrl, demo, onAgain, onHome, onTip, onShare }: {
-  tip: Tip; asset: Asset; creator: PublicCreator; name: string; pageUrl: string; demo: React.ReactNode;
+function TrackStep({ tip, asset, creator, name, pageUrl, demo, bar, onAgain, onHome, onTip, onShare }: {
+  tip: Tip; asset: Asset; creator: PublicCreator; name: string; pageUrl: string; demo: React.ReactNode; bar: (n: number) => React.ReactNode;
   onAgain: () => void; onHome: () => void; onTip: (t: Tip) => void; onShare: () => void;
 }) {
   const sendAmt = coin(tip.amountIn, asset.decimals, 8, asset.stable ? 2 : 0);
@@ -594,9 +606,10 @@ function TrackStep({ tip, asset, creator, name, pageUrl, demo, onAgain, onHome, 
     const conv = s === "converting";
     return (
       <>
+        {bar(4)}
         <div className="tz-row"><span className="tz-pill" data-status={s}>{conv ? "Converting" : "Waiting"}</span><span className="tz-spacer" /><span className="tz-small tz-muted">{conv ? "usually under a minute" : "usually a minute or two"}</span></div>
         <h1 className="tz-h1">{conv ? `We're weaving your ${asset.symbol} into dollars for ${name}` : "Waiting for your payment"}</h1>
-        <Loom symbol={asset.symbol} />
+        <Loom from={asset.chainLabel} />
         <ol className="tz-steps" data-status={s}>
           <Step state={conv ? "done" : "active"} title={conv ? `Got your ${sendAmt} ${asset.symbol}` : `Waiting for your ${sendAmt} ${asset.symbol}`} desc={conv ? undefined : "It shows up once the network confirms it."} />
           <Step state={conv ? "active" : "todo"} title="Weaving it into USDC" desc={conv ? "You can close this tab. We'll keep going." : undefined} />
@@ -686,13 +699,14 @@ function Step({ state, title, desc }: { state: "done" | "active" | "todo" | "fai
   );
 }
 
-function Loom({ symbol }: { symbol: string }) {
+/** "BASE -> SOLANA": where the money comes from and where it lands (the coin name would repeat itself for USDC). */
+function Loom({ from }: { from: string }) {
   return (
-    <svg className="tz-loom" viewBox="0 0 300 120" role="img" aria-label="Converting your payment into USDC">
-      <text className="tz-loom__label" x="0" y="64">{symbol.slice(0, 5)}</text>
+    <svg className="tz-loom" viewBox="0 0 300 120" role="img" aria-label="Converting your payment into USDC on Solana">
+      <text className="tz-loom__label" x="0" y="64">{from.toUpperCase().slice(0, 8)}</text>
       <path className="tz-loom__t tz-loom__t--1" d="M40 20 C110 20 130 60 190 60" /><path className="tz-loom__t tz-loom__t--2" d="M40 60 C80 40 130 80 190 60" /><path className="tz-loom__t tz-loom__t--3" d="M40 100 C110 100 130 60 190 60" />
-      <path className="tz-loom__out" d="M190 60 H258" /><circle className="tz-loom__eye" cx="190" cy="60" r="10" /><path className="tz-loom__shuttle" d="M206 54 212 60 206 66 200 60Z" />
-      <text className="tz-loom__label" x="266" y="64" style={{ fill: "var(--tz-text)" }}>USDC</text>
+      <path className="tz-loom__out" d="M190 60 H234" /><circle className="tz-loom__eye" cx="190" cy="60" r="10" /><path className="tz-loom__shuttle" d="M206 54 212 60 206 66 200 60Z" />
+      <text className="tz-loom__label" x="242" y="64" style={{ fill: "var(--tz-text)" }}>SOLANA</text>
     </svg>
   );
 }

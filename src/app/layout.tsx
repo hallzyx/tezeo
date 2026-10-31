@@ -14,7 +14,8 @@ export const metadata: Metadata = {
   title: { default: "Tezeo — tips from any chain, paid in USDC on Solana", template: "%s · Tezeo" },
   description: "Fans pay from any wallet on any chain. Creators receive USDC on Solana. No login for fans.",
 };
-export const viewport: Viewport = { width: "device-width", initialScale: 1, themeColor: "#D1245A" };
+// viewport-fit=cover lets the sticky button bar respect the phone's safe areas (notch / home indicator).
+export const viewport: Viewport = { width: "device-width", initialScale: 1, viewportFit: "cover", themeColor: "#D1245A" };
 
 // Runs before paint so the saved theme never flashes.
 const THEME_BOOT = `try{var t=localStorage.getItem("tz-theme");if(t)document.documentElement.dataset.theme=t}catch(e){}`;
