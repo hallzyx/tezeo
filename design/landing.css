@@ -725,12 +725,11 @@ html { scroll-behavior: smooth; scroll-padding-top: calc(var(--tzl-nav-h) + 16px
    simply visible in its final state.
    --------------------------------------------------------------------- */
 .tzl-js [data-reveal="toast"]:not(.is-in) .tz-toast,
-.tzl-js [data-reveal="alert"]:not(.is-in) @media (max-width: 599px) { .tzl-stream { aspect-ratio: 4 / 3.4; } .tzl-alert { width: 88% !important; } }
-.tzl-alert { opacity: 0; }
+.tzl-js [data-reveal="toast"]:not(.is-in) .tzl-tiprow--new,
+.tzl-js [data-reveal="alert"]:not(.is-in) .tzl-alert { opacity: 0; }
 .tzl-js [data-reveal="toast"].is-in .tz-toast { animation: tz-toast-in var(--tz-dur-slow) var(--tz-ease-spring) 500ms both; }
 .tzl-js [data-reveal="toast"].is-in .tzl-tiprow--new { animation: tzl-arrive 1.2s var(--tz-ease-out) 300ms both; }
-.tzl-js [data-reveal="alert"].is-in @media (max-width: 599px) { .tzl-stream { aspect-ratio: 4 / 3.4; } .tzl-alert { width: 88% !important; } }
-.tzl-alert { animation: tzl-alert-in 700ms var(--tz-ease-spring) 400ms both; }
+.tzl-js [data-reveal="alert"].is-in .tzl-alert { animation: tzl-alert-in 700ms var(--tz-ease-spring) 400ms both; }
 .tzl-js [data-reveal="goal"]:not(.is-in) .tzl-goal__bar > span { width: 0; }
 .tzl-js [data-reveal="goal"] .tzl-goal__bar > span { transition: width 1.4s var(--tz-ease-out) 200ms; }
 .tzl-hero .tzl-tiprow--new { animation: tzl-arrive 1.2s var(--tz-ease-out) 1.2s both; }
@@ -760,8 +759,7 @@ html { scroll-behavior: smooth; scroll-padding-top: calc(var(--tzl-nav-h) + 16px
   .tzl-marquee__track { animation: none !important; width: auto; }
   .tzl-marquee__track, .tzl-marquee__set { flex-wrap: wrap; justify-content: center; }
   .tzl-marquee__set[aria-hidden="true"] { display: none; }
-  .tzl-js [data-reveal] .tz-toast, .tzl-js [data-reveal] @media (max-width: 599px) { .tzl-stream { aspect-ratio: 4 / 3.4; } .tzl-alert { width: 88% !important; } }
-.tzl-alert { opacity: 1 !important; animation: none !important; }
+  .tzl-js [data-reveal] .tz-toast, .tzl-js [data-reveal] .tzl-tiprow--new, .tzl-js [data-reveal] .tzl-alert { opacity: 1 !important; animation: none !important; }
   .tzl-js [data-reveal="goal"] .tzl-goal__bar > span { width: var(--_p) !important; transition: none; }
   .tzl-tile--pass .tz-pass, .tzl-faq summary::after { transition: none; }
 }

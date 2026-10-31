@@ -8,7 +8,8 @@
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "phase0": "tsx scripts/phase0-validate.ts"
+    "phase0": "tsx scripts/phase0-validate.ts",
+    "landing:sync": "node scripts/sync-landing.mjs"
   },
   "dependencies": {
     "@solana/web3.js": "^3.1.1",

@@ -1,9 +1,10 @@
 "use client";
 import { useEffect, useState, type ReactNode } from "react";
 import { SPRITE_INNER } from "./sprite";
+import { SPRITE_LANDING } from "./sprite-landing";
 
 export function Sprite() {
-  return <svg width="0" height="0" style={{ position: "absolute" }} aria-hidden="true" dangerouslySetInnerHTML={{ __html: SPRITE_INNER }} />;
+  return <svg width="0" height="0" style={{ position: "absolute" }} aria-hidden="true" dangerouslySetInnerHTML={{ __html: SPRITE_INNER + SPRITE_LANDING }} />;
 }
 
 export function Icon({ name, className = "tzs-icon", size }: { name: string; className?: string; size?: number }) {

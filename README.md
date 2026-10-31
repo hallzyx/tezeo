@@ -51,7 +51,7 @@ reach Postgres, and both services have health checks.
 npm ci
 cp .env.example .env.local      # set DATABASE_URL=postgres://user:pass@localhost:5432/tezeo
 npm run dev                     # http://localhost:3000
-npm run typecheck && npm test   # 40 tests, run on an embedded Postgres (PGlite): no server needed
+npm run typecheck && npm test   # 46 tests, run on an embedded Postgres (PGlite): no server needed
 npm run build && npm start
 ```
 
@@ -73,6 +73,7 @@ Simulator tricks (simulated mode only): a tip whose smallest-unit amount ends in
 * `src/lib/aurora/` provider interface, **verified live client** (`live.ts`) and a clearly labelled **simulator**.
 * `src/lib/tips.ts` + `domain.ts` tip state machine: `pending → converting → received | failed | refunded | expired`.
   Aurora is the source of truth; the server re-checks status on each poll and never trusts the browser.
+* Landing (`/`): the designer's prototype in `design/landing.html` + `landing.css` (spec in `design/LANDING.md`), ported by `npm run landing:sync` (re-run it after any design change; never edit `src/app/_landing/markup.ts` by hand). Behaviour lives in `src/app/_landing/LandingEffects.tsx`.
 * Pages: `/alerts/[token]` (OBS), `/` landing, `/onboarding`, `/@handle` (+ `/@handle/pass`), `/dashboard/[token]`, `/pass/[token]`.
 * API: `/api/assets`, `/api/creators`, `/api/tips`, `/api/tips/[id]` (GET status, PATCH fan note),
   `/api/dashboard/[token]` (+ `/pass` settings).
@@ -85,6 +86,7 @@ Simulator tricks (simulated mode only): a tip whose smallest-unit amount ends in
 | **0. Aurora validation** | **API contract verified live** with a real key: tokens list, real quote with deposit address, status polling, Solana USDC as destination. **A funded conversion has NOT been run**, so a real USDC delivery to Solana is unproven. Run `npm run phase0` (command in `docs/PHASE0.md`). |
 | **1. Core UI** | Built and driven in a real browser (Playwright, mobile + desktop, light + dark). The full fan flow (amount → network/coin → quote → deposit → live tracking → thank-you / failure / refund) and the dashboard were exercised against the **simulator**. Against **live Aurora** we verified the asset list and quote creation through the app (no deposit made). |
 | **2. Membership pass** | Built and tested (unit tests with a stub provider + browser run on the simulator). The quote is sized and enforced so the guaranteed minimum covers the price; the pass is issued only once the payment is `received`. |
+| **Pay with wallet** | One-tap payment for EVM coins (MetaMask, Rabby, Coinbase Wallet…): switches chain and sends the exact transfer to Aurora's deposit address. Verified against **live Aurora quotes with a stub wallet** (the transaction's recipient, token contract, chain and amount were checked); **no real wallet was used and no funds moved**. Non-EVM coins (BTC, SOL, NEAR…) use the step-by-step manual flow. Mobile deep links (MetaMask / Coinbase) are not verified. |
 | **3. Extras (OBS alerts, goals, supporter wall)** | Built, tested (6 new tests) and driven in a browser on the simulator: OBS Browser Source page `/alerts/[token]` (own token, `?preview=1` to test the look), a funding goal with progress bar, and a public supporter wall (confirmed tips only; names and notes, never amounts or addresses). Not verified against live Aurora, like everything that depends on a confirmed payment. |
 
 ### Known gaps and decisions

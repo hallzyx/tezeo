@@ -606,7 +606,7 @@
       <p class="tzl-lede">Sometimes a price jumps or a route isn't available. When a tip can't be finished, Tezeo stops before anything is lost and sends it back to the wallet it came from. <b>Automatically.</b></p>
       <ul class="tzl-promise">
         <li><span class="tzl-promise__ic" aria-hidden="true"><svg><use href="#i-shield"/></svg></span><b>Its own address, every time</b><p>Each tip gets a fresh deposit address, so payments never get mixed up.</p></li>
-        <li><span class="tzl-promise__ic" aria-hidden="true"><svg><use href="#i-return"/></svg></span><b>Automatic refunds</b><p>If the conversion can't finish, the money goes back where it came from. No forms to fill in. The network may keep a small fee we can't recover, and we show you exactly how much.</p></li>
+        <li><span class="tzl-promise__ic" aria-hidden="true"><svg><use href="#i-return"/></svg></span><b>Automatic refunds</b><p>If the conversion can't finish, the money goes back where it came from. No forms to fill in. The network may keep a small fee we can't recover.</p></li>
         <li><span class="tzl-promise__ic" aria-hidden="true"><svg><use href="#i-clock"/></svg></span><b>Tracked in plain words</b><p>Waiting, converting, delivered, or on its way back. You always know where your money is.</p></li>
       </ul>
       <div class="tz-card tz-stack" aria-label="Example: a tip that is being refunded">
@@ -632,7 +632,7 @@
     <div class="tzl-why">
       <article class="tzl-why__card tzl-why__card--usd"><span class="tzl-why__big" aria-hidden="true">1:1</span><h3>Dollars, not a rollercoaster</h3><p>USDC is a digital dollar designed to stay at $1. What your fans send is what you count, not a coin that swings overnight.</p></article>
       <article class="tzl-why__card tzl-why__card--fast"><span class="tzl-why__big" aria-hidden="true">~1 min</span><h3>Arrives while you're still live</h3><p>Solana confirms in seconds. End to end, a tip usually lands in under a minute once the fan's payment is seen.</p></article>
-      <article class="tzl-why__card"><span class="tzl-why__big" aria-hidden="true">¢</span><h3>Near-zero network cost</h3><p>Moving USDC on Solana costs a tiny fraction of what most networks charge, so small tips still make sense.</p></article>
+      <article class="tzl-why__card"><span class="tzl-why__big" aria-hidden="true">¢</span><h3>Cents, not wires</h3><p>Solana's own network fee is a fraction of a cent. A small fixed payout cost applies, and every quote shows it before you pay.</p></article>
       <article class="tzl-why__card tzl-why__card--own"><span class="tzl-why__big" aria-hidden="true">Yours</span><h3>Your wallet, your money</h3><p>Tips go straight to the Solana wallet you choose. Spend it, save it, or cash out through an exchange or app you already use.</p></article>
     </div>
 
@@ -666,7 +666,7 @@
         <p class="tzl-receipt__title"><svg width="22" height="22" aria-hidden="true"><use href="#i-receipt"/></svg>How fees work</p>
         <div class="tzl-receipt__row"><span class="tz-rombo"></span><b>Every fee is on the quote</b><p>Before sending anything, fans see the network &amp; swap cost and the service fee in dollars, and exactly what the creator receives.</p></div>
         <div class="tzl-receipt__row"><span class="tz-rombo" style="--_c:var(--tz-gold)"></span><b>A small fixed cost on the Solana payout</b><p>Delivering USDC to your wallet has a small fixed network cost. It's already counted in the quote.</p></div>
-        <div class="tzl-receipt__row"><span class="tz-rombo" style="--_c:var(--tz-refunded-line)"></span><b>Refunds are itemised too</b><p>If a tip comes back, you see what was returned and what the network kept.</p></div>
+        <div class="tzl-receipt__row"><span class="tz-rombo" style="--_c:var(--tz-refunded-line)"></span><b>Refunds are automatic</b><p>If a tip can't be finished, it goes back to the fan's wallet. The network may keep a small fee.</p></div>
       </div>
     </div>
   </div>
@@ -690,11 +690,11 @@
       </details>
       <details>
         <summary>What happens if a payment fails?</summary>
-        <div class="tzl-faq__a"><p>The money goes back to the wallet it came from, automatically. If a fan sends a bit less than the quote, they can send the rest or we return what arrived. The network may keep a small fee we can't recover, and the refund screen shows exactly how much.</p></div>
+        <div class="tzl-faq__a"><p>The money goes back to the wallet it came from, automatically. If a fan sends less than the quote, the payment can't be converted, so we return what arrived. The network may keep a small fee we can't recover.</p></div>
       </details>
       <details>
         <summary>Who holds my money?</summary>
-        <div class="tzl-faq__a"><p><b>You do.</b> Tips are delivered as USDC straight to the Solana wallet address you set up. Tezeo doesn't keep a balance for you, so there's nothing to withdraw from us.</p></div>
+        <div class="tzl-faq__a"><p><b>You do.</b> Tips are delivered as USDC straight to the Solana wallet address you set up. Tezeo doesn't keep a balance for you, so there's nothing to withdraw from us. While a tip is converting, Aurora Intents carries it in transit, and if it can't finish it goes back to the fan.</p></div>
       </details>
       <details>
         <summary>How fast do tips arrive?</summary>
