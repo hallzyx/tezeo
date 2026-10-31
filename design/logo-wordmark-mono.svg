@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 64" width="240" height="64" role="img" aria-labelledby="t">
+  <title id="t">Tezeo</title>
+  <!-- Single-color lockup. Everything is currentColor; the over-under gaps are masks (any background works). -->
+  <defs>
+    <mask id="tz-gap" maskUnits="userSpaceOnUse" x="0" y="0" width="64" height="64">
+      <rect width="64" height="64" fill="#fff"/>
+      <path d="M42 19c-9 0-15.5 6-15.5 14" fill="none" stroke="#000" stroke-width="13.5"/>
+    </mask>
+  </defs>
+  <g fill="none" stroke="currentColor" stroke-width="7.5" stroke-linecap="round">
+    <path mask="url(#tz-gap)" d="M9.5 19H22c9 0 15.5 6 15.5 14v19.5"/>
+    <path d="M54.5 19H42c-9 0-15.5 6-15.5 14v19.5"/>
+  </g>
+  <defs>
+    <mask id="tz-t-gap" maskUnits="userSpaceOnUse" x="82" y="4" width="40" height="56">
+      <rect x="82" y="4" width="40" height="56" fill="#fff"/>
+      <path d="M93.5 19V36" stroke="#000" stroke-width="11"/>
+    </mask>
+  </defs>
+  <g fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
+    <!-- t: its crossbar is a thread that slips under the stem, like the mark -->
+    <path mask="url(#tz-t-gap)" d="M84 27.5H105.5"/>
+    <path d="M93.5 13V41c0 5 2.5 7.5 7.5 7.5h3"/>
+    <!-- e -->
+    <path d="M116.0 38H137.0A10.5 10.5 0 1 0 133.92 45.42"/>
+    <!-- z: a zig-zag stitch -->
+    <path d="M149 27.5H166L149 48.5H166"/>
+    <!-- e -->
+    <path d="M178.0 38H199.0A10.5 10.5 0 1 0 195.92 45.42"/>
+    <!-- o -->
+    <circle cx="221.5" cy="38" r="10.5"/>
+  </g>
+</svg>

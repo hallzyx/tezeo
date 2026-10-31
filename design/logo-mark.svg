@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-labelledby="t">
+  <title id="t">Tezeo</title>
+  <!-- "El Cruce": two threads (two chains) cross over-under and become one T. -->
+  <rect width="64" height="64" rx="16" fill="#D1245A"/>
+  <!-- maíz thread (from the left) passes UNDER -->
+  <path d="M9.5 19H22c9 0 15.5 6 15.5 14v19.5" fill="none" stroke="#FFC23D" stroke-width="7.5" stroke-linecap="round"/>
+  <!-- knockout gap that makes the crossing read as a weave -->
+  <path d="M42 19c-9 0-15.5 6-15.5 14" fill="none" stroke="#D1245A" stroke-width="13.5"/>
+  <!-- algodón thread (from the right) passes OVER -->
+  <path d="M54.5 19H42c-9 0-15.5 6-15.5 14v19.5" fill="none" stroke="#FFF7EC" stroke-width="7.5" stroke-linecap="round"/>
+</svg>
