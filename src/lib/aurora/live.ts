@@ -42,7 +42,7 @@ function scrub(s: string): string {
   return env.auroraApiKey ? s.split(env.auroraApiKey).join("<key>") : s;
 }
 
-async function call<T>(kind: "tokens" | "quote" | "status", opts: { query?: string; body?: unknown } = {}): Promise<T> {
+async function call<T>(kind: "tokens" | "quote" | "status" | "deposit/submit", opts: { query?: string; body?: unknown } = {}): Promise<T> {
   if (!env.auroraApiKey) throw new Error("AURORA_API_KEY is not set (server-side only).");
   const url = `${env.auroraApiBase}/api/${kind}/${encodeURIComponent(env.auroraApiKey)}${opts.query ?? ""}`;
   const res = await fetch(url, {
@@ -71,7 +71,7 @@ const STATUS_MAP: Record<string, ProviderStatus> = {
 };
 
 interface AuroraToken {
-  assetId: string; decimals: number; blockchain: string; symbol: string; price?: number; contractAddress?: string;
+  assetId: string; decimals: number; blockchain: string; symbol: string; price?: number; contractAddress?: string | null;
 }
 interface QuoteResponse {
   correlationId?: string | null;
@@ -104,6 +104,7 @@ export const liveAurora: AuroraProvider = {
         symbol: t.symbol,
         decimals: t.decimals,
         stable: STABLES.has(t.symbol.toUpperCase()),
+        contractAddress: t.contractAddress ?? undefined,
         usdPrice: t.price,
       }));
   },
@@ -149,5 +150,10 @@ export const liveAurora: AuroraProvider = {
       amountOutUsdc: r.swapDetails?.amountOut ?? undefined,
       detail: r.swapDetails?.refundReason ?? undefined,
     };
+  },
+
+  /** Best-effort speed-up: POST /api/deposit/submit/{apiKey} { txHash, depositAddress, memo? }. */
+  async submitDeposit(depositAddress: string, txHash: string, memo?: string): Promise<void> {
+    await call("deposit/submit", { body: { txHash, depositAddress, ...(memo ? { memo } : {}) } });
   },
 };

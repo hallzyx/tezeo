@@ -4,12 +4,14 @@ import QRCode from "qrcode";
 import { Avatar, CopyBox, ErrorNote, Icon, Mark, ThemeToggle, TopBar, Weave } from "@/components/ui";
 import { breakdown, clock, coin, shortAddr, usd, usdc } from "@/lib/money";
 import { PassCard } from "@/components/PassCard";
+import { walletTx } from "@/lib/evm";
+import { WalletPay, type WalletState } from "./WalletPay";
 
 export interface PublicCreator {
   handle: string; displayName: string; message: string; avatarUrl: string; accent: string;
   pass: { priceUsd: number; perk: string } | null;
 }
-interface Asset { assetId: string; chain: string; chainLabel: string; symbol: string; decimals: number; stable: boolean; usdPrice?: number }
+interface Asset { assetId: string; chain: string; chainLabel: string; symbol: string; decimals: number; stable: boolean; usdPrice?: number; contractAddress?: string }
 interface Tip {
   id: string; status: "pending" | "converting" | "received" | "failed" | "refunded" | "expired";
   originAssetId: string; originSymbol: string; originChain: string; amountIn: string; amountOutUsdc: string; appFeeBps: number;
@@ -285,21 +287,26 @@ export function TipFlow({ creator, qrSvg, pageUrl, passMode = false, goal = null
       </>
     );
   } else if (step === "quote" && tip && asset) {
-    body = <QuoteStep {...{ tip, asset, creator, name, now, bar, mini, demo }} onSent={() => setStep("track")} onRefresh={async () => { setAssetId(tip.originAssetId); setRefundTo(tip.refundTo); await requestQuoteFor(tip); }} />;
+    body = <QuoteStep {...{ tip, asset, name, now, bar, mini, demo, busy }} mode={data?.mode ?? ""} onSent={() => setStep("track")} onRefresh={() => requestQuoteFor(tip)} onBack={reset} />;
   } else if (step === "track" && tip && asset) {
     body = <TrackStep {...{ tip, asset, creator, name, pageUrl, demo }} onAgain={retryFresh} onHome={reset} onTip={setTip} onShare={() => setSheet("share")} />;
   } else {
     body = <p className="tz-muted" role="status">Loading your tip…</p>;
   }
 
-  async function requestQuoteFor(t: Tip) {
+  /** New quote for the same coin, amount and refund address (a fresh deposit address and price). Returns an error message, or null. */
+  async function requestQuoteFor(t: Tip): Promise<string | null> {
     setBusy(true);
     try {
       const a = data!.assets.find((x) => x.assetId === t.originAssetId)!;
       const r = await fetch("/api/tips", { method: "POST", headers: { "content-type": "application/json" },
         body: JSON.stringify(passMode ? { handle: creator.handle, originAssetId: a.assetId, pass: true, fanMessage: t.fanMessage, fanName: t.fanName, refundTo: t.refundTo } : { handle: creator.handle, originAssetId: a.assetId, amount: coin(t.amountIn, a.decimals, 8), refundTo: t.refundTo }) });
-      if (r.ok) { const j = await r.json(); setTip(j); history.replaceState(null, "", `?tip=${j.id}`); }
-    } finally { setBusy(false); }
+      const j = await r.json().catch(() => ({}));
+      if (!r.ok) return friendly(j.error);
+      setTip(j); history.replaceState(null, "", `?tip=${j.id}`);
+      return null;
+    } catch { return "We couldn't reach the server. Check your connection and try again."; }
+    finally { setBusy(false); }
   }
 
   const accentStyle = { ["--creator-accent" as string]: creator.accent };
@@ -373,32 +380,41 @@ function PickerSheet({ title, items, onPick, onClose }: { title: string; items: 
 }
 
 // ======================= C. Quote & deposit =======================
-function QuoteStep({ tip, asset, creator, name, now, bar, mini, demo, onSent, onRefresh }: {
-  tip: Tip; asset: Asset; creator: PublicCreator; name: string; now: number; bar: (n: number) => React.ReactNode;
-  mini: React.ReactNode; demo: React.ReactNode; onSent: () => void; onRefresh: () => Promise<void>;
+function QuoteStep({ tip, asset, name, now, bar, mini, demo, busy, mode, onSent, onRefresh, onBack }: {
+  tip: Tip; asset: Asset; name: string; now: number; bar: (n: number) => React.ReactNode;
+  mini: React.ReactNode; demo: React.ReactNode; busy: boolean; mode: string;
+  onSent: () => void; onRefresh: () => Promise<string | null>; onBack: () => void;
 }) {
   const [qr, setQr] = useState("");
+  const [wallet, setWallet] = useState<WalletState>("idle");
+  const [refreshErr, setRefreshErr] = useState("");
   useEffect(() => { QRCode.toDataURL(tip.depositAddress, { margin: 1, width: 168, color: { dark: "#1C1424", light: "#FFFFFF" } }).then(setQr).catch(() => {}); }, [tip.depositAddress]);
-  const left = new Date(tip.createdAt).getTime() + QUOTE_HOLD_MS - now;
-  const expired = left <= 0;
-  const refreshed = useRef<string>("");
-  useEffect(() => { if (expired && refreshed.current !== tip.id) { refreshed.current = tip.id; onRefresh(); } }, [expired, tip.id, onRefresh]);
 
-  const sendAmt = coin(tip.amountIn, asset.decimals, 8);
+  // Counted from when the fan first sees this quote (their own clock), so server/browser clock skew can't expire it early.
+  const start = useMemo(() => Date.now(), [tip.id]); // eslint-disable-line react-hooks/exhaustive-deps
+  const left = start + QUOTE_HOLD_MS - now;
+  // While the wallet is asking the fan to confirm, never pull the screen out from under them.
+  const expired = left <= 0 && wallet === "idle";
+
+  const sendAmt = coin(tip.amountIn, asset.decimals, 8, asset.stable ? 2 : 0);
   const sendUsd = Number(sendAmt) * (asset.usdPrice ?? 0);
   const recv = Number(usdc(tip.amountOutUsdc, 6).replace(/,/g, ""));
   const b = breakdown(sendUsd, tip.appFeeBps, recv);
   const feePct = tip.appFeeBps / 100;
-  return (
-    <>
-      {bar(3)}{mini}
-      <h1 className="tz-h1">Here's the deal</h1>
-      <dl className="tz-quote" style={{ opacity: expired ? 0.5 : 1 }} data-testid="quote">
-        <div className="tz-quote__row"><dt>You send</dt><span className="tz-quote__lead" /><dd>{sendAmt} {asset.symbol}</dd></div>
-        <div className="tz-quote__row"><dt>Network &amp; swap</dt><span className="tz-quote__lead" /><dd>−{usd(b.network)}</dd></div>
-        <div className="tz-quote__row"><dt>Tezeo &amp; Aurora ({feePct}%)</dt><span className="tz-quote__lead" /><dd>−{usd(b.fee)}</dd></div>
-        <div className="tz-quote__row tz-quote__row--total"><dt>{expired ? "Refreshing…" : `${name} receives`}</dt><span className="tz-spacer" /><dd>{usdc(tip.amountOutUsdc)} USDC</dd></div>
-      </dl>
+  // One-tap wallet payment: EVM coins on supported chains, real deposit addresses only (never the simulator's).
+  const tx = mode === "live" ? walletTx(asset, tip.depositAddress, tip.amountIn) : null;
+
+  const refresh = async () => { setRefreshErr(""); const e = await onRefresh(); if (e) setRefreshErr(e); };
+
+  const manual = (
+    <div className="tz-stack" style={{ ["--tz-stack-gap" as string]: "14px" }}>
+      <ol className="tzs-howto">
+        <li>Open your wallet app, or your exchange's <b>withdraw</b> screen.</li>
+        <li>Choose <b>{asset.symbol}</b> on the <b>{asset.chainLabel}</b> network. <span className="tzs-howto__warn">Another network can lose your money.</span></li>
+        <li>Paste the address below, or scan the QR. <span className="tz-muted">The QR holds the address only, so type the amount yourself.</span></li>
+        <li>Send exactly <b className="tz-mono">{sendAmt} {asset.symbol}</b> and confirm.</li>
+        <li>Come back and tap <b>I've sent it</b>. We spot your payment by ourselves.</li>
+      </ol>
       <div className="tz-card tz-card--sunken tz-stack" style={{ ["--tz-stack-gap" as string]: "12px", padding: "var(--tz-space-4)" }}>
         <div className="tz-row" style={{ alignItems: "flex-start" }}>
           <div className="tz-qr" style={{ padding: 8, borderRadius: 12 }}>{qr && /* eslint-disable-next-line @next/next/no-img-element */ <img src={qr} width={96} height={96} alt={`QR code for the ${asset.chainLabel} deposit address`} style={{ display: "block" }} />}</div>
@@ -410,11 +426,58 @@ function QuoteStep({ tip, asset, creator, name, now, bar, mini, demo, onSent, on
         <CopyBox value={tip.depositAddress} />
         {tip.depositMemo && <p className="tz-small" style={{ margin: 0 }}>Include this memo: <b className="tz-mono">{tip.depositMemo}</b></p>}
       </div>
-      <p className="tz-quote__note"><Icon name="clock" size={14} /><span>Price held for <span className="tz-timer">{clock(left)}</span>. If it runs out, we'll refresh it, no harm done.</span></p>
-      <p className="tz-small tz-muted" style={{ margin: 0 }}>Send only {asset.symbol} on {asset.chainLabel} to this address. Anything else may not arrive.</p>
-      {demo}
       <button className="tz-btn tz-btn--primary tz-btn--lg tz-btn--block" onClick={onSent} disabled={expired}>I've sent it</button>
-      <span className="tz-sr-only" role="status">{left > 0 && left <= 10_000 ? "Ten seconds left on this price." : expired ? "Prices moved while you were away. Here's a fresh quote." : ""}</span>
+    </div>
+  );
+
+  return (
+    <>
+      {bar(3)}{mini}
+      <h1 className="tz-h1">Here's the deal</h1>
+      <dl className="tz-quote" data-testid="quote">
+        <div className="tz-quote__row"><dt>You send</dt><span className="tz-quote__lead" /><dd>{sendAmt} {asset.symbol}</dd></div>
+        <div className="tz-quote__row"><dt>Network &amp; swap</dt><span className="tz-quote__lead" /><dd>−{usd(b.network)}</dd></div>
+        <div className="tz-quote__row"><dt>Tezeo &amp; Aurora ({feePct}%)</dt><span className="tz-quote__lead" /><dd>−{usd(b.fee)}</dd></div>
+        <div className="tz-quote__row tz-quote__row--total"><dt>{name} receives</dt><span className="tz-spacer" /><dd>{usdc(tip.amountOutUsdc)} USDC</dd></div>
+      </dl>
+
+      {tx ? (
+        <>
+          <section className="tz-stack" style={{ ["--tz-stack-gap" as string]: "10px" }} aria-label="Pay with your wallet">
+            <WalletPay tx={tx} tipId={tip.id} symbol={asset.symbol} amountLabel={`${sendAmt} ${asset.symbol}`} onSent={onSent} onState={setWallet} />
+            <p className="tz-small tz-muted" style={{ margin: 0 }}>Your wallet opens and asks you to confirm. We fill in the address and the exact amount, so there's nothing to copy.</p>
+          </section>
+          <details className="tzs-manual">
+            <summary>Or pay it yourself, step by step</summary>
+            {manual}
+          </details>
+        </>
+      ) : (
+        <section className="tz-stack" style={{ ["--tz-stack-gap" as string]: "10px" }} aria-label="How to pay">
+          <h2 className="tz-h2" style={{ fontSize: "var(--tz-text-lg)" }}>How to pay</h2>
+          {manual}
+        </section>
+      )}
+
+      <p className="tz-quote__note"><Icon name="clock" size={14} /><span>Price held for <span className="tz-timer">{clock(left)}</span>. When it runs out you can get a fresh quote, no harm done.</span></p>
+      {demo}
+      <span className="tz-sr-only" role="status">{left > 0 && left <= 10_000 ? "Ten seconds left on this price." : ""}</span>
+
+      {expired && (
+        <div className="tzs-sheet tzs-sheet--center" role="presentation">
+          <div role="alertdialog" aria-modal="true" aria-labelledby="exp-t" aria-describedby="exp-d" data-testid="expired-modal">
+            <span className="tz-pill" data-status="pending">Quote expired</span>
+            <h2 id="exp-t" className="tz-h1" style={{ fontSize: "var(--tz-text-2xl)" }}>Prices moved while you were away.</h2>
+            <p id="exp-d" className="tz-muted" style={{ margin: 0 }}>
+              This quote only holds for a few minutes. Get a fresh one: it comes with a new address and an updated price.
+              <b style={{ color: "var(--tz-text)" }}> Already sent your payment? Don't worry, we're still watching for it.</b>
+            </p>
+            {refreshErr && <p className="tzs-error" role="alert"><Icon name="x" />{refreshErr}</p>}
+            <button className="tz-btn tz-btn--primary tz-btn--lg tz-btn--block" onClick={refresh} disabled={busy} autoFocus>{busy ? "Getting a fresh quote…" : "Get a fresh quote"}</button>
+            <button className="tz-btn tz-btn--ghost tz-btn--block" onClick={onBack} disabled={busy}>Start over</button>
+          </div>
+        </div>
+      )}
     </>
   );
 }
@@ -424,7 +487,7 @@ function TrackStep({ tip, asset, creator, name, pageUrl, demo, onAgain, onHome, 
   tip: Tip; asset: Asset; creator: PublicCreator; name: string; pageUrl: string; demo: React.ReactNode;
   onAgain: () => void; onHome: () => void; onTip: (t: Tip) => void; onShare: () => void;
 }) {
-  const sendAmt = coin(tip.amountIn, asset.decimals, 8);
+  const sendAmt = coin(tip.amountIn, asset.decimals, 8, asset.stable ? 2 : 0);
   const [note, setNote] = useState(tip.fanMessage);
   const [fan, setFan] = useState(tip.fanName);
   const [saved, setSaved] = useState(false);

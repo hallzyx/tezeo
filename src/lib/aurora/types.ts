@@ -8,6 +8,8 @@ export interface OriginAsset {
   symbol: string; // e.g. "ETH", "USDC"
   decimals: number;
   stable: boolean;
+  /** Token contract on its chain; undefined for a chain's native coin. */
+  contractAddress?: string;
   /** USD price used only for display hints in the simulator / indicative UI. */
   usdPrice?: number;
 }
@@ -66,4 +68,6 @@ export interface AuroraProvider {
   listOriginAssets(): Promise<OriginAsset[]>;
   quote(req: QuoteRequest): Promise<Quote>;
   status(depositAddress: string): Promise<StatusResult>;
+  /** Optional: tell Aurora which transaction funded a deposit address so it can pick it up sooner. */
+  submitDeposit?(depositAddress: string, txHash: string, memo?: string): Promise<void>;
 }

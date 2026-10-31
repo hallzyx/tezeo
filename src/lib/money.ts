@@ -8,8 +8,11 @@ export function usdc(units: string | null | undefined, maxFrac = 2): string {
 }
 
 /** Origin amount like "0.00213" with sensible trimming, never scientific notation. */
-export function coin(units: string, decimals: number, maxFrac = 6): string {
-  return fromUnits(units, decimals, Math.min(decimals, maxFrac)) || "0";
+export function coin(units: string, decimals: number, maxFrac = 6, minFrac = 0): string {
+  const s = fromUnits(units, decimals, Math.min(decimals, maxFrac)) || "0";
+  if (minFrac <= 0) return s;
+  const [w, f = ""] = s.split(".");
+  return `${w}.${f.padEnd(minFrac, "0")}`; // dollar coins read as "1.10", not "1.1"
 }
 
 export function usd(n: number): string {
