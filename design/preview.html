@@ -457,14 +457,14 @@
     <div class="pv-grid pv-grid--5">
       <div class="tz-card tz-stack"><span class="tz-pill" data-status="pending">Pending</span>
         <ol class="tz-steps" data-status="pending">
-          <li class="tz-step" data-state="active"><span class="tz-step__knot"></span><div class="tz-step__body"><p class="tz-step__title">Waiting for your payment</p><p class="tz-step__desc">Send 0.00213 ETH to the address above.</p></div></li>
+          <li class="tz-step" data-state="active" aria-current="step"><span class="tz-step__knot"></span><div class="tz-step__body"><p class="tz-step__title">Waiting for your payment</p><p class="tz-step__desc">Send 0.00213 ETH to the address above.</p></div></li>
           <li class="tz-step" data-state="todo"><span class="tz-step__knot"></span><div class="tz-step__body"><p class="tz-step__title">Weaving it into USDC</p></div></li>
           <li class="tz-step" data-state="todo"><span class="tz-step__knot"></span><div class="tz-step__body"><p class="tz-step__title">Delivered to Vale</p></div></li>
         </ol></div>
       <div class="tz-card tz-stack"><span class="tz-pill" data-status="converting">Converting</span>
         <ol class="tz-steps" data-status="converting">
           <li class="tz-step" data-state="done"><span class="tz-step__knot"><svg><use href="#i-check"/></svg></span><div class="tz-step__body"><p class="tz-step__title">Payment received</p><span class="tz-step__time">7:42 pm</span></div></li>
-          <li class="tz-step" data-state="active"><span class="tz-step__knot"></span><div class="tz-step__body"><p class="tz-step__title">Weaving it into USDC</p><p class="tz-step__desc">Usually under a minute.</p></div></li>
+          <li class="tz-step" data-state="active" aria-current="step"><span class="tz-step__knot"></span><div class="tz-step__body"><p class="tz-step__title">Weaving it into USDC</p><p class="tz-step__desc">Usually under a minute.</p></div></li>
           <li class="tz-step" data-state="todo"><span class="tz-step__knot"></span><div class="tz-step__body"><p class="tz-step__title">Delivered to Vale</p></div></li>
         </ol></div>
       <div class="tz-card tz-stack"><span class="tz-pill" data-status="received">Received</span>
@@ -477,7 +477,7 @@
         <ol class="tz-steps" data-status="failed">
           <li class="tz-step" data-state="done"><span class="tz-step__knot"><svg><use href="#i-check"/></svg></span><div class="tz-step__body"><p class="tz-step__title">Payment received</p><span class="tz-step__time">7:42 pm</span></div></li>
           <li class="tz-step" data-state="failed"><span class="tz-step__knot"><svg><use href="#i-x"/></svg></span><div class="tz-step__body"><p class="tz-step__title">The thread snapped</p><p class="tz-step__desc">The price moved too much. Your money is safe.</p></div></li>
-          <li class="tz-step" data-state="active" style="--_line:var(--tz-refunded-line);--_bg:var(--tz-refunded-bg);--_fg:var(--tz-refunded-fg)"><span class="tz-step__knot"></span><div class="tz-step__body"><p class="tz-step__title">Sending it back to you</p><p class="tz-step__desc">Automatic. ~5 minutes.</p></div></li>
+          <li class="tz-step" data-state="active" aria-current="step" style="--_line:var(--tz-refunded-line);--_bg:var(--tz-refunded-bg);--_fg:var(--tz-refunded-fg)"><span class="tz-step__knot"></span><div class="tz-step__body"><p class="tz-step__title">Sending it back to you</p><p class="tz-step__desc">Automatic. ~5 minutes.</p></div></li>
         </ol></div>
       <div class="tz-card tz-stack"><span class="tz-pill" data-status="refunded">Refunded</span>
         <ol class="tz-steps" data-status="refunded">
@@ -601,7 +601,7 @@
           </svg>
           <ol class="tz-steps" data-status="converting">
             <li class="tz-step" data-state="done"><span class="tz-step__knot"><svg><use href="#i-check"/></svg></span><div class="tz-step__body"><p class="tz-step__title">Got your 0.00213 ETH</p><span class="tz-step__time">7:42 pm</span></div></li>
-            <li class="tz-step" data-state="active"><span class="tz-step__knot"></span><div class="tz-step__body"><p class="tz-step__title">Weaving it into USDC</p><p class="tz-step__desc">You can close this tab — we'll keep going.</p></div></li>
+            <li class="tz-step" data-state="active" aria-current="step"><span class="tz-step__knot"></span><div class="tz-step__body"><p class="tz-step__title">Weaving it into USDC</p><p class="tz-step__desc">You can close this tab — we'll keep going.</p></div></li>
             <li class="tz-step" data-state="todo"><span class="tz-step__knot"></span><div class="tz-step__body"><p class="tz-step__title">Delivered to Vale</p></div></li>
           </ol>
           <div class="tz-field"><label class="tz-label" for="pv-msg">While you wait — leave Vale a note?</label><textarea id="pv-msg" class="tz-textarea" style="min-height:4.5rem">Your Solana course got me my first dev job. ¡Gracias!</textarea><span class="tz-counter">52 / 140</span></div>
@@ -661,7 +661,7 @@
           <ol class="tz-steps" data-status="failed">
             <li class="tz-step" data-state="done"><span class="tz-step__knot"><svg><use href="#i-check"/></svg></span><div class="tz-step__body"><p class="tz-step__title">Got your 0.00213 ETH</p><span class="tz-step__time">7:42 pm</span></div></li>
             <li class="tz-step" data-state="failed"><span class="tz-step__knot"><svg><use href="#i-x"/></svg></span><div class="tz-step__body"><p class="tz-step__title">Couldn't convert</p><p class="tz-step__desc">Price moved more than 1%.</p></div></li>
-            <li class="tz-step" data-state="active" style="--_line:var(--tz-refunded-line);--_bg:var(--tz-refunded-bg);--_fg:var(--tz-refunded-fg)"><span class="tz-step__knot"></span><div class="tz-step__body"><p class="tz-step__title">Sending it back to you</p><p class="tz-step__desc">To 0x71…e4B0 · about 5 min</p></div></li>
+            <li class="tz-step" data-state="active" aria-current="step" style="--_line:var(--tz-refunded-line);--_bg:var(--tz-refunded-bg);--_fg:var(--tz-refunded-fg)"><span class="tz-step__knot"></span><div class="tz-step__body"><p class="tz-step__title">Sending it back to you</p><p class="tz-step__desc">To 0x71…e4B0 · about 5 min</p></div></li>
           </ol>
           <div class="tz-stack" style="--tz-stack-gap:10px">
             <button class="tz-btn tz-btn--primary tz-btn--lg tz-btn--block">Try again with a fresh quote</button>
