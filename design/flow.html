@@ -1,0 +1,478 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tezeo · Product flow prototype</title>
+<link rel="icon" href="logo-mark.svg" type="image/svg+xml">
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="components.css">
+<link rel="stylesheet" href="flow.css">
+<script>
+  // ?theme=dark|light · ?screen=amount|pay|quote|track|thanks|dashboard|onboarding · ?clean=1 hides the prototype notes
+  (function () { var q = new URLSearchParams(location.search), d = document.documentElement;
+    var t = q.get('theme'); d.dataset.theme = t === 'dark' || t === 'light' ? t : (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    if (q.get('clean')) d.classList.add('fl-clean'); })();
+</script>
+</head>
+<body class="tz-app">
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5 10 17.5 19 7" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 5.5A2.5 2.5 0 0 0 13.5 3H6a3 3 0 0 0-3 3v7.5A2.5 2.5 0 0 0 5.5 16" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+  <symbol id="i-back" viewBox="0 0 24 24"><path d="M15 5 8 12l7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 4.5 6v5.5c0 4.6 3.2 8.3 7.5 9.5 4.3-1.2 7.5-4.9 7.5-9.5V6L12 3Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="m8.5 12 2.5 2.5 4.5-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7.5V12l3 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-share" viewBox="0 0 24 24"><path d="M12 15V4m0 0L8 8m4-4 4 4M5 13v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20s-7.5-4.4-7.5-10.1A4.4 4.4 0 0 1 12 7a4.4 4.4 0 0 1 7.5 2.9C19.5 15.6 12 20 12 20Z" fill="currentColor"/></symbol>
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 11 12 4l8 7v8a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1v-8Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+  <symbol id="i-list" viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="m4.5 4.5 1.5 1.5-1.5 1.5L3 6zM4.5 10.5 6 12l-1.5 1.5L3 12zM4.5 16.5 6 18l-1.5 1.5L3 18z" fill="currentColor"/></symbol>
+  <symbol id="i-brush" viewBox="0 0 24 24"><path d="M14 4 20 10l-8 8H6v-6l8-8Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+  <symbol id="i-pass" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="m12 9 3 3-3 3-3-3z" fill="currentColor"/></symbol>
+  <symbol id="i-stream" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="12" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 21h8M12 17v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="m10.5 8.5 4 2.5-4 2.5z" fill="currentColor"/></symbol>
+  <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="m12 10.5 1.5 1.5-1.5 1.5-1.5-1.5z" fill="currentColor"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24"><path d="M19.5 14.5A8 8 0 0 1 9.5 4.5a8 8 0 1 0 10 10Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+  <symbol id="i-qr" viewBox="0 0 24 24"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M14 14h2.5v2.5H14zM17.5 17.5H20V20h-2.5zM14 18h2v2h-2zM18 14h2v2h-2z" fill="currentColor"/></symbol>
+  <symbol id="tz-mark" viewBox="0 0 64 64"><rect width="64" height="64" rx="16" fill="#D1245A"/><path d="M9.5 19H22c9 0 15.5 6 15.5 14v19.5" fill="none" stroke="#FFC23D" stroke-width="7.5" stroke-linecap="round"/><path d="M42 19c-9 0-15.5 6-15.5 14" fill="none" stroke="#D1245A" stroke-width="13.5"/><path d="M54.5 19H42c-9 0-15.5 6-15.5 14v19.5" fill="none" stroke="#FFF7EC" stroke-width="7.5" stroke-linecap="round"/></symbol>
+  <symbol id="tz-letters" viewBox="82 4 154 56"><mask id="fltgap" maskUnits="userSpaceOnUse" x="82" y="4" width="40" height="56"><rect x="82" y="4" width="40" height="56" fill="#fff"/><path d="M93.5 19V36" stroke="#000" stroke-width="11"/></mask><g fill="none" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" stroke="currentColor"><path mask="url(#fltgap)" d="M84 27.5H105.5" style="stroke:var(--pv-t, currentColor)"/><path d="M93.5 13V41c0 5 2.5 7.5 7.5 7.5h3"/><path d="M116 38H137A10.5 10.5 0 1 0 133.92 45.42"/><path d="M149 27.5H166L149 48.5H166"/><path d="M178 38H199A10.5 10.5 0 1 0 195.92 45.42"/><circle cx="221.5" cy="38" r="10.5"/></g></symbol>
+</svg>
+
+<nav class="fl-proto-index" id="index" aria-label="Prototype screens">
+  <p class="tz-overline" style="margin:0">Tezeo product flow · prototype</p>
+  <p style="margin:0">Open one screen with <span class="tz-mono">?screen=</span>: <a href="?screen=amount">amount</a> · <a href="?screen=pay">pay</a> · <a href="?screen=quote">quote</a> · <a href="?screen=track">tracking</a> · <a href="?screen=thanks">thank-you</a> · <a href="?screen=dashboard">dashboard</a> · <a href="?screen=onboarding">onboarding</a>. Add <span class="tz-mono">&amp;theme=dark</span>. Spec: FLOW.md. Names and amounts are the seeded demo data or examples.</p>
+</nav>
+
+<!-- =================== A. AMOUNT (creator page) =================== -->
+<section class="fl-screen fl-page tz-creator" id="amount" style="--creator-accent:#1A9E8F">
+  <p class="fl-proto-note"><b>A · Amount.</b> &lt;768: one column, band 96px, sticky CTA dock. 768–1023: 576px column, roomier tiles. ≥1024: weave band 128px, then creator pane (352px: identity, goal, scan-to-tip QR, wall) beside a raised step card (640px) that sits on the band's edge.</p>
+  <div class="fl-demo" role="note"><svg aria-hidden="true"><use href="#i-clock"/></svg>Demo mode: payments here are simulated and no real money moves.</div>
+  <div class="tz-weave fl-band" role="presentation"></div>
+  <div class="fl-shell fl-shell--flush">
+    <div class="fl-side fl-side--creator">
+      <div class="fl-id">
+        <div class="tz-avatar"><span>V</span></div>
+        <h1>Valentina Ríos</h1>
+        <span class="fl-handle">@vale</span>
+      </div>
+      <p class="fl-bubble">“I make free Solana &amp; React classes for LatAm devs. Every tip buys another live hour. ¡Gracias!”</p>
+      <div class="fl-goal">
+        <div class="fl-goal__top"><b>New microphone for the stream</b><span>22%</span></div>
+        <div class="fl-goal__bar" role="progressbar" aria-label="New microphone for the stream" aria-valuemin="0" aria-valuemax="300" aria-valuenow="66.76" style="--_p:22%"><span></span></div>
+        <small>$66.76 of $300 raised</small>
+      </div>
+      <div class="fl-scan"><div class="tz-qr"><canvas class="fl-qr" width="88" height="88"></canvas></div><div><b>Scan to tip Valentina</b><span>Or share <span class="tz-mono">tezeo.app/@vale</span></span></div></div>
+    </div>
+
+    <main class="fl-stage fl-stage--lift">
+      <div class="fl-bar" style="justify-content:flex-end">
+        <button class="fl-theme" type="button" aria-label="Share this page"><svg><use href="#i-share"/></svg></button>
+        <button class="fl-theme" type="button" aria-label="Switch to dark mode" data-flip><svg><use href="#i-moon"/></svg></button>
+      </div>
+      <h2 class="fl-ask">Send Valentina a tip</h2>
+      <div class="tz-amounts" role="group" aria-label="Tip amount">
+        <button class="tz-amount-opt" aria-pressed="false"><span class="tz-amount">$3</span><small>a cafecito</small></button>
+        <button class="tz-amount-opt" aria-pressed="true"><span class="tz-amount">$5</span><small>lunch</small></button>
+        <button class="tz-amount-opt" aria-pressed="false"><span class="tz-amount">$15</span><small>big hug</small></button>
+      </div>
+      <div class="tz-field">
+        <label class="tz-label" for="custom">Other amount</label>
+        <label class="tz-amount-custom"><input id="custom" class="tz-input" inputmode="decimal" placeholder="Anything from $1" aria-describedby="custom-h"></label>
+      </div>
+      <a class="fl-passoffer" href="#pass"><span class="fl-passoffer__chip" aria-hidden="true"></span><b>Valentina's Pass</b><small>30 days in the crew · early access to every new class</small><span>$12</span></a>
+      <div class="fl-dock">
+        <button class="tz-btn tz-btn--primary tz-btn--lg tz-btn--block">Send $5 to Valentina</button>
+        <p class="fl-trust"><svg aria-hidden="true"><use href="#i-shield"/></svg>Pay from any wallet, any chain. Valentina gets dollars.</p>
+      </div>
+    </main>
+
+    <section class="fl-wall" aria-label="Recent supporters">
+      <span class="tz-overline">Recent supporters</span>
+      <ul>
+        <li><b>Ana <span class="tz-badge">Pass</span></b><q>Saludos desde Lima</q></li>
+        <li><b>Ana</b><q>Your Solana course got me my first dev job. ¡Gracias!</q></li>
+        <li><b>Lucía</b><q>Saludos desde Medellín</q></li>
+      </ul>
+      <button class="fl-more" type="button">Show 2 more</button>
+    </section>
+  </div>
+  <div class="fl-foot"><svg><use href="#tz-mark"/></svg>woven by tezeo</div>
+</section>
+
+<!-- =================== B. PAY (where's your money) =================== -->
+<section class="fl-screen fl-page tz-creator" id="pay" style="--creator-accent:#1A9E8F">
+  <p class="fl-proto-note"><b>B · Where's your money.</b> &lt;1024: the mini creator chip stays, and "See the quote" docks to the bottom. ≥768: network and coin become an even grid of 52px pickers. ≥1024: a sticky "Your tip" pane on the left (only what the fan pays), and the step card on the right. The wallet row shows only when a wallet is detected (mocked here).</p>
+  <div class="fl-demo" role="note"><svg aria-hidden="true"><use href="#i-clock"/></svg>Demo mode: payments here are simulated and no real money moves.</div>
+  <div class="fl-shell">
+    <aside class="fl-sum" aria-label="Your tip">
+      <div class="tz-weave"></div>
+      <div class="fl-sum__who"><div class="tz-avatar"><span>V</span></div><b>Valentina Ríos</b><span class="fl-handle">@vale</span></div>
+      <div class="fl-sum__body">
+        <div class="fl-sum__amount"><span class="tz-amount">$5</span><small>your tip · lunch</small></div>
+        <dl>
+          <div><dt>Paying with</dt><dd>USDC on Base</dd></div>
+          <div><dt>Refunds go to</dt><dd class="is-todo">your wallet, next</dd></div>
+        </dl>
+        <button class="tz-btn tz-btn--ghost fl-sum__edit" type="button">Change amount</button>
+        <p class="fl-trust"><svg aria-hidden="true"><use href="#i-shield"/></svg>If anything fails, it comes back to you.</p>
+      </div>
+    </aside>
+
+    <main class="fl-stage">
+      <div class="fl-bar">
+        <button class="fl-back" type="button" aria-label="Back"><svg><use href="#i-back"/></svg></button>
+        <div class="fl-progress"><span class="fl-progress__label"><b>Step 2 of 4</b> · Where's your money</span><div class="fl-progress__track" aria-hidden="true"><span class="on"></span><span class="now"></span><span></span><span></span></div></div>
+        <button class="fl-theme" type="button" aria-label="Switch to dark mode" data-flip><svg><use href="#i-moon"/></svg></button>
+      </div>
+      <button class="fl-mini" type="button"><span class="tz-avatar tz-avatar--sm"><span>V</span></span><span><b>$5 for Valentina</b><span>USDC on Base</span></span><span>Change</span></button>
+      <h1 class="tz-h1" style="font-size:var(--tz-text-3xl);letter-spacing:-0.03em">Where's your money?</h1>
+
+      <div class="fl-pickgroup"><span class="tz-overline" id="net-l">Network</span>
+        <div class="tz-chips" role="group" aria-labelledby="net-l">
+          <button class="tz-chip" aria-pressed="true" style="--chip-color:#0052FF"><span class="tz-chip__coin">B</span>Base</button>
+          <button class="tz-chip" style="--chip-color:#28A0F0"><span class="tz-chip__coin">ARB</span>Arbitrum</button>
+          <button class="tz-chip" style="--chip-color:#F7931A"><span class="tz-chip__coin">₿</span>Bitcoin</button>
+          <button class="tz-chip" style="--chip-color:#627EEA"><span class="tz-chip__coin">ETH</span>Ethereum</button>
+        </div>
+      </div>
+      <div class="fl-pickgroup"><span class="tz-overline" id="coin-l">Coin</span>
+        <div class="tz-chips" role="group" aria-labelledby="coin-l">
+          <button class="tz-chip" aria-pressed="true" style="--chip-color:#2775CA"><span class="tz-chip__coin">$</span>USDC</button>
+          <button class="tz-chip" style="--chip-color:#627EEA"><span class="tz-chip__coin">ETH</span>ETH</button>
+        </div>
+      </div>
+      <p class="tz-small tz-muted" style="margin:0">Not sure? Pick the network your wallet app shows at the top. You can't pick wrong. We'll check before you send.</p>
+
+      <section class="tz-stack" style="--tz-stack-gap:10px" aria-label="Your wallet">
+        <span class="tz-label">Connect the wallet you'll pay from</span>
+        <div class="fl-wallets">
+          <button class="fl-wallet" type="button"><i style="--_c:#F6851B"></i>MetaMask <small>detected</small></button>
+          <button class="fl-wallet" type="button"><i style="--_c:#8697FF"></i>Rabby Wallet</button>
+          <button class="fl-wallet" type="button"><i style="--_c:#0052FF"></i>Coinbase Wallet</button>
+        </div>
+        <div class="fl-or">or type it</div>
+        <div class="tz-field">
+          <label class="tz-label" for="refund">Your wallet address on Base</label>
+          <input id="refund" class="tz-input tz-mono" autocapitalize="none" spellcheck="false" autocomplete="off" placeholder="0x…" aria-describedby="refund-h">
+          <span id="refund-h" class="tz-hint">Only used to return your money if something fails. It must be an address you control on Base.</span>
+          <label class="fl-check"><input type="checkbox">Remember this address on this device</label>
+        </div>
+      </section>
+
+      <div class="fl-dock">
+        <button class="tz-btn tz-btn--primary tz-btn--lg tz-btn--block" disabled>See the quote</button>
+      </div>
+    </main>
+  </div>
+</section>
+
+<!-- =================== C. QUOTE (your payment) =================== -->
+<section class="fl-screen fl-page tz-creator" id="quote" style="--creator-accent:#1A9E8F">
+  <p class="fl-proto-note"><b>C · Your payment.</b> The amount and the price timer move to the top, so they're the first thing a fan reads. <b>Live mode</b> adds a one-tap card ("Pay 5.00 USDC with MetaMask"), with pay-by-hand as the fallback below a stitched "or". ≥1024: the send panel (168px QR, exact amount, address) sits beside the numbered steps. &lt;1024: the panel comes first, then the steps, and "I've sent it" docks to the bottom.</p>
+  <div class="fl-demo" role="note"><svg aria-hidden="true"><use href="#i-clock"/></svg>Demo mode: payments here are simulated and no real money moves.</div>
+  <div class="fl-shell">
+    <aside class="fl-sum" aria-label="Your tip">
+      <div class="tz-weave"></div>
+      <div class="fl-sum__who"><div class="tz-avatar"><span>V</span></div><b>Valentina Ríos</b><span class="fl-handle">@vale</span></div>
+      <div class="fl-sum__body">
+        <div class="fl-sum__amount"><span class="tz-amount">$5</span><small>your tip · lunch</small></div>
+        <dl>
+          <div><dt>Paying with</dt><dd>USDC on Base</dd></div>
+          <div><dt>Refunds go to</dt><dd class="tz-mono">0x71c7…976f</dd></div>
+        </dl>
+        <p class="fl-trust"><svg aria-hidden="true"><use href="#i-shield"/></svg>If anything fails, it comes back to you.</p>
+      </div>
+    </aside>
+
+    <main class="fl-stage">
+      <div class="fl-bar">
+        <button class="fl-back" type="button" aria-label="Back"><svg><use href="#i-back"/></svg></button>
+        <div class="fl-progress"><span class="fl-progress__label"><b>Step 3 of 4</b> · Your payment</span><div class="fl-progress__track" aria-hidden="true"><span class="on"></span><span class="on"></span><span class="now"></span><span></span></div></div>
+        <button class="fl-theme" type="button" aria-label="Switch to dark mode" data-flip><svg><use href="#i-moon"/></svg></button>
+      </div>
+      <button class="fl-mini" type="button"><span class="tz-avatar tz-avatar--sm"><span>V</span></span><span><b>$5 for Valentina</b><span>USDC on Base</span></span><span>Change</span></button>
+
+      <div class="fl-pay-hero">
+        <span class="tz-overline">You send</span>
+        <span class="fl-pay-hero__amt">5.00<small>USDC</small></span>
+        <div class="fl-pay-hero__meta">
+          <span class="fl-tag">on Base</span>
+          <span class="fl-tag"><svg aria-hidden="true"><use href="#i-clock"/></svg>Price held for <span class="tz-timer">4:58</span></span>
+        </div>
+      </div>
+
+      <section class="fl-onetap" aria-label="Pay with your wallet">
+        <div class="fl-onetap__head"><span class="tz-label">Pay in one tap</span><span class="fl-badge-fast">Live mode</span></div>
+        <button class="tz-btn tz-btn--primary tz-btn--lg tz-btn--block">Pay 5.00 USDC with MetaMask</button>
+        <p class="tz-small tz-muted" style="margin:0">Your wallet opens and asks you to confirm. We fill in the address and the exact amount, so there's nothing to copy.</p>
+      </section>
+      <div class="fl-or">or pay it yourself</div>
+
+      <div class="fl-send">
+        <div class="fl-send__panel">
+          <div class="tz-qr"><canvas class="fl-qr" width="168" height="168" role="img" aria-label="QR code for the Base deposit address"></canvas></div>
+          <span class="fl-send__exact">Send exactly<b>5.00 USDC</b>on Base, to:</span>
+          <div class="tz-copy"><span class="tz-mono">0x8f3C2b71E0aD4c9b5E7f61a0C3d29e4B5079a21c</span><button class="tz-btn tz-btn--secondary tz-btn--icon" style="min-height:44px;width:44px" aria-label="Copy address"><svg><use href="#i-copy"/></svg></button></div>
+        </div>
+        <ol class="fl-howto">
+          <li>Open your wallet app, or your exchange's <b>withdraw</b> screen.</li>
+          <li>Choose <b>USDC</b> on the <b>Base</b> network. <span class="fl-howto__warn">Another network can lose your money.</span></li>
+          <li>Paste the address, or scan the QR. <span class="tz-muted">The QR holds the address only, so type the amount yourself.</span></li>
+          <li>Send exactly <b class="tz-mono">5.00 USDC</b> and confirm.</li>
+          <li>Come back and tap <b>I've sent it</b>. We spot your payment by ourselves.</li>
+        </ol>
+      </div>
+      <div class="fl-dock">
+        <button class="tz-btn tz-btn--secondary tz-btn--lg tz-btn--block">I've sent it</button>
+        <p class="fl-trust" style="margin:0">When the price runs out you can get a fresh quote, no harm done.</p>
+      </div>
+    </main>
+  </div>
+</section>
+
+<!-- =================== D. TRACKING =================== -->
+<section class="fl-screen fl-page tz-creator" id="track" style="--creator-accent:#1A9E8F">
+  <p class="fl-proto-note"><b>D · Tracking.</b> Every screen keeps the same top bar (back, Step 4 of 4, theme). The loom sits on a sunken stage up to 500px wide, and its labels name the network, not the coin twice ("Base" → "Solana"). ≥1024: the steps sit beside the note form. &lt;1024: everything stacks as today.</p>
+  <div class="fl-demo" role="note"><svg aria-hidden="true"><use href="#i-clock"/></svg>Demo mode: payments here are simulated and no real money moves.</div>
+  <div class="fl-shell">
+    <aside class="fl-sum" aria-label="Your tip">
+      <div class="tz-weave"></div>
+      <div class="fl-sum__who"><div class="tz-avatar"><span>V</span></div><b>Valentina Ríos</b><span class="fl-handle">@vale</span></div>
+      <div class="fl-sum__body">
+        <div class="fl-sum__amount"><span class="tz-amount">5.00 USDC</span><small>sent on Base</small></div>
+        <dl>
+          <div><dt>Refunds go to</dt><dd class="tz-mono">0x71c7…976f</dd></div>
+          <div><dt>Reference</dt><dd class="tz-mono">8e23db41</dd></div>
+        </dl>
+        <p class="fl-trust"><svg aria-hidden="true"><use href="#i-shield"/></svg>You can close this tab. We'll keep going.</p>
+      </div>
+    </aside>
+    <main class="fl-stage">
+      <div class="fl-bar">
+        <button class="fl-back" type="button" aria-label="Back to Valentina's page"><svg><use href="#i-back"/></svg></button>
+        <div class="fl-progress"><span class="fl-progress__label"><b>Step 4 of 4</b> · On its way</span><div class="fl-progress__track" aria-hidden="true"><span class="on"></span><span class="on"></span><span class="on"></span><span class="now"></span></div></div>
+        <button class="fl-theme" type="button" aria-label="Switch to dark mode" data-flip><svg><use href="#i-moon"/></svg></button>
+      </div>
+      <div class="fl-track-head"><span class="tz-pill" data-status="converting">Converting</span><span class="tz-small">usually under a minute</span></div>
+      <h1 class="tz-h1" style="font-size:var(--tz-text-3xl);letter-spacing:-0.03em">We're weaving your USDC into dollars for Valentina</h1>
+      <div class="fl-loomwrap">
+        <svg class="tz-loom" viewBox="0 0 300 120" role="img" aria-label="Converting your payment into USDC">
+          <text class="tz-loom__label" x="0" y="64">BASE</text>
+          <path class="tz-loom__t tz-loom__t--1" d="M44 20 C110 20 130 60 190 60"/><path class="tz-loom__t tz-loom__t--2" d="M44 60 C80 40 130 80 190 60"/><path class="tz-loom__t tz-loom__t--3" d="M44 100 C110 100 130 60 190 60"/>
+          <path class="tz-loom__out" d="M190 60 H250"/><circle class="tz-loom__eye" cx="190" cy="60" r="10"/><path class="tz-loom__shuttle" d="M206 54 212 60 206 66 200 60Z"/>
+          <text class="tz-loom__label" x="258" y="64" style="fill:var(--tz-text)">SOLANA</text>
+        </svg>
+      </div>
+      <div class="fl-track-split">
+        <ol class="tz-steps" data-status="converting">
+          <li class="tz-step" data-state="done"><span class="tz-step__knot"><svg><use href="#i-check"/></svg></span><div class="tz-step__body"><p class="tz-step__title">Got your 5.00 USDC</p><span class="tz-step__time">9:54 pm</span></div></li>
+          <li class="tz-step" data-state="active" aria-current="step"><span class="tz-step__knot"></span><div class="tz-step__body"><p class="tz-step__title">Weaving it into USDC</p><p class="tz-step__desc">You can close this tab. We'll keep going.</p></div></li>
+          <li class="tz-step" data-state="todo"><span class="tz-step__knot"></span><div class="tz-step__body"><p class="tz-step__title">Delivered to Valentina</p></div></li>
+        </ol>
+        <div class="fl-note-card">
+          <div class="tz-field"><label class="tz-label" for="note">While you wait, leave Valentina a note?</label>
+            <textarea id="note" class="tz-textarea" style="min-height:5.5rem" maxlength="140">Your Solana course got me my first dev job. ¡Gracias!</textarea>
+            <span class="tz-counter">52 / 140 · saved</span></div>
+          <div class="tz-field"><label class="tz-label" for="fan">Your name (optional)</label><input id="fan" class="tz-input" value="Ana"></div>
+        </div>
+      </div>
+      <details class="tz-small tz-muted"><summary style="cursor:pointer;min-height:44px;display:flex;align-items:center">Details for support</summary><p>Reference 8e23db41-bb2c-4c2d-bd98-b81993461463</p></details>
+    </main>
+  </div>
+</section>
+
+<!-- =================== E. THANK-YOU =================== -->
+<section class="fl-screen fl-page tz-creator" id="thanks" style="--creator-accent:#1A9E8F">
+  <p class="fl-proto-note"><b>E · Thank-you.</b> &lt;768: as today, with the wall card under the CTAs. 768–1023: a 576px column with the CTAs side by side. ≥1024: a full stage under a 96px weave band. The moment sits left (knot 136px, headline up to 96px, left-aligned) and the wall card right: the fan's note pinned on top as "You", the goal it moved, two other supporters. Real data only (wall, goal, the fan's note).</p>
+  <div class="fl-demo" role="note"><svg aria-hidden="true"><use href="#i-clock"/></svg>Demo mode: payments here are simulated and no real money moves.</div>
+  <div class="tz-weave" style="--_h:96px" role="presentation"></div>
+  <div class="fl-thanks is-playing">
+    <div class="fl-thanks__moment">
+      <div class="tz-knot is-playing" id="thanks-knot">
+        <svg viewBox="0 0 64 64" aria-hidden="true">
+          <rect class="tz-knot__tile" width="64" height="64" rx="16" fill="#D1245A"/>
+          <path class="tz-knot__thread tz-knot__thread--a" pathLength="80" d="M9.5 19H22c9 0 15.5 6 15.5 14v19.5" fill="none" stroke="#FFC23D" stroke-width="7.5" stroke-linecap="round"/>
+          <path class="tz-knot__gap" d="M42 19c-9 0-15.5 6-15.5 14" fill="none" stroke="#D1245A" stroke-width="13.5"/>
+          <path class="tz-knot__thread tz-knot__thread--b" pathLength="80" d="M54.5 19H42c-9 0-15.5 6-15.5 14v19.5" fill="none" stroke="#FFF7EC" stroke-width="7.5" stroke-linecap="round"/>
+        </svg>
+        <div class="tz-burst" aria-hidden="true"><i style="--x:-90px;--y:-50px;--r:200deg"></i><i style="--x:90px;--y:-56px;--r:-160deg;--d:40ms"></i><i style="--x:-110px;--y:10px;--r:120deg;--d:80ms"></i><i style="--x:110px;--y:6px;--r:-220deg"></i><i style="--x:-40px;--y:-100px;--r:260deg;--d:60ms"></i><i style="--x:44px;--y:-104px;--r:-140deg;--d:20ms"></i></div>
+      </div>
+      <span class="tz-pill tz-rise" data-status="received" style="--d:1000ms">Delivered</span>
+      <h1 class="tz-display tz-rise" style="--d:1150ms">You just made Valentina's day.</h1>
+      <p class="tz-rise" style="--d:1250ms">Your tip just landed in Valentina's wallet. Your thread is part of their story now.</p>
+      <div class="fl-thanks__ctas tz-rise" style="--d:1400ms">
+        <button class="tz-btn tz-btn--primary tz-btn--lg"><svg><use href="#i-share"/></svg>Tell your friends about Valentina</button>
+        <button class="tz-btn tz-btn--ghost tz-btn--lg">Back to Valentina's page</button>
+      </div>
+    </div>
+    <aside class="fl-thanks__card tz-rise" style="--d:1500ms" aria-label="Valentina's wall">
+      <div class="fl-thanks__who"><div class="tz-avatar tz-avatar--sm"><span>V</span></div><div><b>Valentina Ríos</b><span>@vale</span></div></div>
+      <div class="fl-goal">
+        <div class="fl-goal__top"><b>New microphone for the stream</b><span>24%</span></div>
+        <div class="fl-goal__bar" role="progressbar" aria-label="New microphone for the stream" aria-valuemin="0" aria-valuemax="300" aria-valuenow="71.76" style="--_p:24%"><span></span></div>
+        <small>$71.76 of $300 raised, with your tip</small>
+      </div>
+      <section class="fl-wall" aria-label="Recent supporters">
+        <span class="tz-overline">On Valentina's wall</span>
+        <ul>
+          <li class="is-you"><b>Ana <span class="fl-you">You</span></b><q>Your Solana course got me my first dev job. ¡Gracias!</q></li>
+          <li><b>Ana <span class="tz-badge">Pass</span></b><q>Saludos desde Lima</q></li>
+          <li><b>Lucía</b><q>Saludos desde Medellín</q></li>
+        </ul>
+      </section>
+    </aside>
+  </div>
+</section>
+
+<!-- =================== F. DASHBOARD =================== -->
+<section class="fl-screen tz-creator" id="dashboard" style="--creator-accent:#1A9E8F">
+  <p class="fl-proto-note"><b>F · Dashboard.</b> &lt;641: stats 2-up with the hero card full width, tips as cards, bottom tab bar. 861+: sidebar, and main centred up to 1408px instead of hugging the left. ≥1280: tips on the left and a sticky 360px tools rail (your page + QR, goal, OBS alerts, pass) with compact forms and auto-width save buttons. Money in the Details breakdown never wraps.</p>
+  <div class="fl-dash">
+    <nav class="fl-dash__nav" aria-label="Dashboard navigation">
+      <a class="fl-logo" href="/" aria-label="Tezeo home"><svg viewBox="0 0 240 64" style="--pv-t:var(--tz-brand);color:var(--tz-text)"><use href="#tz-mark" width="64" height="64"/><use href="#tz-letters" x="82" y="4" width="154" height="56"/></svg></a>
+      <a class="on" href="#home" aria-current="page"><svg><use href="#i-home"/></svg>Home</a>
+      <a href="#tips"><svg><use href="#i-list"/></svg>Tips</a>
+      <a href="#passes"><svg><use href="#i-pass"/></svg>Passes</a>
+      <a href="#stream"><svg><use href="#i-stream"/></svg>Stream</a>
+      <a href="/@vale"><svg><use href="#i-brush"/></svg>My page</a>
+    </nav>
+    <main class="fl-dash__main" id="home">
+      <div class="fl-dash__head">
+        <div><span class="tz-overline">Saturday, Oct 31</span><h1 class="tz-h1">Good evening, Valentina</h1></div>
+        <div class="fl-actions"><button class="fl-theme" type="button" aria-label="Switch to dark mode" data-flip><svg><use href="#i-moon"/></svg></button><button class="tz-btn tz-btn--secondary"><svg><use href="#i-share"/></svg>Share my page</button></div>
+      </div>
+      <div class="fl-stats">
+        <div class="tz-card tz-stat fl-stat-hero"><span class="tz-overline">Received this month</span><span class="tz-stat__value">66.76<span class="tz-amount__unit">USDC</span></span><div class="tz-weave"></div></div>
+        <div class="tz-card tz-stat"><span class="tz-overline">Tips this month</span><span class="tz-stat__value">7</span></div>
+        <div class="tz-card tz-stat"><span class="tz-overline">Active passes</span><span class="tz-stat__value">1</span></div>
+      </div>
+      <div class="fl-cols">
+        <div class="tz-card fl-tips-card" id="tips">
+          <div class="fl-card-h"><h2>Latest tips</h2><span class="tz-pill" data-status="converting">1 on its way</span></div>
+          <table class="tz-table tz-table--stack">
+            <thead><tr><th>Fan</th><th>Date</th><th>Paid with</th><th class="num">You got</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td><div class="fl-fan"><span class="fl-dot" style="--_c:#D1245A">A</span><div><b>Ana <span class="tz-badge">Pass</span></b><small>“Saludos desde Lima”</small></div></div></td><td data-col="date" class="tz-muted">Today, 9:54 PM</td><td data-col="chain">USDC · Base</td><td data-col="amount" class="num"><b>12.48 USDC</b><br><button class="fl-details" aria-expanded="true">Hide details</button></td><td data-col="status"><span class="tz-pill" data-status="received">Received</span></td></tr>
+              <tr data-detail="1"><td colspan="5" data-col="detail" style="padding-top:0;border-top:0">
+                <div class="tz-card tz-card--sunken fl-breakdown" style="padding:var(--tz-space-4)">
+                  <dl class="tz-quote">
+                    <div class="tz-quote__row"><dt>Your fan sent</dt><span class="tz-quote__lead"></span><dd>$12.64</dd></div>
+                    <div class="tz-quote__row"><dt>Delivery to your Solana wallet</dt><span class="tz-quote__lead"></span><dd>−$0.01</dd></div>
+                    <div class="tz-quote__row"><dt>Service fees &amp; price spread</dt><span class="tz-quote__lead"></span><dd>−$0.15</dd></div>
+                    <div class="tz-quote__row tz-quote__row--total"><dt>You received</dt><span class="tz-spacer"></span><dd>12.48 USDC</dd></div>
+                  </dl>
+                </div></td></tr>
+              <tr><td><div class="fl-fan"><span class="fl-dot" style="--_c:#5B4FE0">J</span><div><b>Jorge</b><small>“Para el próximo stream”</small></div></div></td><td data-col="date" class="tz-muted">Today, 9:52 PM</td><td data-col="chain">USDC · Base</td><td data-col="amount" class="num">—</td><td data-col="status"><span class="tz-pill" data-status="converting">Converting</span></td></tr>
+              <tr><td><div class="fl-fan"><span class="fl-dot" style="--_c:#1A9E8F">L</span><div><b>Lucía</b><small>“Saludos desde Medellín”</small></div></div></td><td data-col="date" class="tz-muted">Today, 9:51 PM</td><td data-col="chain">USDC · Base</td><td data-col="amount" class="num"><b>4.94 USDC</b><br><button class="fl-details" aria-expanded="false">Details</button></td><td data-col="status"><span class="tz-pill" data-status="received">Received</span></td></tr>
+              <tr><td><div class="fl-fan"><span class="fl-dot" style="--_c:#7C3AED">?</span><div><b>Someone kind</b><small>No message</small></div></div></td><td data-col="date" class="tz-muted">Today, 9:50 PM</td><td data-col="chain">USDC · Ethereum</td><td data-col="amount" class="num tz-muted">—</td><td data-col="status"><span class="tz-pill" data-status="refunded">Refunded</span></td></tr>
+              <tr><td><div class="fl-fan"><span class="fl-dot" style="--_c:#D1245A">A</span><div><b>Ana</b><small>“Your Solana course got me my first dev job. ¡Gra…”</small></div></div></td><td data-col="date" class="tz-muted">Today, 9:51 PM</td><td data-col="chain">USDC · Base</td><td data-col="amount" class="num"><b>24.68 USDC</b><br><button class="fl-details" aria-expanded="false">Details</button></td><td data-col="status"><span class="tz-pill" data-status="received">Received</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <aside class="fl-rail" aria-label="Tools">
+          <div class="tz-card tz-stack" style="--tz-stack-gap:14px">
+            <div class="fl-card-h"><svg aria-hidden="true"><use href="#i-qr"/></svg><h2>Your page</h2></div>
+            <div class="fl-sharecard"><div class="tz-qr"><canvas class="fl-qr" width="92" height="92"></canvas></div><div><b>tezeo.app/@vale</b><span class="tz-mono">Print it, pin it on stream.</span></div></div>
+            <div class="fl-btnrow"><button class="tz-btn tz-btn--secondary"><svg><use href="#i-copy"/></svg>Copy link</button><a class="tz-btn tz-btn--ghost" href="/@vale">Open my page</a></div>
+          </div>
+          <form class="tz-card tz-stack" id="goal" style="--tz-stack-gap:12px">
+            <div class="fl-card-h"><svg aria-hidden="true"><use href="#i-target"/></svg><h2>Funding goal</h2></div>
+            <div class="fl-goal" style="padding:0;border:0;background:none"><div class="fl-goal__top"><b>New microphone for the stream</b><span>22%</span></div><div class="fl-goal__bar" style="--_p:22%"><span></span></div><small>$66.76 of $300 raised</small></div>
+            <div class="fl-inline-form">
+              <div class="tz-field"><label class="tz-label" for="gt">Goal name</label><input id="gt" class="tz-input" value="New microphone for the stream"></div>
+              <div class="tz-field"><label class="tz-label" for="ga">Target</label><input id="ga" class="tz-input" inputmode="numeric" value="300"></div>
+              <button class="tz-btn tz-btn--primary">Save goal</button>
+            </div>
+          </form>
+          <div class="tz-card tz-stack" id="stream" style="--tz-stack-gap:12px">
+            <div class="fl-card-h"><svg aria-hidden="true"><use href="#i-stream"/></svg><h2>Alerts for OBS</h2></div>
+            <p class="tz-small tz-muted" style="margin:0">Add a <b>Browser Source</b> in OBS with this link. A card pops up for every confirmed tip. Keep it private.</p>
+            <div class="tz-copy"><span class="tz-mono" style="font-size:12px">tezeo.app/alerts/zCdS_fCi…QCMg</span><button class="tz-btn tz-btn--secondary tz-btn--icon" style="min-height:44px;width:44px" aria-label="Copy alerts link"><svg><use href="#i-copy"/></svg></button></div>
+            <a class="tz-btn tz-btn--ghost" href="#" style="justify-self:start">Preview the alert</a>
+          </div>
+          <form class="tz-card tz-stack" id="passes" style="--tz-stack-gap:12px">
+            <div class="fl-card-h"><svg aria-hidden="true"><use href="#i-pass"/></svg><h2>Membership pass</h2><span class="tz-pill" data-status="received">On</span></div>
+            <label class="fl-check"><input type="checkbox" checked>Offer a 30-day pass on my page</label>
+            <div class="fl-inline-form" style="grid-template-columns:7rem 1fr">
+              <div class="tz-field"><label class="tz-label" for="pp">Price (USD)</label><input id="pp" class="tz-input" inputmode="numeric" value="12"></div>
+              <div class="tz-field"><label class="tz-label" for="perk">What members get</label><input id="perk" class="tz-input" value="Early access to every new class"></div>
+              <button class="tz-btn tz-btn--primary">Save pass</button>
+            </div>
+            <div class="tz-row tz-small"><b>Ana</b><span class="tz-badge">Pass</span><span class="tz-spacer"></span><span class="tz-muted">30d left</span></div>
+          </form>
+        </aside>
+      </div>
+    </main>
+    <nav class="fl-tabbar" aria-label="Dashboard"><a class="on" href="#home"><svg><use href="#i-home"/></svg>Home</a><a href="#tips"><svg><use href="#i-list"/></svg>Tips</a><a href="#stream"><svg><use href="#i-stream"/></svg>Stream</a><a href="#passes"><svg><use href="#i-pass"/></svg>Passes</a><a href="/@vale"><svg><use href="#i-brush"/></svg>My page</a></nav>
+  </div>
+</section>
+
+<!-- =================== G. ONBOARDING =================== -->
+<section class="fl-screen fl-page tz-creator" id="onboarding" style="--creator-accent:#7C3AED">
+  <p class="fl-proto-note"><b>G · Onboarding.</b> &lt;1024: form, then a full live preview with a Light/Dark switch (it replaces the two tiny tiles) right above the CTA. ≥1024: form (512px) beside a sticky 384px phone preview of the real page: weave, avatar, name, handle, message, amounts, CTA. The CTA reads "Create my page" (today it says "Create you's page" while the name is empty).</p>
+  <div class="fl-onb">
+    <form class="fl-onb__form" onsubmit="return false">
+      <div><span class="tz-overline">Create your page</span><h1>Let's weave your page</h1></div>
+      <div class="tz-field"><label class="tz-label" for="o-name">Your name</label><input id="o-name" class="tz-input" value="Mateo Quispe"></div>
+      <div class="tz-field"><label class="tz-label" for="o-h">Handle</label><input id="o-h" class="tz-input" value="mateodraws" aria-describedby="o-h-h"><span id="o-h-h" class="tz-hint">Your link: tezeo.app/@mateodraws · 3–24 letters, numbers or _</span></div>
+      <div class="tz-field"><label class="tz-label" for="o-m">A short message for your fans</label><textarea id="o-m" class="tz-textarea" maxlength="160">I draw Andean folk tales live every Sunday. Tips keep the ink flowing.</textarea><span class="tz-counter">71 / 160</span></div>
+      <div class="tz-field"><span class="tz-label" id="o-ph">Photo</span><div class="tz-row"><div class="tz-avatar tz-avatar--sm"><span>M</span></div><button class="tz-btn tz-btn--secondary" type="button">Upload a photo</button></div></div>
+      <div class="tz-field"><span class="tz-label" id="o-ac">Your colour</span>
+        <div class="fl-swatches" role="group" aria-labelledby="o-ac">
+          <button class="fl-swatch" style="--_c:#1A9E8F" aria-label="Turquesa" aria-pressed="false" type="button"></button>
+          <button class="fl-swatch" style="--_c:#7C3AED" aria-label="Violet" aria-pressed="true" type="button"></button>
+          <button class="fl-swatch" style="--_c:#0EA5E9" aria-label="Sky" aria-pressed="false" type="button"></button>
+          <button class="fl-swatch" style="--_c:#F97316" aria-label="Orange" aria-pressed="false" type="button"></button>
+          <button class="fl-swatch" style="--_c:#E8FF3A" aria-label="Neon yellow" aria-pressed="false" type="button"></button>
+          <button class="fl-swatch" style="--_c:#FF66CC" aria-label="Pink" aria-pressed="false" type="button"></button>
+          <button class="fl-swatch" style="--_c:#111111" aria-label="Black" aria-pressed="false" type="button"></button>
+          <button class="fl-swatch fl-swatch--custom" aria-label="Custom colour" type="button"><span>+</span></button>
+        </div>
+        <span class="tz-hint">The pay button and status colours stay Tezeo's, so everyone recognises a real payment page.</span></div>
+      <div class="tz-field"><label class="tz-label" for="o-w">Your Solana wallet (where USDC arrives)</label><input id="o-w" class="tz-input tz-mono" placeholder="e.g. 7xKX…gAsU" aria-describedby="o-w-h"><span id="o-w-h" class="tz-hint">Double-check it: tips are paid straight to this address and can't be reversed.</span></div>
+      <div class="fl-dock" style="margin-top:var(--tz-space-2)">
+        <button class="tz-btn tz-btn--primary tz-btn--lg tz-btn--block" type="submit">Create my page</button>
+        <p class="fl-trust"><svg aria-hidden="true"><use href="#i-shield"/></svg>We check your wallet address before saving it.</p>
+      </div>
+    </form>
+
+    <aside class="fl-preview" aria-label="Live preview of your page">
+      <div class="fl-preview__head"><span class="tz-overline">How fans see it</span>
+        <div class="fl-seg" role="group" aria-label="Preview theme"><button type="button" aria-pressed="true" data-pv="light">Light</button><button type="button" aria-pressed="false" data-pv="dark">Dark</button></div></div>
+      <div class="fl-phone" id="pv-phone">
+        <div class="fl-phone__url">tezeo.app/<b>@mateodraws</b></div>
+        <div class="tz-weave"></div>
+        <div class="fl-phone__body">
+          <div class="fl-id"><div class="tz-avatar"><span>M</span></div><h1 style="font-size:var(--tz-text-xl)">Mateo Quispe</h1><span class="fl-handle">@mateodraws</span></div>
+          <p class="fl-bubble">“I draw Andean folk tales live every Sunday. Tips keep the ink flowing.”</p>
+          <div class="tz-amounts"><span class="tz-amount-opt"><span class="tz-amount">$3</span><small>a cafecito</small></span><span class="tz-amount-opt" aria-pressed="true"><span class="tz-amount">$5</span><small>lunch</small></span><span class="tz-amount-opt"><span class="tz-amount">$15</span><small>big hug</small></span></div>
+          <span class="tz-btn tz-btn--primary tz-btn--block">Send $5 to Mateo</span>
+        </div>
+      </div>
+      <p class="tz-small tz-muted" style="margin:0">Example. The preview updates as you type.</p>
+    </aside>
+  </div>
+</section>
+
+<script>
+  (function () {
+    var q = new URLSearchParams(location.search), s = q.get('screen');
+    if (s) { document.getElementById('index').hidden = true; document.querySelectorAll('.fl-screen').forEach(function (el) { el.hidden = el.id !== s; }); }
+    var root = document.documentElement;
+    document.querySelectorAll('[data-flip]').forEach(function (b) { b.addEventListener('click', function () { root.dataset.theme = root.dataset.theme === 'dark' ? 'light' : 'dark'; }); });
+    // onboarding preview: render the phone in the chosen theme (prototype: flips the page theme)
+    document.querySelectorAll('[data-pv]').forEach(function (b) { b.addEventListener('click', function () {
+      document.querySelectorAll('[data-pv]').forEach(function (x) { x.setAttribute('aria-pressed', x === b); }); root.dataset.theme = b.dataset.pv; }); });
+    // decorative QR (not scannable)
+    document.querySelectorAll('canvas.fl-qr').forEach(function (c) {
+      var x = c.getContext('2d'), n = 25, s = c.width / n, seed = 11;
+      var r = function () { return (seed = (seed * 9301 + 49297) % 233280) / 233280; };
+      x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height); x.fillStyle = '#1C1424';
+      for (var i = 0; i < n; i++) for (var j = 0; j < n; j++) if (r() > 0.52) x.fillRect(i * s, j * s, Math.ceil(s), Math.ceil(s));
+      var eye = function (a, b) { x.fillStyle = '#1C1424'; x.fillRect(a*s, b*s, 7*s, 7*s); x.fillStyle = '#fff'; x.fillRect((a+1)*s, (b+1)*s, 5*s, 5*s); x.fillStyle = '#1C1424'; x.fillRect((a+2)*s, (b+2)*s, 3*s, 3*s); };
+      eye(0, 0); eye(n - 7, 0); eye(0, n - 7);
+    });
+  })();
+</script>
+</body>
+</html>

@@ -1,4 +1,4 @@
-# Phase 0 — Aurora validation (status: API contract VERIFIED live; funded conversion PENDING)
+# Phase 0 — Aurora validation (status: PASSED — a real funded conversion landed in a Solana wallet)
 
 Last verified: 2026-10-31 with the real `AURORA_API_KEY` (never committed or printed).
 
@@ -25,9 +25,22 @@ Last verified: 2026-10-31 with the real `AURORA_API_KEY` (never committed or pri
 3. **USDC on Solana is excluded as an origin** (it is the destination asset); fans already holding USDC on Solana would use a plain transfer outside the swap flow.
 4. The API key sits in the URL path, so `live.ts` scrubs it from error messages. Keep every Aurora call server-side.
 
-## What is NOT verified
+## Funded conversion: PASSED (reported by the project owner)
 
-A real funded conversion. A quote creates a deposit address but moves no funds, so `SUCCESS` (USDC actually landing in a Solana wallet), `REFUNDED` and `FAILED` transitions are **not yet observed live**. Phase 0 is **not passed** until you run:
+The owner paid a real tip through the deployed app (`tezeo.arroz.dev`, `AURORA_MODE=live`): a fan paid from an EVM wallet to the per-tip deposit address Aurora issued, the app tracked it live and ended on the "Delivered" screen (which is only shown when Aurora reports `SUCCESS`), and **the owner confirmed the USDC arrived in their Phantom wallet on Solana**.
+
+What this establishes: the whole path works for real — quote, per-tip deposit address, the fan's payment (one-tap wallet flow), Aurora's conversion, delivery of USDC on Solana to the creator's own wallet, and status tracking to "Delivered". Plan B (Intents Connect) is not needed.
+
+Limits of this evidence: it comes from the owner's report. The transaction hash and the exact amount were not recorded here, so they are not independently checked in this repository. It was one payment, from one origin coin.
+
+## Still not verified live
+
+- **`REFUNDED` and `FAILED` transitions.** The failure and refund screens have only been exercised against the simulator. No real refund has been observed.
+- **Why the first tip to a new wallet costs ~$0.25.** Measured with dry quotes (0.2549 USDC to brand-new wallets vs 0.0100 to active ones) and explained by Solana's USDC token-account creation, but that explanation is a hypothesis: where the money goes was not checked (look at the delivery transaction on Solscan), and it has not been confirmed that the *next* tip to the same wallet drops to ~0.01.
+- **Other origin coins and chains** (anything besides the one used in the payment above), non-EVM origins, and the pass flow with a real payment.
+- **Tezeo's own fee**: it is configured per API key in Aurora's Client Portal; nothing is charged until it is set there.
+
+## Re-running the check
 
 ```bash
 # Use a Solana wallet you control as recipient and an address you control on Base for refunds.
@@ -37,4 +50,4 @@ PHASE0_AMOUNT=5000000 PHASE0_REFUND_TO=<your Base address, lowercase 0x…> \
 npm run phase0      # AURORA_API_KEY must be set in the environment
 ```
 
-It prints a deposit address on Base; send exactly **5 USDC (Base)** to it. The script polls until `SUCCESS` (expect ~30 s) and prints the Solana tx. Report the result back and this document will be updated.
+It prints a deposit address on Base; send exactly **5 USDC (Base)** to it. The script polls until `SUCCESS` (expect ~30 s) and prints the Solana tx.
