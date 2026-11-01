@@ -106,7 +106,7 @@ export function Live({ d, onLeave }: { d: DoneState; onLeave: () => void }) {
           <div className="ob-keep__gate">
             <label className="fl-check"><input type="checkbox" checked={ticked} onChange={(e) => setTicked(e.target.checked)} data-testid="saved-tick" />I've saved it somewhere safe</label>
             <a className="tz-btn tz-btn--primary tz-btn--lg tz-btn--block" href={`/dashboard/${d.dashboardToken}`} aria-disabled={!ticked} aria-describedby="keep-why" data-testid="go-dashboard"
-              onClick={(e) => { if (!ticked) e.preventDefault(); else onLeave(); }}>Go to my dashboard</a>
+              onClick={(e) => { if (!ticked) e.preventDefault(); else { try { localStorage.setItem(`tz-saved-${d.handle}`, "1"); } catch { /* ignore */ } onLeave(); } }}>Go to my dashboard</a>
             {!ticked && <p className="fl-why-disabled" id="keep-why">Save your link first. It's the only way back in.</p>}
           </div>
         </section>

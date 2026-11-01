@@ -483,3 +483,5 @@
 .ob-step { scroll-margin-bottom: 150px; }
 .ob-share canvas { width: 84px !important; height: 84px !important; }
 @media (min-width: 1024px) { .ob-share canvas { width: 104px !important; height: 104px !important; } }
+.ob-dash-note { margin-top: 0; }
+@media (min-width: 1280px) { .ob-dash-cols { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important; align-items: start; } }

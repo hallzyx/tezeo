@@ -3,9 +3,10 @@ import { Fragment, useEffect, useRef, useState } from "react";
 import { Icon, Logo, Mark, ThemeToggle } from "@/components/ui";
 import { passState } from "@/components/PassCard";
 import type { DashboardData } from "@/lib/dashboard";
+import { BookmarkStrip, FirstRun } from "./FirstRun";
 
 const STATUS_LABEL: Record<string, string> = { converting: "Converting", received: "Received", failed: "Didn't go through", refunded: "Refunded" };
-const COLORS = ["#D1245A", "#5B4FE0", "#1A9E8F", "#F2A900", "#7C3AED"];
+const COLORS = ["#D1245A", "#5B4FE0", "#1A9E8F", "#8F5B00", "#7C3AED"];
 
 const fmtDate = (iso: string) => {
   const d = new Date(iso), today = new Date();
@@ -62,6 +63,7 @@ export function Dashboard({ token, initial, accent }: { token: string; initial: 
   const hour = new Date().getHours();
   const greeting = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
   const s = data.stats;
+  const firstRun = data.tips.length === 0 && s.receivedThisMonthUsdc === 0;
   return (
     <div className="tzs-dash tz-creator" style={{ ["--creator-accent" as string]: accent }}>
       <aside aria-label="Dashboard navigation">
@@ -74,38 +76,39 @@ export function Dashboard({ token, initial, accent }: { token: string; initial: 
       </aside>
       <main id="home">
         <div className="tz-row" style={{ flexWrap: "wrap" }}>
-          <div><span className="tz-overline">{new Date().toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" })}</span><h1 className="tz-h1" style={{ marginTop: 6 }}>{greeting}, {name}</h1></div>
+          <div><span className="tz-overline">{new Date().toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" })}</span><h1 className="tz-h1" style={{ marginTop: 6 }}>{firstRun ? "Welcome" : greeting}, {name}</h1></div>
           <span className="tz-spacer" />
           <ThemeToggle />
           <button className="tz-btn tz-btn--secondary" onClick={share}><Icon name="share" />{copied ? "Link copied" : "Share my page"}</button>
         </div>
 
-        {data.walletHasUsdc === false && (
-          <div className="tz-card tz-card--sunken tz-stack" style={{ ["--tz-stack-gap" as string]: "6px" }} role="note" data-testid="new-wallet-note">
-            <span className="tz-overline">Heads up about your wallet</span>
-            <p className="tz-small" style={{ margin: 0 }}>A Solana wallet needs a USDC account before it can receive USDC, and yours doesn't have one yet. Your <b>first tip carries a one-time set-up cost of about $0.25</b>. After that, delivery costs about $0.01 per tip. You'll see the exact amounts on each tip in your dashboard.</p>
-          </div>
-        )}
+        {firstRun && <BookmarkStrip />}
 
-        <div className="tzs-stats">
+        {!firstRun && <div className="tzs-stats">
           <div className="tz-card tz-stat" style={{ background: "var(--tz-surface-inverse)", color: "var(--tz-text-inverse)", border: 0 }}>
             <span className="tz-overline" style={{ color: "inherit", opacity: 0.7 }}>Received this month</span>
             <span className="tz-stat__value" data-testid="month-total">{money(s.receivedThisMonthUsdc)}<span className="tz-amount__unit" style={{ color: "inherit", opacity: 0.7 }}>USDC</span></span>
           </div>
           <div className="tz-card tz-stat"><span className="tz-overline">Tips this month</span><span className="tz-stat__value">{s.tipsThisMonth}</span></div>
           <div className="tz-card tz-stat"><span className="tz-overline">Active passes</span><span className="tz-stat__value">{s.activePasses}</span></div>
-        </div>
+        </div>}
 
+        <div className={firstRun ? "ob-dash-cols" : undefined} style={firstRun ? { display: "grid", gap: "var(--tz-space-5)" } : undefined}>
+        {firstRun && <FirstRun handle={data.creator.handle} hasGoal={data.goal.targetUsd > 0} hasTip={data.tips.length > 0} />}
+        <div style={{ display: "grid", gap: "var(--tz-space-4)", alignContent: "start" }}>
         <div className="tz-card" id="tips" style={{ padding: "var(--tz-space-5) var(--tz-space-3) var(--tz-space-3)" }}>
           <div className="tz-row" style={{ padding: "0 var(--tz-space-3) var(--tz-space-4)" }}>
             <h2 className="tz-h2" style={{ fontSize: "var(--tz-text-lg)" }}>Latest tips</h2><span className="tz-spacer" />
             {s.inFlight > 0 && <span className="tz-pill" data-status="converting">{s.inFlight} on its way</span>}
           </div>
           {data.tips.length === 0 ? (
-            <div className="tz-empty">
-              <p className="tz-empty__title">Your first thread is on its way</p>
-              <p className="tz-muted tz-small" style={{ margin: 0 }}>Share your page and the first tip will show up here, live.</p>
-              <button className="tz-btn tz-btn--primary" onClick={share}>Copy my link</button>
+            <div className="ob-empty">
+              <svg className="ob-loose" viewBox="0 0 140 56" aria-hidden="true" fill="none" strokeWidth="5" strokeLinecap="round">
+                <path d="M6 40c26 0 30-26 56-26s24 22 44 22" stroke="currentColor" /><path d="M110 36c10 0 18-2 26-8" stroke="var(--tz-gold)" />
+              </svg>
+              <p className="ob-empty__title">Your first thread is on its way</p>
+              <p>Share your page and the first tip will show up here, live. No need to refresh.</p>
+              <span className="ob-listen"><span className="tz-rombo" aria-hidden="true" />Listening for tips</span>
             </div>
           ) : (
             <table className="tz-table tz-table--stack">
@@ -130,6 +133,15 @@ export function Dashboard({ token, initial, accent }: { token: string; initial: 
               </tbody>
             </table>
           )}
+        </div>
+        {data.walletHasUsdc === false && (
+          <div className="ob-dash-note" role="note" data-testid="new-wallet-note">
+            <span className="tz-rombo" aria-hidden="true" />
+            <span><b>New wallet.</b> Your first tip pays a one-time set-up of about $0.25.</span>
+            <details><summary>Why?</summary><p>Solana needs a USDC account for your wallet before dollars can land, and opening it costs about $0.25. It comes out of your first tip, once. After that, delivery is about $0.01 per tip.</p></details>
+          </div>
+        )}
+        </div>
         </div>
         <StreamTools token={token} goal={data.goal} alertToken={data.alertToken} />
         <PassSettings token={token} pass={data.pass} passes={data.passes} handle={data.creator.handle} />
