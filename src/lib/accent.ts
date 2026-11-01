@@ -73,7 +73,7 @@ function shiftLightness(rgb: RGB, dir: 1 | -1, ok: (c: RGB) => boolean): RGB {
 
 export type AccentResult =
   | { ok: true; accent: string; light: string; dark: string }
-  | { ok: false; reason: string; suggestion?: string };
+  | { ok: false; reason: string; suggestion?: string; near?: "failed" | "received" };
 
 export function validateAccent(hex: string): AccentResult {
   const rgb = parseHex(hex);
@@ -89,6 +89,7 @@ export function validateAccent(hex: string): AccentResult {
         ok: false,
         reason: "That colour is too close to a payment-status colour, so it could be mistaken for one. Try another.",
         suggestion: toHex(fromOklab([L, c * Math.cos(hue), c * Math.sin(hue)])),
+        near: status === ARCILLA ? "failed" : "received",
       };
     }
   }
@@ -101,3 +102,20 @@ export function validateAccent(hex: string): AccentResult {
 }
 
 export const ACCENT_PRESETS = ["#1A9E8F", "#7C3AED", "#0EA5E9", "#F97316", "#E8FF3A", "#FF66CC", "#111111"];
+
+export const PRESET_NAMES: Record<string, string> = {
+  "#1A9E8F": "Turquesa", "#7C3AED": "Violeta", "#0EA5E9": "Cielo", "#F97316": "Mandarina",
+  "#E8FF3A": "Lima", "#FF66CC": "Rosa", "#111111": "Noche",
+};
+
+/** The preset closest to a colour (OKLab) that the guard accepts. */
+export function nearestPreset(hex: string): string {
+  const rgb = parseHex(hex);
+  let best = ACCENT_PRESETS[0], bestD = Infinity;
+  for (const p of ACCENT_PRESETS) {
+    if (!validateAccent(p).ok) continue;
+    const d = rgb ? deltaE(rgb, parseHex(p)!) : 0;
+    if (d < bestD) { best = p; bestD = d; }
+  }
+  return best;
+}

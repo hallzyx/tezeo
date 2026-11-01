@@ -1,4 +1,3 @@
-import { PublicKey } from "@solana/web3.js";
 import { AURORA_MAX_BPS, AURORA_MIN_BPS } from "./env";
 import type { OriginAsset, ProviderStatus } from "./aurora/types";
 
@@ -17,20 +16,18 @@ export function mapStatus(p: ProviderStatus): TipStatus {
   }
 }
 
-/** Token mints are valid keys but never someone's wallet; Aurora rejects the USDC mint as a recipient. */
-const NOT_WALLETS = new Set(["EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"]);
-
-/** RF-2: a Solana address must be a valid base58 32-byte ed25519-sized key. */
-export function isValidSolanaAddress(addr: string): boolean {
-  if (typeof addr !== "string" || addr.length < 32 || addr.length > 44 || NOT_WALLETS.has(addr)) return false;
-  try {
-    return new PublicKey(addr).toBytes().length === 32;
-  } catch {
-    return false;
-  }
-}
+export { isValidSolanaAddress, walletProblem, NOT_WALLETS, type WalletProblem } from "./wallet-check";
 
 const HANDLE_RE = /^[a-z0-9_]{3,24}$/;
+
+/** Turns whatever was typed into the closest valid handle text (lowercase, no accents, [a-z0-9_] only, max 24). */
+export function cleanHandle(raw: string): string {
+  return raw.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/^@/, "").replace(/\s+/g, "_").replace(/[^a-z0-9_]/g, "").slice(0, 24);
+}
+/** A first link idea from a display name: "Mateo Quispe" -> "mateoquispe". */
+export function slugFromName(name: string): string {
+  return cleanHandle(name.replace(/\s+/g, ""));
+}
 export function normalizeHandle(raw: string): string | null {
   const h = raw.trim().replace(/^@/, "").toLowerCase();
   return HANDLE_RE.test(h) ? h : null;

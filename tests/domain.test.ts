@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { clampFeeBps, fromUnits, isValidSolanaAddress, mapStatus, meetsMinTip, normalizeHandle, toUnits } from "@/lib/domain";
+import { cleanHandle, slugFromName, walletProblem, clampFeeBps, fromUnits, isValidSolanaAddress, mapStatus, meetsMinTip, normalizeHandle, toUnits } from "@/lib/domain";
 
 describe("domain", () => {
   it("validates Solana addresses", () => {
@@ -9,6 +9,18 @@ describe("domain", () => {
     expect(isValidSolanaAddress("0xde0B295669a9FD93d5F28D9Ec85E40f4cb697BAe")).toBe(false);
     expect(isValidSolanaAddress("short")).toBe(false);
     expect(isValidSolanaAddress("")).toBe(false);
+  });
+  it("explains why a wallet is rejected", () => {
+    expect(walletProblem("GBR7vwX5Thj7GzMLYHDUS21rnyTFhGciaz59Bm7jwMrJ")).toBeNull();
+    expect(walletProblem("0xde0B295669a9FD93d5F28D9Ec85E40f4cb697BAe")).toBe("eth");
+    expect(walletProblem("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v")).toBe("token");
+    expect(walletProblem("apple bird cat dog egg fish goat hat ice jam kite lamp")).toBe("phrase");
+    expect(walletProblem("hello")).toBe("format");
+  });
+  it("cleans handles typed by people", () => {
+    expect(cleanHandle("Mateo Quispe")).toBe("mateo_quispe");
+    expect(slugFromName("José Ñandú")).toBe("josenandu");
+    expect(cleanHandle("a".repeat(40))).toHaveLength(24);
   });
   it("normalizes handles", () => {
     expect(normalizeHandle("@Ana_Dev")).toBe("ana_dev");

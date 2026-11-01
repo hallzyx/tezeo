@@ -2,9 +2,10 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { SPRITE_INNER } from "./sprite";
 import { SPRITE_LANDING } from "./sprite-landing";
+import { SPRITE_ONBOARDING } from "./sprite-onboarding";
 
 export function Sprite() {
-  return <svg width="0" height="0" style={{ position: "absolute" }} aria-hidden="true" dangerouslySetInnerHTML={{ __html: SPRITE_INNER + SPRITE_LANDING }} />;
+  return <svg width="0" height="0" style={{ position: "absolute" }} aria-hidden="true" dangerouslySetInnerHTML={{ __html: SPRITE_INNER + SPRITE_LANDING + SPRITE_ONBOARDING }} />;
 }
 
 export function Icon({ name, className = "tzs-icon", size }: { name: string; className?: string; size?: number }) {
@@ -28,7 +29,9 @@ export function Mark({ size = 16 }: { size?: number }) {
 export function ThemeToggle() {
   const [theme, setTheme] = useState<"light" | "dark">("light");
   useEffect(() => {
-    setTheme(document.documentElement.dataset.theme === "dark" ? "dark" : "light");
+    const set = document.documentElement.dataset.theme;
+    // No explicit choice yet: follow the OS, which is what the CSS is already doing.
+    setTheme(set ? (set === "dark" ? "dark" : "light") : window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
   }, []);
   const flip = () => {
     const next = theme === "dark" ? "light" : "dark";
