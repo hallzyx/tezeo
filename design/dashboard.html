@@ -1,0 +1,455 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="referrer" content="no-referrer">
+<title>Home · Tezeo dashboard (prototype)</title>
+<link rel="icon" href="logo-mark.svg" type="image/svg+xml">
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="components.css">
+<link rel="stylesheet" href="flow.css">
+<link rel="stylesheet" href="dashboard.css">
+<script>
+  // ?screen=home|tips|passes|stream|page · ?theme=dark|light · ?state=busy|empty|live · ?next=1 (preview of "next" items) · ?clean=1 hides notes
+  (function () { var q = new URLSearchParams(location.search), d = document.documentElement;
+    var t = q.get('theme'); d.dataset.theme = t === 'dark' || t === 'light' ? t : (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    d.dataset.state = ['empty', 'live'].indexOf(q.get('state')) >= 0 ? q.get('state') : 'busy';
+    if (q.get('next')) d.dataset.next = '1';
+    if (q.get('clean')) d.classList.add('db-clean'); })();
+</script>
+</head>
+<body class="tz-app">
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5 10 17.5 19 7" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 5.5A2.5 2.5 0 0 0 13.5 3H6a3 3 0 0 0-3 3v7.5A2.5 2.5 0 0 0 5.5 16" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 4.5 6v5.5c0 4.6 3.2 8.3 7.5 9.5 4.3-1.2 7.5-4.9 7.5-9.5V6L12 3Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="m8.5 12 2.5 2.5 4.5-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-share" viewBox="0 0 24 24"><path d="M12 15V4m0 0L8 8m4-4 4 4M5 13v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20s-7.5-4.4-7.5-10.1A4.4 4.4 0 0 1 12 7a4.4 4.4 0 0 1 7.5 2.9C19.5 15.6 12 20 12 20Z" fill="currentColor"/></symbol>
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 11 12 4l8 7v8a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1v-8Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+  <symbol id="i-list" viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="m4.5 4.5 1.5 1.5-1.5 1.5L3 6zM4.5 10.5 6 12l-1.5 1.5L3 12zM4.5 16.5 6 18l-1.5 1.5L3 18z" fill="currentColor"/></symbol>
+  <symbol id="i-brush" viewBox="0 0 24 24"><path d="M14 4 20 10l-8 8H6v-6l8-8Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+  <symbol id="i-pass" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="m12 9 3 3-3 3-3-3z" fill="currentColor"/></symbol>
+  <symbol id="i-stream" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="12" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 21h8M12 17v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="m10.5 8.5 4 2.5-4 2.5z" fill="currentColor"/></symbol>
+  <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="m12 10.5 1.5 1.5-1.5 1.5-1.5-1.5z" fill="currentColor"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24"><path d="M19.5 14.5A8 8 0 0 1 9.5 4.5a8 8 0 1 0 10 10Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.5 1.5M17.2 17.2l1.5 1.5M5.3 18.7l1.5-1.5M17.2 6.8l1.5-1.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h13m-5-5 5 5-5 5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-qr" viewBox="0 0 24 24"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M14 14h2.5v2.5H14zM17.5 17.5H20V20h-2.5zM14 18h2v2h-2zM18 14h2v2h-2z" fill="currentColor"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7.5V12l3 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <!-- proposed new icons (same 24px grid, 2px strokes) -->
+  <symbol id="i-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-external" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M18 14v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+  <symbol id="tz-mark" viewBox="0 0 64 64"><rect width="64" height="64" rx="16" fill="#D1245A"/><path d="M9.5 19H22c9 0 15.5 6 15.5 14v19.5" fill="none" stroke="#FFC23D" stroke-width="7.5" stroke-linecap="round"/><path d="M42 19c-9 0-15.5 6-15.5 14" fill="none" stroke="#D1245A" stroke-width="13.5"/><path d="M54.5 19H42c-9 0-15.5 6-15.5 14v19.5" fill="none" stroke="#FFF7EC" stroke-width="7.5" stroke-linecap="round"/></symbol>
+  <symbol id="tz-letters" viewBox="82 4 154 56"><mask id="dbtgap" maskUnits="userSpaceOnUse" x="82" y="4" width="40" height="56"><rect x="82" y="4" width="40" height="56" fill="#fff"/><path d="M93.5 19V36" stroke="#000" stroke-width="11"/></mask><g fill="none" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" stroke="currentColor"><path mask="url(#dbtgap)" d="M84 27.5H105.5" style="stroke:var(--tz-brand)"/><path d="M93.5 13V41c0 5 2.5 7.5 7.5 7.5h3"/><path d="M116 38H137A10.5 10.5 0 1 0 133.92 45.42"/><path d="M149 27.5H166L149 48.5H166"/><path d="M178 38H199A10.5 10.5 0 1 0 195.92 45.42"/><circle cx="221.5" cy="38" r="10.5"/></g></symbol>
+</svg>
+
+<!-- ===================================================================
+     SHELL — app/dashboard/[token]/layout.tsx. Rendered once; pages swap
+     inside <main>. The poller, toasts and live count live here.
+     =================================================================== -->
+<div class="db-app tz-creator" style="--creator-accent:#1A9E8F">
+  <a class="db-skip" href="#main">Skip to content</a>
+
+  <aside class="db-side" aria-label="Dashboard">
+    <div class="tz-weave tz-weave--slim" aria-hidden="true"></div>
+    <a class="db-logo" href="/" aria-label="Tezeo home"><svg viewBox="0 0 240 64" aria-hidden="true"><use href="#tz-mark" width="64" height="64"/><use href="#tz-letters" x="82" y="4" width="154" height="56"/></svg></a>
+    <nav class="db-nav" aria-label="Dashboard pages">
+      <a href="?screen=home" data-nav="home"><svg aria-hidden="true"><use href="#i-home"/></svg>Home</a>
+      <a href="?screen=tips" data-nav="tips"><svg aria-hidden="true"><use href="#i-list"/></svg>Tips<span class="db-nav__count db-if-live" aria-label="1 on its way">1</span></a>
+      <a href="?screen=passes" data-nav="passes"><svg aria-hidden="true"><use href="#i-pass"/></svg>Passes</a>
+      <a href="?screen=stream" data-nav="stream"><svg aria-hidden="true"><use href="#i-stream"/></svg>Stream</a>
+      <a href="?screen=page" data-nav="page"><svg aria-hidden="true"><use href="#i-brush"/></svg>My page</a>
+    </nav>
+    <div class="db-key">
+      <b><svg aria-hidden="true"><use href="#i-shield"/></svg>This link is your key</b>
+      Anyone with it can see your tips and change your settings. Keep it private.
+      <a href="?screen=page#key">How to keep it safe</a>
+    </div>
+  </aside>
+
+  <div class="db-col">
+    <header class="db-top">
+      <span class="db-top__mark" aria-hidden="true"><svg><use href="#tz-mark"/></svg></span>
+      <a class="db-who" href="?screen=page" aria-label="My page: Valentina Ríos, @vale">
+        <span class="tz-avatar" aria-hidden="true"><span data-initial>V</span></span>
+        <div><b data-name>Valentina Ríos</b><small data-handle>@vale</small></div>
+      </a>
+      <div class="db-top__end">
+        <a class="tz-pill db-live db-if-live" data-status="converting" href="?screen=tips&amp;state=live"><span>1</span><span class="db-live__words">on its way</span></a>
+        <button class="tz-btn tz-btn--secondary tz-btn--icon" type="button" data-flip aria-label="Switch to dark mode" aria-pressed="false"><svg aria-hidden="true"><use href="#i-moon"/></svg></button>
+        <button class="tz-btn tz-btn--secondary db-sharebtn" type="button"><svg aria-hidden="true"><use href="#i-share"/></svg><span class="db-share-label">Share my page</span></button>
+      </div>
+    </header>
+
+    <main class="db-main" id="main" tabindex="-1">
+
+<!-- =================== HOME /dashboard/<token> =================== -->
+<section data-screen="home" style="display:grid;gap:var(--tz-space-5)" aria-labelledby="h-home">
+  <p class="db-proto-note"><b>Home · /dashboard/&lt;token&gt;.</b> Today's greeting, wallet notice and 3 stat tiles, now tiles that open their page. Under them: the latest 5 tips (not 100) and one card per other page with a single fact and a door. &lt;641: hero tile full width, 2-up below, rail cards stack. 641–1099: tiles 1.4/1/1, rail cards in a 2-up grid under the tips. ≥1100: tips + 340px sticky rail. Data: existing GET /api/dashboard/&lt;token&gt; only.</p>
+  <div class="db-head">
+    <div><span class="tz-overline">Sunday, Nov 1</span><h1 class="tz-h1" id="h-home" tabindex="-1">Good afternoon, <span data-first>Valentina</span></h1></div>
+  </div>
+  <div class="tz-card tz-card--sunken db-notice" role="note">
+    <span class="tz-overline">Heads up about your wallet</span>
+    <p class="tz-small">A Solana wallet needs a USDC account before it can receive USDC, and yours doesn't have one yet. Your <b>first tip carries a one-time set-up cost of about $0.25</b>. After that, delivery costs about $0.01 per tip.</p>
+  </div>
+
+  <div class="db-stats">
+    <a class="tz-card tz-stat db-stat db-stat--hero" href="?screen=tips">
+      <span class="tz-overline">Received this month</span>
+      <span class="tz-stat__value"><span data-k="month">0.00</span><span class="tz-amount__unit">USDC</span></span>
+      <small class="db-if-busy"><span data-k="total">0.00</span> USDC all time · already in your wallet</small><small class="db-if-empty">Tips land straight in your wallet, as USDC.</small>
+      <div class="tz-weave tz-weave--slim" aria-hidden="true"></div>
+    </a>
+    <a class="tz-card tz-stat db-stat" href="?screen=tips"><svg class="db-stat__go" aria-hidden="true"><use href="#i-arrow"/></svg>
+      <span class="tz-overline">Tips this month</span><span class="tz-stat__value" data-k="count">0</span><small>See every tip</small></a>
+    <a class="tz-card tz-stat db-stat" href="?screen=passes"><svg class="db-stat__go" aria-hidden="true"><use href="#i-arrow"/></svg>
+      <span class="tz-overline">Active passes</span><span class="tz-stat__value"><span class="db-if-busy">3</span><span class="db-if-empty">0</span></span><small class="db-if-busy">$12 · 30 days</small><small class="db-if-empty">Your pass is off</small></a>
+  </div>
+
+  <div class="db-cols">
+    <div class="tz-card db-tips">
+      <div class="db-card-h"><h2>Latest tips</h2><span class="db-card-h__end"><a class="tz-pill db-live db-if-live" data-status="converting" href="?screen=tips&amp;state=live">1 on its way</a></span></div>
+      <div class="db-if-busy">
+        <table class="tz-table tz-table--stack db-table">
+          <caption class="tz-sr-only">Your 5 latest tips</caption>
+          <thead><tr><th scope="col" data-col="fan">Fan</th><th scope="col">Date</th><th scope="col" data-col="chain">Paid with</th><th scope="col" class="num">You got</th><th scope="col">Status</th></tr></thead>
+          <tbody data-rows="5"></tbody>
+        </table>
+        <div class="db-tablefoot"><span>Your 5 latest tips</span><a class="db-link" href="?screen=tips"><span>See all <span data-k="all">0</span> tips</span><svg aria-hidden="true"><use href="#i-arrow"/></svg></a></div>
+      </div>
+      <div class="db-empty db-if-empty">
+        <svg class="db-empty__art" viewBox="0 0 120 48" aria-hidden="true"><path d="M4 30c18 0 22-18 40-18s20 24 38 24 20-14 34-14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-dasharray="7 6"/><path d="M110 18l6 4-6 4-6-4z" fill="var(--tz-gold)"/></svg>
+        <p class="db-empty__title">Your first thread is on its way</p>
+        <p>Share your page and the first tip will show up here, live.</p>
+        <div class="db-btnrow"><button class="tz-btn tz-btn--primary" type="button"><svg aria-hidden="true"><use href="#i-copy"/></svg>Copy my link</button><a class="tz-btn tz-btn--ghost" href="?screen=page&amp;state=empty">Get my QR code</a></div>
+      </div>
+    </div>
+
+    <aside class="db-rail" aria-label="Your other pages">
+      <div class="tz-card db-door">
+        <div class="db-card-h"><svg aria-hidden="true"><use href="#i-target"/></svg><h2>Funding goal</h2></div>
+        <div class="fl-goal db-if-busy">
+          <div class="fl-goal__top"><b>New microphone for the stream</b><span>39%</span></div>
+          <div class="fl-goal__bar" role="progressbar" aria-label="Goal progress" aria-valuenow="39" aria-valuemin="0" aria-valuemax="100"><span style="--_p:39%"></span></div>
+          <small>$116.11 of $300 raised</small>
+        </div>
+        <p class="db-quiet db-if-empty">No goal yet. A goal adds a progress bar to your page, and fans love to push it.</p>
+        <a class="db-link" href="?screen=stream"><span class="db-if-busy">Edit goal</span><span class="db-if-empty">Set a goal</span><svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
+      </div>
+      <div class="tz-card db-door">
+        <div class="db-card-h"><svg aria-hidden="true"><use href="#i-pass"/></svg><h2>Membership pass</h2><span class="db-card-h__end"><span class="db-onoff db-if-busy" data-on>On</span><span class="db-onoff db-if-empty">Off</span></span></div>
+        <div class="db-door__fact db-if-busy"><b>3</b><span>members · $12 for 30 days</span></div>
+        <p class="db-quiet db-if-busy">Ana's pass ends first, on Nov 30.</p>
+        <p class="db-quiet db-if-empty">Offer fans 30 days in your crew for a one-time price.</p>
+        <a class="db-link" href="?screen=passes"><span class="db-if-busy">Manage passes</span><span class="db-if-empty">Turn on a pass</span><svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
+      </div>
+      <div class="tz-card db-door">
+        <div class="db-card-h"><svg aria-hidden="true"><use href="#i-brush"/></svg><h2>Your page</h2></div>
+        <div class="db-sharecard">
+          <div class="tz-qr"><canvas class="db-qr" width="84" height="84" aria-hidden="true"></canvas></div>
+          <div><b>Scan to tip <span data-first>Valentina</span></b><span class="tz-mono" data-url>tezeo.app/@vale</span></div>
+        </div>
+        <a class="db-link" href="?screen=page">Share, copy or print it<svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<!-- =================== TIPS /dashboard/<token>/tips =================== -->
+<section data-screen="tips" style="display:grid;gap:var(--tz-space-5)" aria-labelledby="h-tips">
+  <p class="db-proto-note"><b>Tips · /dashboard/&lt;token&gt;/tips.</b> Today's "Latest tips" table, moved to its own page, full width. Details gets its own 44px column, so amounts never wrap at 768–1280; opening it shows the fan's whole note (cut at 48 characters today, with no way to read the rest) beside the cost breakdown. &lt;641: rows stack into cards. Converting tips stay at the top with their pill. Add <span class="tz-mono">&amp;next=1</span> to see the filter bar from the "next" list.</p>
+  <div class="db-head">
+    <div><h1 class="tz-h1" id="h-tips" tabindex="-1">Tips</h1>
+      <p class="db-if-busy"><span data-k="all">0</span> tips so far · <span data-k="total">0</span> USDC received in total, straight to your wallet.</p>
+      <p class="db-if-empty">Every tip shows up here as it arrives, with exactly what it cost.</p></div>
+    <div class="db-head__actions"><a class="tz-pill db-live db-if-live" data-status="converting" href="#tips-table">1 on its way</a>
+      <button class="tz-btn tz-btn--secondary db-if-next db-if-busy" type="button">Export CSV <span class="db-next-tag">next</span></button></div>
+  </div>
+  <div class="tz-card db-tips" id="tips-table">
+    <div class="db-filters db-if-next db-if-busy" role="search">
+      <label class="db-search"><span class="tz-sr-only">Search tips</span><svg aria-hidden="true"><use href="#i-search"/></svg><input class="tz-input" type="search" placeholder="Search by name or note"></label>
+      <div class="tz-chips" role="group" aria-label="Show">
+        <button class="tz-chip" type="button" aria-pressed="true">All <span class="db-chip-n">50</span></button>
+        <button class="tz-chip" type="button" aria-pressed="false">Received <span class="db-chip-n">46</span></button>
+        <button class="tz-chip" type="button" aria-pressed="false">Didn't go through <span class="db-chip-n">2</span></button>
+        <button class="tz-chip" type="button" aria-pressed="false">Refunded <span class="db-chip-n">2</span></button>
+      </div>
+    </div>
+    <div class="db-if-busy">
+      <table class="tz-table tz-table--stack db-table">
+        <caption class="tz-sr-only">All your tips, newest first</caption>
+        <thead><tr><th scope="col" data-col="fan">Fan</th><th scope="col">Date</th><th scope="col" data-col="chain">Paid with</th><th scope="col" class="num">You got</th><th scope="col">Status</th><th scope="col"><span class="tz-sr-only">Details</span></th></tr></thead>
+        <tbody data-rows="all"></tbody>
+      </table>
+      <div class="db-tablefoot"><span>Showing all <span data-k="all">0</span> tips. The dashboard keeps your latest 100.</span></div>
+    </div>
+    <div class="db-empty db-if-empty">
+      <svg class="db-empty__art" viewBox="0 0 120 48" aria-hidden="true"><path d="M4 30c18 0 22-18 40-18s20 24 38 24 20-14 34-14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-dasharray="7 6"/><path d="M110 18l6 4-6 4-6-4z" fill="var(--tz-gold)"/></svg>
+      <p class="db-empty__title">No tips yet</p>
+      <p>When a fan pays, the tip appears here within seconds: who sent it, their note and what you received.</p>
+      <div class="db-btnrow"><button class="tz-btn tz-btn--primary" type="button"><svg aria-hidden="true"><use href="#i-copy"/></svg>Copy my link</button></div>
+    </div>
+  </div>
+</section>
+
+<!-- =================== PASSES /dashboard/<token>/passes =================== -->
+<section data-screen="passes" style="display:grid;gap:var(--tz-space-5)" aria-labelledby="h-passes">
+  <p class="db-proto-note"><b>Passes · /dashboard/&lt;token&gt;/passes.</b> Today's "Membership pass" card, split into settings (compact: a real switch, price + perk side by side, an auto-width Save) and a live preview of the pass fans buy (the existing tz-pass card). Members become a table with an end date and a days-left meter. &lt;1024: preview under the form. Data: pass + passes from the existing API; PATCH /pass as today.</p>
+  <div class="db-head">
+    <div><h1 class="tz-h1" id="h-passes" tabindex="-1">Passes</h1>
+      <p>A Membership Pass gives a fan 30 days in your crew for one payment. No auto-renew: it simply ends.</p></div>
+    <div class="db-head__actions db-if-busy"><a class="tz-btn tz-btn--ghost" href="/@vale/pass" target="_blank" rel="noopener">See the pass page<svg aria-hidden="true"><use href="#i-external"/></svg></a></div>
+  </div>
+  <div class="db-two">
+    <form class="tz-card db-card db-form" onsubmit="return false">
+      <div class="db-card-h"><h2>Pass settings</h2></div>
+      <label class="db-switch"><input type="checkbox" role="switch" class="db-pass-on" checked><span>Offer a 30-day pass on my page<small>Fans see it under your tip amounts.</small></span></label>
+      <div class="db-fields">
+        <div class="tz-field"><label class="tz-label" for="pp">Price</label><div class="db-money"><input id="pp" class="tz-input" inputmode="numeric" value="12" aria-describedby="pp-h"></div></div>
+        <div class="tz-field"><label class="tz-label" for="perk">What members get</label><input id="perk" class="tz-input" maxlength="140" value="Early access to every new class" placeholder="e.g. Early access to every new class"></div>
+      </div>
+      <p class="tz-hint" id="pp-h" style="margin:0">Paid once, in dollars. You receive the full price in USDC; the fan's quote is sized to cover the fees.</p>
+      <div class="db-form__end">
+        <button class="tz-btn tz-btn--primary" type="submit">Save pass</button>
+        <p class="db-status db-if-busy" role="status"><svg aria-hidden="true"><use href="#i-check"/></svg>Saved. Your pass is live at /@vale/pass</p>
+      </div>
+    </form>
+    <div class="db-preview" data-pass-preview>
+      <span class="tz-overline">How fans see it</span>
+      <div class="tz-pass">
+        <div><span class="tz-overline">Membership pass</span><p class="tz-pass__title"><span data-first>Valentina</span>'s Crew</p><p class="tz-pass__meta" style="margin:0">Early access to every new class</p></div>
+        <div class="tz-pass__days">30<small>days</small></div>
+        <div class="tz-pass__meter"><span style="--_p:100%"></span></div>
+      </div>
+      <p class="db-quiet">$12 · paid once · ends after 30 days</p>
+    </div>
+  </div>
+  <div class="tz-card db-tips">
+    <div class="db-card-h"><h2>Members</h2><span class="db-card-h__end db-if-busy"><span class="db-onoff" data-on>3 active</span></span></div>
+    <table class="tz-table tz-table--stack db-table db-members db-if-busy">
+      <caption class="tz-sr-only">Pass members, the one ending soonest first</caption>
+      <thead><tr><th scope="col" data-col="fan">Member</th><th scope="col">Ends</th><th scope="col">Days left</th></tr></thead>
+      <tbody>
+        <tr><td data-col="fan"><div class="db-fan"><span class="db-dot" aria-hidden="true">A</span><div><b>Ana <span class="tz-badge">Pass</span></b></div></div></td><td data-col="ends" class="db-when">Nov 30</td><td data-col="left"><div class="db-left"><small>29 days left</small><div class="db-meter"><span style="--_p:97%"></span></div></div></td></tr>
+        <tr><td data-col="fan"><div class="db-fan"><span class="db-dot" data-c="1" aria-hidden="true">M</span><div><b>Mari <span class="tz-badge">Pass</span></b><small>“Me uno al crew”</small></div></div></td><td data-col="ends" class="db-when">Dec 1</td><td data-col="left"><div class="db-left"><small>30 days left</small><div class="db-meter"><span style="--_p:100%"></span></div></div></td></tr>
+        <tr><td data-col="fan"><div class="db-fan"><span class="db-dot" data-c="3" aria-hidden="true">D</span><div><b>Diego <span class="tz-badge">Pass</span></b></div></div></td><td data-col="ends" class="db-when">Dec 1</td><td data-col="left"><div class="db-left"><small>30 days left</small><div class="db-meter"><span style="--_p:100%"></span></div></div></td></tr>
+      </tbody>
+    </table>
+    <p class="db-quiet db-if-empty" style="padding:0 var(--tz-space-3) var(--tz-space-3)">No members yet. A member appears here once their payment is confirmed.</p>
+  </div>
+</section>
+
+<!-- =================== STREAM /dashboard/<token>/stream =================== -->
+<section data-screen="stream" style="display:grid;gap:var(--tz-space-5)" aria-labelledby="h-stream">
+  <p class="db-proto-note"><b>Stream · /dashboard/&lt;token&gt;/stream.</b> Today's "Livestream tools" card becomes a page: OBS alerts as three numbered steps with the copy box, plus a picture of how the alert looks on stream (same markup as Alerts.tsx) and "Preview the alert" (opens ?preview=1). The funding goal sits beside it with a compact form. &lt;1024: goal under alerts. Data: alertToken + goal from the existing API; PATCH /goal as today.</p>
+  <div class="db-head">
+    <div><h1 class="tz-h1" id="h-stream" tabindex="-1">Stream</h1>
+      <p>Show a card on your stream for every tip, and a goal your fans can push together.</p></div>
+  </div>
+  <div class="db-two">
+    <div class="tz-card db-card">
+      <div class="db-card-h"><svg aria-hidden="true"><use href="#i-stream"/></svg><h2>Tip alerts for OBS</h2></div>
+      <ol class="fl-howto db-steps">
+        <li><b>Copy your alert link.</b> It's separate from this dashboard link, but keep it private too.
+          <div class="tz-copy"><span class="tz-mono">https://tezeo.app/alerts/zCdS_fCiDF…QCMg</span><button class="tz-btn tz-btn--secondary db-copybtn" type="button" aria-label="Copy alert link"><svg aria-hidden="true"><use href="#i-copy"/></svg></button></div></li>
+        <li><b>In OBS, add a Browser Source</b> and paste the link. The background is transparent and the card sits at the bottom centre.</li>
+        <li><b>That's it.</b> A card pops up for every confirmed tip, even when this dashboard is closed.</li>
+      </ol>
+      <div class="db-stage" role="img" aria-label="Example of a tip alert on your stream: New tip for Valentina, Ana, 4.72 USDC, with her note.">
+        <span class="db-stage__tag">Your stream</span>
+        <div class="tz-card tz-card--raised" aria-hidden="true">
+          <div class="tz-row"><svg><use href="#tz-mark"/></svg><span class="tz-overline">New tip for <span data-first>Valentina</span></span></div>
+          <p class="tz-display">Ana · 4.72 USDC</p>
+          <p>“Your Solana course got me my first dev job. ¡Gracias!”</p>
+        </div>
+      </div>
+      <div class="db-btnrow"><a class="tz-btn tz-btn--secondary" href="#" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#i-external"/></svg>Preview the alert</a><span class="db-hint">Opens the alert page with a sample tip every few seconds.</span></div>
+    </div>
+
+    <form class="tz-card db-card db-form" onsubmit="return false">
+      <div class="db-card-h"><svg aria-hidden="true"><use href="#i-target"/></svg><h2>Funding goal</h2></div>
+      <div class="fl-goal db-if-busy" style="padding:0;border:0">
+        <div class="fl-goal__top"><b>New microphone for the stream</b><span>39%</span></div>
+        <div class="fl-goal__bar" role="progressbar" aria-label="Goal progress" aria-valuenow="39" aria-valuemin="0" aria-valuemax="100"><span style="--_p:39%"></span></div>
+        <small>$116.11 of $300 raised since you set it</small>
+      </div>
+      <div class="db-fields db-fields--goal">
+        <div class="tz-field"><label class="tz-label" for="gt">Goal name</label><input id="gt" class="tz-input" maxlength="80" placeholder="e.g. New microphone" data-goal-title value="New microphone for the stream"></div>
+        <div class="tz-field"><label class="tz-label" for="ga">Target</label><div class="db-money"><input id="ga" class="tz-input" inputmode="numeric" data-goal-target value="300" aria-describedby="ga-h"></div></div>
+      </div>
+      <p class="tz-hint" id="ga-h" style="margin:0">It shows on your page. Only tips received after you save count.</p>
+      <div class="db-form__end"><button class="tz-btn tz-btn--primary" type="submit">Save goal</button><button class="tz-btn tz-btn--ghost db-if-busy" type="button">Remove goal</button></div>
+    </form>
+  </div>
+</section>
+
+<!-- =================== MY PAGE /dashboard/<token>/page =================== -->
+<section data-screen="page" style="display:grid;gap:var(--tz-space-5)" aria-labelledby="h-page">
+  <p class="db-proto-note"><b>My page · /dashboard/&lt;token&gt;/my-page.</b> Today "My page" leaves the dashboard for the public page, with no way back. Now it is a dashboard page: a preview card of the public page (weave, avatar, name, handle) with the link, "Open my page" in a new tab and Share; a print-ready QR; and the private-link card. Data: creator handle, name and accent (existing). Editing the profile is in the "next" list (needs backend).</p>
+  <div class="db-head">
+    <div><h1 class="tz-h1" id="h-page" tabindex="-1">My page</h1>
+      <p>This is where fans tip you. Put the link in your bio and the QR on your stream or your classroom wall.</p></div>
+  </div>
+  <div class="db-two">
+    <div class="tz-card db-pagecard">
+      <div class="tz-weave" aria-hidden="true"></div>
+      <div class="db-pagecard__body">
+        <span class="tz-avatar" aria-hidden="true"><span data-initial>V</span></span>
+        <h2 data-name>Valentina Ríos</h2>
+        <span class="db-handle" data-handle>@vale</span>
+        <div class="db-pagecard__url"><div class="tz-copy"><span class="tz-mono" data-url>tezeo.app/@vale</span><button class="tz-btn tz-btn--secondary db-copybtn" type="button" aria-label="Copy my page link"><svg aria-hidden="true"><use href="#i-copy"/></svg></button></div></div>
+        <div class="db-btnrow" style="justify-content:center;margin-top:8px">
+          <a class="tz-btn tz-btn--secondary" href="/@vale" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#i-external"/></svg>Open my page</a>
+          <button class="tz-btn tz-btn--primary" type="button"><svg aria-hidden="true"><use href="#i-share"/></svg>Share my page</button>
+        </div>
+      </div>
+    </div>
+    <div class="tz-card db-card db-qrbig">
+      <span class="tz-overline">Scan to tip</span>
+      <div class="tz-qr"><canvas class="db-qr" width="176" height="176" role="img" aria-label="QR code for tezeo.app/@vale"></canvas></div>
+      <b style="font:700 var(--tz-text-lg)/1.2 var(--tz-font-display)">Scan to tip <span data-first>Valentina</span></b>
+      <p class="db-hint">Print it, pin it on your stream, put it on a slide.</p>
+      <button class="tz-btn tz-btn--secondary" type="button"><svg aria-hidden="true"><use href="#i-qr"/></svg>Download QR</button>
+    </div>
+  </div>
+  <div class="tz-card db-card db-keycard" id="key">
+    <div class="db-card-h"><svg aria-hidden="true"><use href="#i-shield"/></svg><h2>Your private dashboard link</h2></div>
+    <p class="db-hint">There's no password: this link is your key. Anyone who has it can see your tips and change your goal and pass.</p>
+    <ul>
+      <li>Bookmark it, or save it in your notes or password manager.</li>
+      <li>Don't share screenshots that show the address bar.</li>
+      <li>Your public page is safe to share anywhere. Your OBS alert link is separate: if it leaks, it can only show alerts, never this dashboard.</li>
+    </ul>
+    <div class="db-btnrow"><button class="tz-btn tz-btn--secondary" type="button"><svg aria-hidden="true"><use href="#i-copy"/></svg>Copy my private link</button><span class="db-hint">To save it somewhere safe. Never paste it in public.</span></div>
+  </div>
+</section>
+
+      <div class="db-foot"><svg aria-hidden="true"><use href="#tz-mark"/></svg>woven by tezeo · keep this link private</div>
+    </main>
+  </div>
+
+  <nav class="db-tabbar" aria-label="Dashboard pages">
+    <a href="?screen=home" data-nav="home"><svg aria-hidden="true"><use href="#i-home"/></svg><span>Home</span></a>
+    <a href="?screen=tips" data-nav="tips"><svg aria-hidden="true"><use href="#i-list"/></svg><span>Tips</span><b class="db-tabbar__dot db-if-live" aria-label="1 on its way">1</b></a>
+    <a href="?screen=passes" data-nav="passes"><svg aria-hidden="true"><use href="#i-pass"/></svg><span>Passes</span></a>
+    <a href="?screen=stream" data-nav="stream"><svg aria-hidden="true"><use href="#i-stream"/></svg><span>Stream</span></a>
+    <a href="?screen=page" data-nav="page"><svg aria-hidden="true"><use href="#i-brush"/></svg><span>My page</span></a>
+  </nav>
+
+  <div class="db-toasts" aria-live="polite">
+    <div class="tz-toast db-if-live" data-status="converting"><span class="tz-toast__body"><strong>A tip from Inés is on its way</strong>It'll show as received in about a minute.</span><a class="db-toast__link" href="?screen=tips&amp;state=live">See it</a></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  var TIPS = [["Renata","",false,"USDC","ethereum","received","2026-11-01T13:24",7.9,8,0.01,0.09],["Gabriela","Para los stickers",false,"USDC","base","received","2026-11-01T13:24",11.84,12,0.01,0.15],["Nico","",false,"USDC","arbitrum","received","2026-11-01T13:24",1.97,2,0.01,0.02],["Camila","otro cafecito",false,"USDC","base","received","2026-11-01T13:24",5.92,6,0.01,0.07],["Diego","",true,"USDC","arbitrum","received","2026-11-01T13:24",12.48,12.64,0.01,0.15],["Mari","Me uno al crew",true,"USDC","base","received","2026-11-01T13:24",12.48,12.64,0.01,0.15],["Emilio","Next week: Rust please",false,"ETH","ethereum","received","2026-11-01T13:24",6.32,6.4,0.01,0.07],["Ana","",false,"USDC","base","received","2026-11-01T13:24",3.95,4,0.01,0.04],["Valeria","From São Paulo with love",false,"USDC","arbitrum","received","2026-11-01T13:24",4.94,5,0.01,0.05],["Diego","Te lo mereces",false,"USDC","base","received","2026-11-01T13:24",24.68,25,0.01,0.31],["Joaquín","",false,"BTC","bitcoin","received","2026-11-01T13:24",4.69,4.75,0.01,0.05],["Martina","la mejor profe",false,"ETH","base","received","2026-11-01T13:24",3.16,3.2,0.01,0.03],["Pablo","😀",false,"USDC","ethereum","refunded","2026-11-01T13:24",null,null,null,null],["Ximena","",false,"USDC","base","received","2026-11-01T13:24",2.96,3,0.01,0.03],["Tomás","Gracias por el tutorial de Anchor",false,"USDC","arbitrum","received","2026-11-01T13:24",19.74,20,0.01,0.25],["Renata","Para el próximo stream",false,"USDC","base","received","2026-11-01T13:24",6.91,7,0.01,0.08],["Bruno","go go go",false,"USDC","ethereum","failed","2026-11-01T13:24",null,null,null,null],["Ana","otra vez yo jaja",false,"USDC","base","received","2026-11-01T13:24",4.94,5,0.01,0.05],["","",false,"ETH","arbitrum","received","2026-11-01T13:24",6.32,6.4,0.01,0.07],["Jorge","Big hug from Monterrey",false,"USDC","base","received","2026-11-01T13:24",14.81,15,0.01,0.18],["Lucía","Saludos desde Medellín",false,"ETH","ethereum","received","2026-11-01T13:24",9.48,9.6,0.01,0.11],["Sofía Fernández de la Torre y Montenegro","Llevo tres meses viendo tus streams desde Cusco y por fin entiendo cómo funcionan las wallets. Gracias por explicar todo con tanta paciencia, de verdad.",false,"BTC","bitcoin","received","2026-11-01T13:24",7.5,7.6,0.01,0.09],["Mateo","",false,"ETH","base","received","2026-11-01T13:24",6.32,6.4,0.01,0.07],["Camila","un cafecito ☕",false,"USDC","arbitrum","received","2026-11-01T13:24",2.96,3,0.01,0.03],["Diego","Para el micro nuevo",false,"USDC","ethereum","received","2026-11-01T13:24",9.87,10,0.01,0.12],["Ana","Tu clase de Solana me salvó la semana",false,"USDC","base","received","2026-11-01T13:24",4.94,5,0.01,0.05],["","",false,"USDC","base","received","2026-10-31T22:42",4.94,5,0.01,0.05],["","",false,"USDC","base","received","2026-10-31T22:42",4.94,5,0.01,0.05],["","",false,"USDC","base","received","2026-10-31T22:42",4.94,5,0.01,0.05],["","",false,"USDC","base","received","2026-10-31T22:42",4.94,5,0.01,0.05],["","",false,"USDC","base","received","2026-10-31T22:40",4.94,5,0.01,0.05],["","",false,"USDC","base","received","2026-10-31T22:12",4.94,5,0.01,0.05],["","",false,"USDC","base","received","2026-10-31T22:11",4.94,5,0.01,0.05],["","",false,"USDC","base","received","2026-10-31T22:10",4.94,5,0.01,0.05],["","",false,"USDC","base","received","2026-10-31T21:57",4.94,5,0.01,0.05],["","",false,"USDC","base","received","2026-10-31T21:56",4.94,5,0.01,0.05],["","",false,"USDC","base","received","2026-10-31T21:55",4.94,5,0.01,0.05],["","",false,"USDC","base","received","2026-10-31T21:55",4.94,5,0.01,0.05],["","",false,"USDC","base","received","2026-10-31T21:55",4.94,5,0.01,0.05],["","",false,"USDC","base","received","2026-10-31T21:55",4.94,5,0.01,0.05],["","",false,"USDC","base","received","2026-10-31T21:54",4.94,5,0.01,0.05],["Ana","Saludos desde Lima",true,"USDC","base","received","2026-10-31T21:54",12.48,12.64,0.01,0.15],["","",false,"USDC","ethereum","refunded","2026-10-31T21:54",null,null,null,null],["","",false,"USDC","ethereum","failed","2026-10-31T21:54",null,null,null,null],["Ana","Your Solana course got me my first dev job. ¡Gracias!",false,"USDC","base","received","2026-10-31T21:54",4.94,5,0.01,0.05],["","",false,"USDC","base","received","2026-10-31T21:52",4.94,5,0.01,0.05],["","",false,"USDC","base","received","2026-10-31T21:52",4.94,5,0.01,0.05],["Lucía","Saludos desde Medellín",false,"USDC","base","received","2026-10-31T21:51",4.94,5,0.01,0.05],["Jorge","Para el próximo stream",false,"USDC","base","received","2026-10-31T21:51",9.87,10,0.01,0.12],["Ana","Your Solana course got me my first dev job. ¡Gracias!",false,"USDC","base","received","2026-10-31T21:51",24.68,25,0.01,0.31]];   // demo data from the running app (seeded creator "vale"); names and notes are examples
+  var root = document.documentElement, q = new URLSearchParams(location.search);
+  var screen = q.get('screen') || 'home', state = root.dataset.state;
+  if (['home', 'tips', 'passes', 'stream', 'page'].indexOf(screen) < 0) screen = 'home';
+  if (state === 'empty') {
+    TIPS = [];
+    document.querySelectorAll('[data-name]').forEach(function (e) { e.textContent = 'Lupe Mamani'; });
+    document.querySelectorAll('[data-first]').forEach(function (e) { e.textContent = 'Lupe'; });
+    document.querySelectorAll('[data-initial]').forEach(function (e) { e.textContent = 'L'; });
+    document.querySelectorAll('[data-handle]').forEach(function (e) { e.textContent = '@lupe'; });
+    document.querySelectorAll('[data-url]').forEach(function (e) { e.textContent = 'tezeo.app/@lupe'; });
+    document.querySelector('.db-app').style.setProperty('--creator-accent', '#7C3AED');
+    document.querySelectorAll('[data-goal-title],[data-goal-target]').forEach(function (e) { e.value = ''; });
+    document.querySelectorAll('.db-pass-on').forEach(function (e) { e.checked = false; });
+    document.querySelectorAll('[data-pass-preview]').forEach(function (e) { e.setAttribute('data-off', ''); });
+  }
+  if (state === 'live') TIPS = [["Inés", "¡Vamos Vale!", false, "USDC", "base", "converting", "2026-11-01T13:26", null, null, null, null]].concat(TIPS);
+
+  // --- screens + nav state (in the app: usePathname() → aria-current) ---
+  var titles = { home: 'Home', tips: 'Tips', passes: 'Passes', stream: 'Stream', page: 'My page' };
+  document.title = titles[screen] + ' · Tezeo dashboard (prototype)';
+  document.querySelectorAll('[data-screen]').forEach(function (s) { s.hidden = s.dataset.screen !== screen; });
+  var keep = ['theme', 'state', 'next', 'clean'].map(function (k) { return q.get(k) ? '&' + k + '=' + q.get(k) : ''; }).join('');
+  document.querySelectorAll('a[href^="?screen="]').forEach(function (a) {
+    if (a.getAttribute('href').indexOf('state=') < 0) a.setAttribute('href', a.getAttribute('href').split('#')[0] + keep + (a.hash || ''));
+  });
+  document.querySelectorAll('[data-nav]').forEach(function (a) { if (a.dataset.nav === screen) a.setAttribute('aria-current', 'page'); });
+
+  // --- theme toggle (same as the app's ThemeToggle) ---
+  var flip = document.querySelector('[data-flip]');
+  function syncFlip() { var d = root.dataset.theme === 'dark'; flip.setAttribute('aria-pressed', d); flip.setAttribute('aria-label', d ? 'Switch to light mode' : 'Switch to dark mode'); flip.querySelector('use').setAttribute('href', d ? '#i-sun' : '#i-moon'); }
+  flip.addEventListener('click', function () { root.dataset.theme = root.dataset.theme === 'dark' ? 'light' : 'dark'; syncFlip(); }); syncFlip();
+
+  // --- numbers (the app gets these from stats; computed here from the same rows) ---
+  var rec = TIPS.filter(function (t) { return t[5] === 'received'; });
+  var money = function (n) { return n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); };
+  var sum = function (r) { return r.reduce(function (s, t) { return s + t[7]; }, 0); };
+  var month = rec.filter(function (t) { return t[6] >= '2026-11-01'; });
+  var put = function (k, v) { document.querySelectorAll('[data-k="' + k + '"]').forEach(function (e) { e.textContent = v; }); };
+  put('month', money(sum(month))); put('count', month.length); put('total', money(sum(rec))); put('all', TIPS.length);
+
+  // --- tip rows (same columns as today's table) ---
+  var LABEL = { converting: 'Converting', received: 'Received', failed: "Didn't go through", refunded: 'Refunded' };
+  var CHAIN = { base: 'Base', ethereum: 'Ethereum', arbitrum: 'Arbitrum', bitcoin: 'Bitcoin' };
+  var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
+  var when = function (iso) { var d = iso.slice(0, 10), h = +iso.slice(11, 13), m = iso.slice(14, 16);
+    var t = (h % 12 || 12) + ':' + m + ' ' + (h < 12 ? 'AM' : 'PM');
+    return d === '2026-11-01' ? 'Today, ' + t : d === '2026-10-31' ? 'Yesterday, ' + t : 'Oct ' + (+d.slice(8)); };
+  function row(t, i, withMore) {
+    var name = t[0] || 'Someone kind', kind = !t[0];
+    var dot = kind ? '<span class="db-dot" data-c="kind" aria-hidden="true"><svg><use href="#i-heart"/></svg></span>'
+      : '<span class="db-dot" data-c="' + (name.charCodeAt(0) % 4) + '" aria-hidden="true">' + esc(name[0].toUpperCase()) + '</span>';
+    var note = t[1] ? '<small>“' + esc(t[1]) + '”</small>' : '<small class="is-none">No message</small>';
+    var amt = t[7] !== null ? '<b>' + money(t[7]) + ' USDC</b>' : (t[5] === 'converting' ? '<span class="db-none">on its way</span>' : '<span class="db-none">returned to fan</span>');
+    var id = 'd' + i, open = withMore && /^Sof/.test(t[0]);
+    var tr = '<tr class="' + (t[5] === 'converting' ? 'db-newrow' : '') + (open ? ' is-open' : '') + '">' +
+      '<td data-col="fan"><div class="db-fan">' + dot + '<div><b>' + esc(name) + (t[2] ? ' <span class="tz-badge">Pass</span>' : '') + ' <span class="db-new">New</span></b>' + note + '</div></div></td>' +
+      '<td data-col="date" class="db-when"><time datetime="' + t[6] + '">' + when(t[6]) + '</time><span class="db-via">' + t[3] + ' on ' + (CHAIN[t[4]] || t[4]) + '</span></td>' +
+      '<td data-col="chain"><span class="db-coin"><b>' + t[3] + '</b><span>on ' + (CHAIN[t[4]] || t[4]) + '</span></span></td>' +
+      '<td data-col="amount" class="num db-amt">' + amt + '</td>' +
+      '<td data-col="status"><span class="tz-pill" data-status="' + t[5] + '">' + LABEL[t[5]] + '</span></td>';
+    if (withMore) tr += '<td data-col="more">' + (t[5] !== 'converting' ? '<button class="db-more" type="button" aria-expanded="' + open + '" aria-controls="' + id + '"><span class="db-more__label">Details<span class="tz-sr-only"> for ' + esc(name) + '’s tip</span></span><svg aria-hidden="true"><use href="#i-down"/></svg></button>' : '') + '</td>';
+    tr += '</tr>';
+    if (withMore && t[5] !== 'converting') {
+      var noteHtml = (t[1] ? '<div><span class="tz-overline">' + esc(name.split(' ')[0]) + '’s note</span><p class="db-note" style="margin-top:8px">' + esc(t[1]) + '</p></div>' : '<p class="db-note is-none">' + esc(name) + ' didn’t leave a note.</p>');
+      if (t[5] !== 'received') { tr += '<tr data-detail id="' + id + '"' + (open ? '' : ' hidden') + '><td colspan="6" data-col="detail"><div class="db-detail">' + noteHtml + '<p class="db-why"><b>' + (t[5] === 'failed' ? 'This one didn’t go through.' : 'This one was refunded.') + '</b>' + esc(t[0] || 'The fan') + '’s money went back to the wallet it came from, automatically. Nothing reached you and nothing was taken from you.</p></div></td></tr>'; return tr; }
+      tr += '<tr data-detail id="' + id + '"' + (open ? '' : ' hidden') + '><td colspan="6" data-col="detail"><div class="db-detail">' +
+        (t[1] ? '<div><span class="tz-overline">' + esc(name.split(' ')[0]) + '’s note</span><p class="db-note" style="margin-top:8px">' + esc(t[1]) + '</p></div>' : '<p class="db-note is-none">' + esc(name) + ' didn’t leave a note.</p>') +
+        '<div><dl class="tz-quote">' +
+        '<div class="tz-quote__row"><dt>Your fan sent</dt><span class="tz-quote__lead"></span><dd>$' + money(t[8]) + '</dd></div>' +
+        '<div class="tz-quote__row"><dt>Delivery to your wallet</dt><span class="tz-quote__lead"></span><dd>−$' + money(t[9]) + '</dd></div>' +
+        '<div class="tz-quote__row"><dt>Fees &amp; price spread</dt><span class="tz-quote__lead"></span><dd>−$' + money(t[10]) + '</dd></div>' +
+        '<div class="tz-quote__row tz-quote__row--total"><dt>You received</dt><span class="tz-spacer"></span><dd>' + money(t[7]) + ' USDC</dd></div></dl>' +
+        '<small>Your fan only saw what they paid. These costs are for you.</small></div></div></td></tr>';
+    }
+    return tr;
+  }
+  document.querySelectorAll('tbody[data-rows]').forEach(function (tb) {
+    var all = tb.dataset.rows === 'all', list = all ? TIPS : TIPS.slice(0, 5);
+    tb.innerHTML = list.map(function (t, i) { return row(t, i, all); }).join('');
+    if (!all) tb.closest('table').querySelectorAll('tr').forEach(function () {});
+  });
+  // Overview's mini table has no Details column (that lives on Tips)
+  document.querySelectorAll('tbody[data-rows="5"]').forEach(function (tb) { tb.querySelectorAll('td[data-col="detail"]').forEach(function (td) { td.remove(); }); });
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('.db-more'); if (!b) return;
+    var open = b.getAttribute('aria-expanded') !== 'true'; b.setAttribute('aria-expanded', open);
+    document.getElementById(b.getAttribute('aria-controls')).hidden = !open; b.closest('tr').classList.toggle('is-open', open);
+  });
+  // pass switch → preview greys out
+  document.querySelectorAll('.db-pass-on').forEach(function (s) { s.addEventListener('change', function () {
+    document.querySelectorAll('[data-pass-preview]').forEach(function (p) { s.checked ? p.removeAttribute('data-off') : p.setAttribute('data-off', ''); }); }); });
+
+  // decorative QR (not scannable)
+  document.querySelectorAll('canvas.db-qr').forEach(function (c) {
+    var x = c.getContext('2d'), n = 25, s = c.width / n, seed = 11;
+    var r = function () { return (seed = (seed * 9301 + 49297) % 233280) / 233280; };
+    x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height); x.fillStyle = '#1C1424';
+    for (var i = 0; i < n; i++) for (var j = 0; j < n; j++) if (r() > 0.52) x.fillRect(i * s, j * s, Math.ceil(s), Math.ceil(s));
+    var eye = function (a, b) { x.fillStyle = '#1C1424'; x.fillRect(a*s, b*s, 7*s, 7*s); x.fillStyle = '#fff'; x.fillRect((a+1)*s, (b+1)*s, 5*s, 5*s); x.fillStyle = '#1C1424'; x.fillRect((a+2)*s, (b+2)*s, 3*s, 3*s); };
+    eye(0, 0); eye(n - 7, 0); eye(0, n - 7);
+  });
+})();
+</script>
+</body>
+</html>

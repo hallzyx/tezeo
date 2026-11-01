@@ -1,0 +1,528 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tezeo · Creator onboarding prototype</title>
+<link rel="icon" href="logo-mark.svg" type="image/svg+xml">
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="components.css">
+<link rel="stylesheet" href="flow.css">
+<link rel="stylesheet" href="onboarding.css">
+<script>
+  // ?screen=you|look|look-guard|wallet|wallet-help|live|dashboard|states · ?theme=dark|light · ?clean=1 hides the prototype notes
+  (function () { var q = new URLSearchParams(location.search), d = document.documentElement;
+    var t = q.get('theme'); d.dataset.theme = t === 'dark' || t === 'light' ? t : (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    if (q.get('clean')) d.classList.add('fl-clean'); if (q.get('shot')) d.classList.add('ob-shot'); })();
+</script>
+</head>
+<body class="tz-app">
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5 10 17.5 19 7" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M6.5 6.5 17.5 17.5M17.5 6.5 6.5 17.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 5.5A2.5 2.5 0 0 0 13.5 3H6a3 3 0 0 0-3 3v7.5A2.5 2.5 0 0 0 5.5 16" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+  <symbol id="i-paste" viewBox="0 0 24 24"><rect x="5" y="4.5" width="14" height="16.5" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><rect x="9" y="2.5" width="6" height="4" rx="1.5" fill="currentColor"/><path d="M9 12h6M9 16h4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19h14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24"><path d="M20.5 3.5 3.5 10.5l7 2.5 2.5 7 7.5-16.5ZM10.5 13l4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></symbol>
+  <symbol id="i-key" viewBox="0 0 24 24"><circle cx="8" cy="12" r="4.5" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M12.5 12H21m-3 0v3.5M15 12v2.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+  <symbol id="i-camera" viewBox="0 0 24 24"><path d="M4 8.5A2.5 2.5 0 0 1 6.5 6h1.8l1.4-2h4.6l1.4 2h1.8A2.5 2.5 0 0 1 20 8.5v8a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 16.5z" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/><circle cx="12" cy="12.5" r="3.2" fill="none" stroke="currentColor" stroke-width="2.4"/></symbol>
+  <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M9.6 9.5a2.5 2.5 0 1 1 3.4 2.3c-.6.3-1 .8-1 1.5v.4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="16.7" r="1.2" fill="currentColor"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 3.5 21 19.5H3z" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/><path d="M12 10v4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><circle cx="12" cy="16.8" r="1.2" fill="currentColor"/></symbol>
+  <symbol id="i-hand" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M6 18 18 6" stroke="currentColor" stroke-width="2.2"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M4 12h15m0 0-5-5m5 5-5 5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7.5V12l3 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 4.5 6v5.5c0 4.6 3.2 8.3 7.5 9.5 4.3-1.2 7.5-4.9 7.5-9.5V6L12 3Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="m8.5 12 2.5 2.5 4.5-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-share" viewBox="0 0 24 24"><path d="M12 15V4m0 0L8 8m4-4 4 4M5 13v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-bookmark" viewBox="0 0 24 24"><path d="M6.5 3.5h11v17l-5.5-4-5.5 4z" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/></symbol>
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 11 12 4l8 7v8a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1v-8Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+  <symbol id="i-list" viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="m4.5 4.5 1.5 1.5-1.5 1.5L3 6zM4.5 10.5 6 12l-1.5 1.5L3 12zM4.5 16.5 6 18l-1.5 1.5L3 18z" fill="currentColor"/></symbol>
+  <symbol id="i-brush" viewBox="0 0 24 24"><path d="M14 4 20 10l-8 8H6v-6l8-8Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+  <symbol id="i-pass" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="m12 9 3 3-3 3-3-3z" fill="currentColor"/></symbol>
+  <symbol id="i-stream" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="12" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 21h8M12 17v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="m10.5 8.5 4 2.5-4 2.5z" fill="currentColor"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24"><path d="M19.5 14.5A8 8 0 0 1 9.5 4.5a8 8 0 1 0 10 10Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24"><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M5.6 18.4 7 17M17 7l1.4-1.4M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="tz-mark" viewBox="0 0 64 64"><rect width="64" height="64" rx="16" fill="#D1245A"/><path d="M9.5 19H22c9 0 15.5 6 15.5 14v19.5" fill="none" stroke="#FFC23D" stroke-width="7.5" stroke-linecap="round"/><path d="M42 19c-9 0-15.5 6-15.5 14" fill="none" stroke="#D1245A" stroke-width="13.5"/><path d="M54.5 19H42c-9 0-15.5 6-15.5 14v19.5" fill="none" stroke="#FFF7EC" stroke-width="7.5" stroke-linecap="round"/></symbol>
+  <symbol id="tz-letters" viewBox="82 4 154 56"><mask id="obtgap" maskUnits="userSpaceOnUse" x="82" y="4" width="40" height="56"><rect x="82" y="4" width="40" height="56" fill="#fff"/><path d="M93.5 19V36" stroke="#000" stroke-width="11"/></mask><g fill="none" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" stroke="currentColor"><path mask="url(#obtgap)" d="M84 27.5H105.5" style="stroke:var(--pv-t, currentColor)"/><path d="M93.5 13V41c0 5 2.5 7.5 7.5 7.5h3"/><path d="M116 38H137A10.5 10.5 0 1 0 133.92 45.42"/><path d="M149 27.5H166L149 48.5H166"/><path d="M178 38H199A10.5 10.5 0 1 0 195.92 45.42"/><circle cx="221.5" cy="38" r="10.5"/></g></symbol>
+</svg>
+
+<nav class="fl-proto-index" id="index" aria-label="Prototype screens">
+  <p class="tz-overline" style="margin:0">Tezeo creator onboarding · prototype</p>
+  <p style="margin:0">Open one screen with <span class="tz-mono">?screen=</span>:
+    <a href="?screen=you">1 · you</a> · <a href="?screen=look">2 · your colour</a> · <a href="?screen=look-guard">2 · colour rejected</a> ·
+    <a href="?screen=wallet-help">3 · wallet + help</a> · <a href="?screen=wallet">3 · wallet checked</a> · <a href="?screen=live">you're live</a> ·
+    <a href="?screen=dashboard">first-run dashboard</a> · <a href="?screen=states">every field state</a>.
+    Add <span class="tz-mono">&amp;theme=dark</span>, and <span class="tz-mono">&amp;clean=1</span> to hide the notes. Spec: ONBOARDING.md. Mateo, his handle, colour and wallet are examples.</p>
+</nav>
+
+<!-- ============ 1. YOU ============ -->
+<section class="fl-screen ob-page tz-creator" id="you" style="--creator-accent:#7C3AED">
+  <p class="fl-proto-note"><b>Step 1 · You.</b> &lt;1024: one 480px column (576px on tablets). A compact "peek" of the page sits above the docked "Next" button and updates as you type. ≥1024: the step card (544px) beside a sticky phone preview of the real page (384px; 416px at ≥1440) with its own Light/Dark switch. The link field shows <b>tezeo.app/@</b> as a fixed prefix and checks availability while typing (needs a small backend call, see spec 3.2).</p>
+  <header class="ob-top">
+    <a class="ob-logo" href="/" aria-label="Tezeo home"><svg viewBox="0 0 240 64"><use href="#tz-mark" width="64" height="64"/><g class="ob-letters"><use href="#tz-letters" x="82" y="4" width="154" height="56"/></g></svg></a>
+    <div class="fl-progress"><span class="fl-progress__label"><b>Step 1 of 3</b> · You</span><div class="fl-progress__track" aria-hidden="true"><span class="now"></span><span></span><span></span></div></div>
+    <button class="fl-theme" type="button" aria-label="Switch to dark mode" data-flip><svg><use href="#i-moon"/></svg></button>
+  </header>
+  <div class="ob-shell">
+    <form class="ob-step" onsubmit="return false" aria-labelledby="you-h">
+      <div class="ob-head">
+        <div class="ob-eyebrow"><span class="tz-overline">Create your page</span><span class="ob-time"><svg aria-hidden="true"><use href="#i-clock"/></svg>About 2 minutes</span></div>
+        <h1 id="you-h" tabindex="-1">Let's weave your page</h1>
+        <p>Three short steps: you, your colour, and where tips land. Your page goes live the moment you finish.</p>
+      </div>
+      <ul class="ob-need" aria-label="You'll need">
+        <li><span>Your name and a short hello for fans</span></li>
+        <li><span>A photo, if you like</span></li>
+        <li><span>Your Solana wallet address, for the last step. <a href="?screen=wallet-help">Where do I find it?</a></span></li>
+      </ul>
+      <div class="ob-fields">
+        <div class="tz-field"><label class="tz-label" for="y-name">Your name</label>
+          <input id="y-name" class="tz-input" value="Mateo Quispe" autocomplete="name" maxlength="60" aria-describedby="y-name-h">
+          <p id="y-name-h" class="ob-status">Real name or stage name, as your fans know you.</p></div>
+        <div class="tz-field"><label class="tz-label" for="y-h">Your link</label>
+          <div class="ob-affix" data-state="ok"><span class="ob-affix__pre" aria-hidden="true">tezeo.app/@</span>
+            <input id="y-h" value="mateodraws" autocapitalize="none" spellcheck="false" maxlength="24" aria-describedby="y-h-s" aria-invalid="false">
+            <span class="ob-affix__state" style="color:var(--tz-received-fg)"><svg aria-hidden="true"><use href="#i-check"/></svg></span></div>
+          <p id="y-h-s" class="ob-status" data-state="ok" aria-live="polite"><b>@mateodraws is free.</b>&nbsp;</p>
+          <p class="ob-status" style="margin-top:-4px">3 to 24 letters, numbers or _. This is the link you'll share.</p></div>
+        <div class="tz-field"><div class="ob-label-row"><label class="tz-label" for="y-m">A hello for your fans</label><span class="ob-opt">Optional</span></div>
+          <textarea id="y-m" class="tz-textarea" maxlength="160" style="min-height:5rem" aria-describedby="y-m-c">I draw Andean folk tales live every Sunday. Tips keep the ink flowing.</textarea>
+          <span id="y-m-c" class="tz-counter">70 / 160</span></div>
+        <div class="tz-field"><div class="ob-label-row"><span class="tz-label" id="y-ph">Photo</span><span class="ob-opt">Optional</span></div>
+          <div class="ob-photo">
+            <button class="ob-photo__btn" type="button" aria-labelledby="y-ph y-ph-b"><span class="tz-avatar"><span>M</span></span><span class="ob-photo__cam"><svg aria-hidden="true"><use href="#i-camera"/></svg></span></button>
+            <div class="ob-photo__txt"><b id="y-ph-b">Add a photo</b><span>Square works best. We'll crop it to a circle. JPG or PNG.</span>
+              <div class="ob-photo__actions"><button class="tz-btn tz-btn--secondary" type="button">Choose a photo</button></div></div>
+          </div></div>
+      </div>
+      <div class="ob-peek" aria-hidden="true"><div class="tz-weave"></div><span class="tz-avatar"><span>M</span></span><b>Mateo Quispe</b><span class="ob-peek__link">tezeo.app/@mateodraws</span><span class="ob-peek__label">Your page so far. You'll see all of it on the next step.</span></div>
+      <div class="fl-dock ob-dock">
+        <button class="tz-btn tz-btn--primary tz-btn--lg tz-btn--block" type="submit">Next: your colour<svg aria-hidden="true"><use href="#i-arrow"/></svg></button>
+      </div>
+    </form>
+    <aside class="ob-pv ob-pv--hide-mobile" data-pv aria-label="Live preview of your page"></aside>
+  </div>
+</section>
+
+<!-- ============ 2. LOOK ============ -->
+<section class="fl-screen ob-page tz-creator" id="look" style="--creator-accent:#7C3AED">
+  <p class="fl-proto-note"><b>Step 2 · Your colour.</b> Named swatches in a 4-up grid on phones (8-up from 480px), 44px circles in 48px targets. "Light and dark" shows the weave, ring, handle and a tip tile in both themes at a readable size, on every viewport. ≥1024: the phone preview on the right switches theme on its own. The guard runs in the browser (<span class="tz-mono">validateAccent</span> is already client-safe), so a rejected colour is caught here, not after "Create".</p>
+  <header class="ob-top">
+    <a class="ob-logo" href="/" aria-label="Tezeo home"><svg viewBox="0 0 240 64"><use href="#tz-mark" width="64" height="64"/><g class="ob-letters"><use href="#tz-letters" x="82" y="4" width="154" height="56"/></g></svg></a>
+    <div class="fl-progress"><span class="fl-progress__label"><b>Step 2 of 3</b> · Your colour</span><div class="fl-progress__track" aria-hidden="true"><span class="on"></span><span class="now"></span><span></span></div></div>
+    <button class="fl-theme" type="button" aria-label="Switch to dark mode" data-flip><svg><use href="#i-moon"/></svg></button>
+  </header>
+  <div class="ob-shell">
+    <form class="ob-step" onsubmit="return false" aria-labelledby="look-h">
+      <div class="ob-head">
+        <h1 id="look-h" tabindex="-1">Pick your colour</h1>
+        <p>It dyes your stripe in the weave, your photo ring and your tip buttons. The pay button stays Tezeo pink, so fans always know it's a real payment page.</p>
+      </div>
+      <div class="tz-field"><span class="tz-label" id="look-c">Your colour</span>
+        <div class="ob-swatches" role="group" aria-labelledby="look-c" data-swatches>
+          <button class="ob-swatch" type="button" style="--_c:#1A9E8F" aria-pressed="false"><i></i>Turquesa</button>
+          <button class="ob-swatch" type="button" style="--_c:#7C3AED" aria-pressed="true"><i></i>Violeta</button>
+          <button class="ob-swatch" type="button" style="--_c:#0EA5E9" aria-pressed="false"><i></i>Cielo</button>
+          <button class="ob-swatch" type="button" style="--_c:#F97316" aria-pressed="false"><i></i>Mandarina</button>
+          <button class="ob-swatch" type="button" style="--_c:#E8FF3A" aria-pressed="false"><i></i>Lima</button>
+          <button class="ob-swatch" type="button" style="--_c:#FF66CC" aria-pressed="false"><i></i>Rosa</button>
+          <button class="ob-swatch" type="button" style="--_c:#111111" aria-pressed="false"><i></i>Noche</button>
+          <button class="ob-swatch ob-swatch--custom" type="button" aria-pressed="false" aria-label="Pick any colour"><i><b aria-hidden="true">+</b></i>Any</button>
+        </div></div>
+      <div class="tz-field"><span class="tz-label">In light and dark</span>
+        <div class="ob-duo" data-duo></div>
+        <p class="ob-status" data-state="ok"><svg aria-hidden="true"><use href="#i-check"/></svg>Easy to read in both. We adjust the shade for dark screens automatically.</p></div>
+      <div class="fl-dock ob-dock">
+        <div class="ob-dock__row"><button class="tz-btn tz-btn--secondary" type="button" aria-label="Back to step 1"><svg aria-hidden="true" style="transform:scaleX(-1)"><use href="#i-arrow"/></svg>Back</button>
+          <button class="tz-btn tz-btn--primary tz-btn--lg" type="submit">Next: where tips land</button></div>
+      </div>
+    </form>
+    <aside class="ob-pv ob-pv--hide-mobile" data-pv aria-label="Live preview of your page"></aside>
+  </div>
+</section>
+
+<!-- ============ 2b. LOOK — guard ============ -->
+<section class="fl-screen ob-page tz-creator" id="look-guard" style="--creator-accent:#7C3AED">
+  <p class="fl-proto-note"><b>Step 2 · A colour the guard rejects</b> (here #D9481F). The swatch shows what was picked, crossed; the reason is in plain words; two safe options are one tap away: the guard's own suggestion and the nearest preset. The preview keeps the last good colour, so the creator never sees their page "in error red". "Next" waits, with the reason under it.</p>
+  <header class="ob-top">
+    <a class="ob-logo" href="/" aria-label="Tezeo home"><svg viewBox="0 0 240 64"><use href="#tz-mark" width="64" height="64"/><g class="ob-letters"><use href="#tz-letters" x="82" y="4" width="154" height="56"/></g></svg></a>
+    <div class="fl-progress"><span class="fl-progress__label"><b>Step 2 of 3</b> · Your colour</span><div class="fl-progress__track" aria-hidden="true"><span class="on"></span><span class="now"></span><span></span></div></div>
+    <button class="fl-theme" type="button" aria-label="Switch to dark mode" data-flip><svg><use href="#i-moon"/></svg></button>
+  </header>
+  <div class="ob-shell">
+    <form class="ob-step" onsubmit="return false" aria-labelledby="lg-h">
+      <div class="ob-head">
+        <h1 id="lg-h" tabindex="-1">Pick your colour</h1>
+        <p>It dyes your stripe in the weave, your photo ring and your tip buttons. The pay button stays Tezeo pink, so fans always know it's a real payment page.</p>
+      </div>
+      <div class="tz-field"><span class="tz-label" id="lg-c">Your colour</span>
+        <div class="ob-swatches" role="group" aria-labelledby="lg-c">
+          <button class="ob-swatch" type="button" style="--_c:#1A9E8F" aria-pressed="false"><i></i>Turquesa</button>
+          <button class="ob-swatch" type="button" style="--_c:#7C3AED" aria-pressed="false"><i></i>Violeta</button>
+          <button class="ob-swatch" type="button" style="--_c:#0EA5E9" aria-pressed="false"><i></i>Cielo</button>
+          <button class="ob-swatch" type="button" style="--_c:#F97316" aria-pressed="false"><i></i>Mandarina</button>
+          <button class="ob-swatch" type="button" style="--_c:#E8FF3A" aria-pressed="false"><i></i>Lima</button>
+          <button class="ob-swatch" type="button" style="--_c:#FF66CC" aria-pressed="false"><i></i>Rosa</button>
+          <button class="ob-swatch" type="button" style="--_c:#111111" aria-pressed="false"><i></i>Noche</button>
+          <button class="ob-swatch ob-swatch--custom" type="button" style="--_c:#D9481F" aria-pressed="true" aria-label="Pick any colour, #D9481F chosen" aria-describedby="lg-guard"><i></i>#D9481F</button>
+        </div></div>
+      <div class="ob-guard" id="lg-guard" role="status">
+        <div class="ob-guard__row"><span class="ob-guard__sw ob-guard__sw--no" style="--_c:#D9481F" aria-hidden="true"></span>
+          <p><b>That red-orange looks like our "didn't go through" colour.</b> Fans could mistake your page for a payment error, so pick a nearby one:</p></div>
+        <div class="fl-btnrow">
+          <button class="tz-btn tz-btn--secondary" type="button"><span class="ob-guard__sw" style="--_c:#B07400;width:24px;height:24px" aria-hidden="true"></span>Use ochre <span class="ob-mono">#B07400</span></button>
+          <button class="tz-btn tz-btn--secondary" type="button"><span class="ob-guard__sw" style="--_c:#F97316;width:24px;height:24px" aria-hidden="true"></span>Use Mandarina</button>
+        </div>
+      </div>
+      <div class="tz-field"><span class="tz-label">In light and dark <span class="tz-muted" style="font-weight:500">(your last good colour)</span></span>
+        <div class="ob-duo" data-duo></div></div>
+      <div class="fl-dock ob-dock">
+        <div class="ob-dock__row"><button class="tz-btn tz-btn--secondary" type="button" aria-label="Back to step 1"><svg aria-hidden="true" style="transform:scaleX(-1)"><use href="#i-arrow"/></svg>Back</button>
+          <button class="tz-btn tz-btn--primary tz-btn--lg" type="submit" disabled aria-describedby="lg-why">Next: where tips land</button></div>
+        <p class="fl-why-disabled" id="lg-why">Pick one of the colours above to continue.</p>
+      </div>
+    </form>
+    <aside class="ob-pv ob-pv--hide-mobile" data-pv aria-label="Live preview of your page"></aside>
+  </div>
+</section>
+
+<!-- ============ 3a. WALLET + HELP ============ -->
+<section class="fl-screen ob-page tz-creator" id="wallet-help" style="--creator-accent:#7C3AED">
+  <p class="fl-proto-note"><b>Step 3 · Where tips land (empty, help open).</b> The address field is a 2-line mono box, so the whole address is always visible; "Paste" sits on the label row (Clipboard API; hidden where unsupported). "Where do I find my Solana address?" opens in place with three tabs (Phantom, Solflare, An exchange), plain steps and an honest memo warning. "Never paste these" is always visible. ≥1024: the phone preview stays on the right.</p>
+  <header class="ob-top">
+    <a class="ob-logo" href="/" aria-label="Tezeo home"><svg viewBox="0 0 240 64"><use href="#tz-mark" width="64" height="64"/><g class="ob-letters"><use href="#tz-letters" x="82" y="4" width="154" height="56"/></g></svg></a>
+    <div class="fl-progress"><span class="fl-progress__label"><b>Step 3 of 3</b> · Where tips land</span><div class="fl-progress__track" aria-hidden="true"><span class="on"></span><span class="on"></span><span class="now"></span></div></div>
+    <button class="fl-theme" type="button" aria-label="Switch to dark mode" data-flip><svg><use href="#i-moon"/></svg></button>
+  </header>
+  <div class="ob-shell">
+    <form class="ob-step" onsubmit="return false" aria-labelledby="wh-h">
+      <div class="ob-head">
+        <h1 id="wh-h" tabindex="-1">Where should your tips land?</h1>
+        <p>Paste your Solana wallet address. Tips arrive there as USDC, digital dollars, straight from your fans. Tezeo never holds your money.</p>
+      </div>
+      <div class="tz-field"><div class="ob-label-row"><label class="tz-label" for="wh-w">Your Solana wallet address</label><button class="tz-btn tz-btn--secondary ob-paste" type="button"><svg aria-hidden="true"><use href="#i-paste"/></svg>Paste</button></div>
+        <div class="ob-wallet"><textarea id="wh-w" rows="2" autocapitalize="none" autocomplete="off" spellcheck="false" placeholder="Paste it here. It's 32 to 44 letters and numbers." aria-describedby="wh-s"></textarea></div>
+        <p id="wh-s" class="ob-status">Copy it from your wallet app and paste it. Typing it by hand is how mistakes happen.</p></div>
+      <details class="ob-help" open>
+        <summary><svg aria-hidden="true"><use href="#i-help"/></svg>Where do I find my Solana address?</summary>
+        <div class="ob-help__body">
+          <div class="ob-tabs" role="tablist" aria-label="Where your wallet is">
+            <button type="button" role="tab" aria-selected="true" aria-controls="wh-p1" id="wh-t1">Phantom</button>
+            <button type="button" role="tab" aria-selected="false" aria-controls="wh-p2" id="wh-t2" tabindex="-1">Solflare</button>
+            <button type="button" role="tab" aria-selected="false" aria-controls="wh-p3" id="wh-t3" tabindex="-1">An exchange</button>
+          </div>
+          <div class="ob-panel" role="tabpanel" id="wh-p1" aria-labelledby="wh-t1">
+            <ol class="fl-howto"><li>Open the Phantom app.</li><li>Tap <b>Receive</b>.</li><li>Find <b>Solana</b> in the list and tap <b>Copy</b>.</li><li>Come back here and tap <b>Paste</b>.</li></ol>
+            <p>Phantom also shows Ethereum and other addresses. Use the one next to Solana.</p>
+          </div>
+          <div class="ob-panel" role="tabpanel" id="wh-p2" aria-labelledby="wh-t2" hidden>
+            <ol class="fl-howto"><li>Open the Solflare app.</li><li>Tap <b>Receive</b>.</li><li>Tap <b>Copy</b> under your address.</li><li>Come back here and tap <b>Paste</b>.</li></ol>
+          </div>
+          <div class="ob-panel" role="tabpanel" id="wh-p3" aria-labelledby="wh-t3" hidden>
+            <ol class="fl-howto"><li>Go to <b>Deposit</b> and choose <b>USDC</b>.</li><li>Pick the <b>Solana</b> network.</li><li>Copy the address and paste it here.</li></ol>
+            <p class="fl-howto__warn">If the exchange also shows a memo or tag, use a personal wallet instead. Tezeo can't add a memo, so tips might not reach your account.</p>
+          </div>
+          <p class="tz-small tz-muted" style="margin:0">No wallet yet? Phantom and Solflare are free apps, and setting one up takes a few minutes. Write down the recovery phrase it gives you and keep it to yourself.</p>
+        </div>
+      </details>
+      <ul class="ob-never" aria-labelledby="wh-never">
+        <li style="display:block"><span class="ob-never__title" id="wh-never">Never paste these</span></li>
+        <li><svg aria-hidden="true"><use href="#i-hand"/></svg><span><b>Your secret recovery phrase</b> (12 or 24 words). No one at Tezeo will ever ask for it.</span></li>
+        <li><svg aria-hidden="true"><use href="#i-hand"/></svg><span><b>An Ethereum address</b>, the kind that starts with 0x.</span></li>
+        <li><svg aria-hidden="true"><use href="#i-hand"/></svg><span><b>A coin's address</b>, like USDC's own. It has to be your wallet.</span></li>
+      </ul>
+      <div class="fl-dock ob-dock">
+        <div class="ob-dock__row"><button class="tz-btn tz-btn--secondary" type="button" aria-label="Back to step 2"><svg aria-hidden="true" style="transform:scaleX(-1)"><use href="#i-arrow"/></svg>Back</button>
+          <button class="tz-btn tz-btn--primary tz-btn--lg" type="submit" disabled aria-describedby="wh-why">Create my page</button></div>
+        <p class="fl-why-disabled" id="wh-why">Paste your wallet address to continue.</p>
+      </div>
+    </form>
+    <aside class="ob-pv ob-pv--hide-mobile" data-pv aria-label="Live preview of your page"></aside>
+  </div>
+</section>
+
+<!-- ============ 3b. WALLET — checked ============ -->
+<section class="fl-screen ob-page tz-creator" id="wallet" style="--creator-accent:#7C3AED">
+  <p class="fl-proto-note"><b>Step 3 · Wallet pasted and checked.</b> Validation runs on paste and on blur, never mid-typing. A valid address opens "Check it against your wallet app": the address in 4-character groups with the first and last group inked, plus one required tick. The help collapses once the address is valid. "Create my page" docks at the bottom on phones; the honest fine print sits under it.</p>
+  <header class="ob-top">
+    <a class="ob-logo" href="/" aria-label="Tezeo home"><svg viewBox="0 0 240 64"><use href="#tz-mark" width="64" height="64"/><g class="ob-letters"><use href="#tz-letters" x="82" y="4" width="154" height="56"/></g></svg></a>
+    <div class="fl-progress"><span class="fl-progress__label"><b>Step 3 of 3</b> · Where tips land</span><div class="fl-progress__track" aria-hidden="true"><span class="on"></span><span class="on"></span><span class="now"></span></div></div>
+    <button class="fl-theme" type="button" aria-label="Switch to dark mode" data-flip><svg><use href="#i-moon"/></svg></button>
+  </header>
+  <div class="ob-shell">
+    <form class="ob-step" onsubmit="return false" aria-labelledby="w-h">
+      <div class="ob-head">
+        <h1 id="w-h" tabindex="-1">Where should your tips land?</h1>
+        <p>Paste your Solana wallet address. Tips arrive there as USDC, digital dollars, straight from your fans. Tezeo never holds your money.</p>
+      </div>
+      <div class="tz-field"><div class="ob-label-row"><label class="tz-label" for="w-w">Your Solana wallet address</label><button class="tz-btn tz-btn--secondary ob-paste" type="button"><svg aria-hidden="true"><use href="#i-paste"/></svg>Paste</button></div>
+        <div class="ob-wallet" data-state="ok"><textarea id="w-w" rows="2" autocapitalize="none" autocomplete="off" spellcheck="false" aria-describedby="w-s">GBR7vwX5Thj7GzMLYHDUS21rnyTFhGciaz59Bm7jwMrJ</textarea></div>
+        <p id="w-s" class="ob-status" data-state="ok" aria-live="polite"><svg aria-hidden="true"><use href="#i-check"/></svg>That's a valid Solana address.</p></div>
+      <div class="ob-readback" role="group" aria-labelledby="w-rb">
+        <p class="ob-readback__title" id="w-rb"><svg aria-hidden="true"><use href="#i-shield"/></svg>Check it against your wallet app</p>
+        <ul class="ob-chunks" aria-label="Your address in groups of four" data-chunks="GBR7vwX5Thj7GzMLYHDUS21rnyTFhGciaz59Bm7jwMrJ"></ul>
+        <p>Look at the first and last four: <b>GBR7</b> … <b>wMrJ</b>. If they match what your wallet shows, you're set.</p>
+        <label class="fl-check"><input type="checkbox" checked>This is my own wallet, and I copied it from my wallet app.</label>
+      </div>
+      <details class="ob-help">
+        <summary><svg aria-hidden="true"><use href="#i-help"/></svg>Where do I find my Solana address?</summary>
+      </details>
+      <p class="ob-status"><svg aria-hidden="true" style="color:var(--tz-brand-text)"><use href="#i-shield"/></svg><span>Want to be extra sure? Once you're live, send yourself a $1 tip from your own page and watch it land.</span></p>
+      <div class="fl-dock ob-dock">
+        <div class="ob-dock__row"><button class="tz-btn tz-btn--secondary" type="button" aria-label="Back to step 2"><svg aria-hidden="true" style="transform:scaleX(-1)"><use href="#i-arrow"/></svg>Back</button>
+          <button class="tz-btn tz-btn--primary tz-btn--lg" type="submit">Create my page</button></div>
+        <p class="ob-fine">For now your link and wallet can't be changed after this, so take a second.</p>
+      </div>
+    </form>
+    <aside class="ob-pv ob-pv--hide-mobile" data-pv aria-label="Live preview of your page"></aside>
+  </div>
+</section>
+
+<!-- ============ LIVE ============ -->
+<section class="fl-screen ob-page tz-creator" id="live" style="--creator-accent:#7C3AED">
+  <p class="fl-proto-note"><b>You're live.</b> One celebration (the knot, 1.2s), then the one thing that can't be redone. &lt;1024: moment → "Save your private dashboard link" → share card → wallet note; the dashboard button lives inside the save card and waits for the tick. ≥1024: moment, share and note on the left; the save card is sticky on the right (480px), so it's on screen the whole time. Refreshing keeps this screen (sessionStorage), and leaving before saving asks first.</p>
+  <div class="tz-weave tz-weave--slim" aria-hidden="true"></div>
+  <header class="ob-top">
+    <a class="ob-logo" href="/" aria-label="Tezeo home"><svg viewBox="0 0 240 64"><use href="#tz-mark" width="64" height="64"/><g class="ob-letters"><use href="#tz-letters" x="82" y="4" width="154" height="56"/></g></svg></a>
+    <span class="tz-spacer"></span>
+    <button class="fl-theme" type="button" aria-label="Switch to dark mode" data-flip><svg><use href="#i-moon"/></svg></button>
+  </header>
+  <main class="ob-live">
+    <div class="ob-moment">
+      <div class="tz-knot is-playing">
+        <svg viewBox="0 0 64 64" aria-hidden="true">
+          <rect class="tz-knot__tile" width="64" height="64" rx="16" fill="#D1245A"/>
+          <path class="tz-knot__thread tz-knot__thread--a" pathLength="80" d="M9.5 19H22c9 0 15.5 6 15.5 14v19.5" fill="none" stroke="#FFC23D" stroke-width="7.5" stroke-linecap="round"/>
+          <path class="tz-knot__gap" d="M42 19c-9 0-15.5 6-15.5 14" fill="none" stroke="#D1245A" stroke-width="13.5"/>
+          <path class="tz-knot__thread tz-knot__thread--b" pathLength="80" d="M54.5 19H42c-9 0-15.5 6-15.5 14v19.5" fill="none" stroke="#FFF7EC" stroke-width="7.5" stroke-linecap="round"/>
+        </svg>
+        <div class="tz-burst" aria-hidden="true"><i style="--x:-70px;--y:-50px;--r:200deg"></i><i style="--x:70px;--y:-56px;--r:-160deg;--d:40ms"></i><i style="--x:-86px;--y:10px;--r:120deg;--d:80ms"></i><i style="--x:88px;--y:6px;--r:-220deg"></i><i style="--x:-40px;--y:-84px;--r:260deg;--d:60ms"></i><i style="--x:44px;--y:-90px;--r:-140deg;--d:20ms"></i><i style="--x:-58px;--y:62px;--r:180deg;--d:100ms"></i><i style="--x:60px;--y:66px;--r:-200deg;--d:50ms"></i></div>
+      </div>
+      <h1 class="tz-display">You're live, Mateo!</h1>
+      <p>Your page is up at <a href="/@mateodraws">tezeo.app/@mateodraws</a>. Share it, and the first tip will show up in your dashboard, live.</p>
+    </div>
+
+    <section class="ob-keep" aria-labelledby="keep-h">
+      <span class="ob-keep__tag"><svg aria-hidden="true"><use href="#i-key"/></svg>Shown only once</span>
+      <h2 id="keep-h" tabindex="-1">Save your private dashboard link</h2>
+      <p><b>It's your only way back to your tips.</b> There's no password and no email, so if you lose it we can't send it again. Anyone who has it can see your tips, so keep it to yourself.</p>
+      <div class="tz-copy"><span class="tz-mono" aria-label="Your dashboard link">tezeo.app/dashboard/G0xx_PxvPVFpVlcnbxPKjUW2aGVL5_-j</span></div>
+      <div class="ob-keep__actions">
+        <button class="tz-btn tz-btn--secondary" type="button" data-save><svg aria-hidden="true"><use href="#i-download"/></svg>Download a backup file<small></small></button>
+        <button class="tz-btn tz-btn--secondary" type="button" data-save><svg aria-hidden="true"><use href="#i-copy"/></svg>Copy link<small></small></button>
+        <button class="tz-btn tz-btn--secondary" type="button" data-save><svg aria-hidden="true"><use href="#i-send"/></svg>Send to myself<small></small></button>
+      </div>
+      <p class="ob-status" role="status" data-saved-msg style="margin:0"></p>
+      <div class="ob-keep__gate">
+        <label class="fl-check"><input type="checkbox" data-gate>I've saved it somewhere safe</label>
+        <a class="tz-btn tz-btn--primary tz-btn--lg tz-btn--block" href="?screen=dashboard" aria-disabled="true" aria-describedby="keep-why" data-go>Go to my dashboard</a>
+        <p class="fl-why-disabled" id="keep-why" data-why>Save your link first. It's the only way back in.</p>
+      </div>
+    </section>
+
+    <section class="ob-share" aria-labelledby="share-h">
+      <div class="ob-share__top"><div class="tz-qr"><canvas class="ob-qr" width="96" height="96" role="img" aria-label="QR code for tezeo.app/@mateodraws"></canvas></div>
+        <div class="ob-share__link"><span class="tz-overline" id="share-h">Your public page</span><b>tezeo.app/@mateodraws</b><span>Put it in your bio, on stream, on your class slides.</span></div></div>
+      <div class="fl-btnrow">
+        <button class="tz-btn tz-btn--secondary" type="button"><svg aria-hidden="true"><use href="#i-copy"/></svg>Copy link</button>
+        <button class="tz-btn tz-btn--secondary" type="button"><svg aria-hidden="true"><use href="#i-share"/></svg>Share</button>
+        <button class="tz-btn tz-btn--secondary" type="button"><svg aria-hidden="true"><use href="#i-download"/></svg>QR code</button>
+        <a class="tz-btn tz-btn--ghost" href="/@mateodraws">Open my page</a>
+      </div>
+    </section>
+
+    <div class="ob-note" role="note">
+      <span class="tz-rombo" aria-hidden="true"></span>
+      <b>Good to know: your wallet is new to USDC.</b>
+      <p>Solana opens a USDC account for it with your first tip. That costs about $0.25, once, and comes out of that tip. After that, delivery is about $0.01 per tip. Nothing for you to do.</p>
+    </div>
+  </main>
+</section>
+
+<!-- ============ FIRST-RUN DASHBOARD ============ -->
+<section class="fl-screen tz-creator" id="dashboard" style="--creator-accent:#7C3AED">
+  <p class="fl-proto-note"><b>First-run dashboard</b> (no tips yet). The three "0" stat cards are hidden until the first tip; a "Get your first tip" checklist takes their place, built only from data the dashboard already has (tips, goal, pass) plus two per-device ticks. A one-time bookmark strip. The empty tips card says it's listening (it polls every 7s today). ≥1280: checklist and tips side by side; &lt;1280 they stack, checklist first. The goal, OBS and pass cards follow unchanged (FLOW.md §2.7).</p>
+  <div class="fl-dash">
+    <nav class="fl-dash__nav" aria-label="Dashboard navigation">
+      <a class="fl-logo" href="/" aria-label="Tezeo home"><svg viewBox="0 0 240 64" style="--pv-t:var(--tz-brand);color:var(--tz-text)"><use href="#tz-mark" width="64" height="64"/><use href="#tz-letters" x="82" y="4" width="154" height="56"/></svg></a>
+      <a class="on" href="#home" aria-current="page"><svg><use href="#i-home"/></svg>Home</a>
+      <a href="#tips"><svg><use href="#i-list"/></svg>Tips</a>
+      <a href="#passes"><svg><use href="#i-pass"/></svg>Passes</a>
+      <a href="#stream"><svg><use href="#i-stream"/></svg>Stream</a>
+      <a href="/@mateodraws"><svg><use href="#i-brush"/></svg>My page</a>
+    </nav>
+    <main class="fl-dash__main" id="home">
+      <div class="fl-dash__head">
+        <div><span class="tz-overline">Sunday, Nov 1</span><h1 class="tz-h1">Welcome, Mateo</h1></div>
+        <div class="fl-actions"><button class="fl-theme" type="button" aria-label="Switch to dark mode" data-flip><svg><use href="#i-moon"/></svg></button><button class="tz-btn tz-btn--secondary"><svg><use href="#i-share"/></svg>Share my page</button></div>
+      </div>
+      <div class="ob-bookmark" role="note"><svg aria-hidden="true"><use href="#i-bookmark"/></svg><span>Bookmark this page. It's your way back in.<span class="ob-kbd"> <kbd>Ctrl</kbd> + <kbd>D</kbd></span></span><button class="tz-btn tz-btn--ghost" type="button">Got it</button></div>
+      <div class="fl-cols ob-dash-cols">
+        <section class="tz-card ob-start" aria-labelledby="start-h">
+          <div class="ob-start__head">
+            <div class="fl-card-h"><h2 id="start-h">Get your first tip</h2><span class="ob-start__count">1 of 5 done</span></div>
+            <div class="ob-thread" style="--n:5" aria-hidden="true"><span class="on"></span><span></span><span></span><span></span><span></span></div>
+          </div>
+          <ol class="ob-tasks">
+            <li class="ob-task" data-state="done"><span class="ob-task__knot"><svg aria-hidden="true"><use href="#i-check"/></svg></span>
+              <h3>Save your dashboard link <span class="ob-tag ob-tag--done">Done</span></h3><p>You saved a backup on this device today.</p></li>
+            <li class="ob-task" data-state="next" aria-current="step"><span class="ob-task__knot"></span>
+              <h3>Share your page</h3><p>Put your link where your fans already are: your bio, your stream, your class slides, your WhatsApp status.</p>
+              <div class="ob-task__share"><div class="tz-qr"><canvas class="ob-qr" width="72" height="72" role="img" aria-label="QR code for tezeo.app/@mateodraws"></canvas></div>
+                <div class="ob-task__link"><b>tezeo.app/@mateodraws</b><span>Print it, pin it on stream.</span></div>
+                <div class="fl-btnrow ob-task__btns"><button class="tz-btn tz-btn--secondary" type="button"><svg aria-hidden="true"><use href="#i-copy"/></svg>Copy link</button><button class="tz-btn tz-btn--ghost" type="button"><svg aria-hidden="true"><use href="#i-download"/></svg>Download QR</button></div></div></li>
+            <li class="ob-task" data-state="todo"><span class="ob-task__knot"></span>
+              <h3>Send yourself a $1 test tip <span class="ob-tag">Optional</span></h3><p>See exactly what your fans see, and watch it land here.</p>
+              <div class="fl-btnrow"><a class="tz-btn tz-btn--secondary" href="/@mateodraws">Open my page</a></div></li>
+            <li class="ob-task" data-state="todo"><span class="ob-task__knot"></span>
+              <h3>Set a funding goal</h3><p>Give fans a reason: "New microphone, $300". It shows on your page with a progress bar.</p>
+              <div class="fl-btnrow"><a class="tz-btn tz-btn--secondary" href="#goal">Add a goal</a></div></li>
+            <li class="ob-task" data-state="todo"><span class="ob-task__knot"></span>
+              <h3>Add tip alerts to OBS <span class="ob-tag">For streamers</span></h3><p>A card pops up on your stream for every tip.</p>
+              <div class="fl-btnrow"><a class="tz-btn tz-btn--secondary" href="#stream">Set up alerts</a><button class="tz-btn tz-btn--ghost" type="button">Mark as done</button></div></li>
+          </ol>
+          <div class="ob-start__foot"><a class="tz-btn tz-btn--ghost" href="#passes">Also: offer a 30-day pass</a><button class="tz-btn tz-btn--ghost" type="button">Hide this list</button></div>
+        </section>
+        <div class="fl-rail" style="position:static">
+          <section class="tz-card fl-tips-card" id="tips" aria-labelledby="tips-h">
+            <div class="fl-card-h"><h2 id="tips-h">Latest tips</h2></div>
+            <div class="ob-empty">
+              <svg class="ob-loose" viewBox="0 0 140 56" aria-hidden="true"><path d="M6 40c18-26 34-26 48-8s30 18 44-6" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round"/><path d="M98 26c10-14 22-16 36-8" fill="none" stroke="var(--tz-gold)" stroke-width="5" stroke-linecap="round"/></svg>
+              <p class="ob-empty__title">Your first thread is on its way</p>
+              <p>Share your page and the first tip will show up here, live. No need to refresh.</p>
+              <span class="ob-listen"><span class="tz-rombo" aria-hidden="true"></span>Listening for tips</span>
+            </div>
+          </section>
+          <div class="ob-dash-note" role="note"><span class="tz-rombo" aria-hidden="true"></span><span><b>New wallet.</b> your first tip pays a one-time set-up of about $0.25.</span>
+            <details><summary>Why?</summary><p>Solana needs a USDC account for your wallet before dollars can land, and opening it costs about $0.25. It comes out of your first tip, once. After that, delivery is about $0.01 per tip.</p></details></div>
+        </div>
+      </div>
+    </main>
+    <nav class="fl-tabbar" aria-label="Dashboard"><a class="on" href="#home"><svg><use href="#i-home"/></svg>Home</a><a href="#tips"><svg><use href="#i-list"/></svg>Tips</a><a href="#stream"><svg><use href="#i-stream"/></svg>Stream</a><a href="#passes"><svg><use href="#i-pass"/></svg>Passes</a><a href="/@mateodraws"><svg><use href="#i-brush"/></svg>My page</a></nav>
+  </div>
+</section>
+
+<!-- ============ STATES BOARD ============ -->
+<section class="fl-screen ob-page" id="states">
+  <p class="fl-proto-note"><b>Every field state</b>, side by side. Each status line is icon + words (never colour alone), sits in the field's <span class="tz-mono">aria-describedby</span>, and is announced politely. Errors after "Create" move focus to the field and take you back to its step.</p>
+  <div class="ob-board">
+    <h1>Field states</h1>
+    <p>Copy is final. Names and addresses are examples. "Needs backend" marks states that depend on the small availability check (spec 3.2).</p>
+
+    <div class="ob-state"><span class="tz-overline">Link · checking <i>needs backend</i></span>
+      <div class="ob-affix"><span class="ob-affix__pre">tezeo.app/@</span><input value="mateo" aria-label="Your link"><span class="ob-affix__state"></span></div>
+      <p class="ob-status" data-state="checking"><span class="tz-rombo" aria-hidden="true"></span>Checking @mateo…</p></div>
+    <div class="ob-state"><span class="tz-overline">Link · taken <i>needs backend</i></span>
+      <div class="ob-affix" data-state="error"><span class="ob-affix__pre">tezeo.app/@</span><input value="mateo" aria-label="Your link" aria-invalid="true"><span class="ob-affix__state" style="color:var(--tz-failed-fg)"><svg aria-hidden="true"><use href="#i-x"/></svg></span></div>
+      <p class="ob-status" data-state="error"><svg aria-hidden="true"><use href="#i-x"/></svg>@mateo is taken. These are free:</p>
+      <div class="ob-suggest"><button type="button">@mateodraws</button><button type="button">@mateo_quispe</button><button type="button">@mateoq</button></div></div>
+    <div class="ob-state"><span class="tz-overline">Link · cleaned as you type</span>
+      <div class="ob-affix"><span class="ob-affix__pre">tezeo.app/@</span><input value="mateo_quispe" aria-label="Your link"><span class="ob-affix__state"></span></div>
+      <p class="ob-status" data-state="warn"><svg aria-hidden="true"><use href="#i-alert"/></svg>Links can't have spaces, accents or dots, so we made it mateo_quispe.</p></div>
+    <div class="ob-state"><span class="tz-overline">Link · taken at the last second <i>today's 409</i></span>
+      <p class="tzs-error" role="alert" style="margin:0;color:var(--tz-failed-fg);background:var(--tz-failed-bg);border-radius:14px;padding:10px 12px;font-size:14px;display:flex;gap:8px"><svg style="width:18px;height:18px;flex:none"><use href="#i-x"/></svg><span>Someone just took @mateodraws. We took you back to step 1: pick another link and everything else stays as you left it.</span></p></div>
+
+    <div class="ob-state"><span class="tz-overline">Wallet · still typing</span>
+      <div class="ob-wallet"><textarea rows="2" aria-label="Wallet" spellcheck="false">GBR7vwX5Thj7</textarea></div>
+      <p class="ob-status">Keep going. Solana addresses are 32 to 44 letters and numbers.</p></div>
+    <div class="ob-state"><span class="tz-overline">Wallet · Ethereum address</span>
+      <div class="ob-wallet" data-state="error"><textarea rows="2" aria-label="Wallet" aria-invalid="true" spellcheck="false">0x71c7656ec7ab88b098defb751b7401b5f6d8976f</textarea></div>
+      <p class="ob-status" data-state="error"><svg aria-hidden="true"><use href="#i-x"/></svg><span>That's an Ethereum address (it starts with 0x). Tips land on Solana, so we need your <b>Solana</b> address. In Phantom it's the one next to Solana.</span></p></div>
+    <div class="ob-state"><span class="tz-overline">Wallet · a coin, not a wallet</span>
+      <div class="ob-wallet" data-state="error"><textarea rows="2" aria-label="Wallet" aria-invalid="true" spellcheck="false">EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v</textarea></div>
+      <p class="ob-status" data-state="error"><svg aria-hidden="true"><use href="#i-x"/></svg><span>That's the address of the USDC coin itself, not a wallet. Paste the address from your own wallet app.</span></p></div>
+    <div class="ob-state"><span class="tz-overline">Wallet · not an address</span>
+      <div class="ob-wallet" data-state="error"><textarea rows="2" aria-label="Wallet" aria-invalid="true" spellcheck="false">mateo@gmail.com</textarea></div>
+      <p class="ob-status" data-state="error"><svg aria-hidden="true"><use href="#i-x"/></svg><span>That doesn't look like a Solana address. It's 32 to 44 letters and numbers, with no spaces or symbols.</span></p></div>
+    <div class="ob-state"><span class="tz-overline">Wallet · recovery phrase pasted</span>
+      <div class="ob-wallet" data-state="stop"><textarea rows="2" aria-label="Wallet" aria-invalid="true" spellcheck="false">•••••• •••••• •••••• •••••• •••••• ••••••</textarea></div>
+      <div class="ob-stop" role="alert"><svg aria-hidden="true"><use href="#i-alert"/></svg><b>Stop: that looks like your secret recovery phrase.</b>
+        <p>We cleared it and didn't save or send it. Never share those words with anyone, including us. We only need your address.</p>
+        <button class="tz-btn tz-btn--secondary" type="button">Show me where my address is</button></div></div>
+    <div class="ob-state"><span class="tz-overline">Wallet · spaces removed</span>
+      <div class="ob-wallet" data-state="ok"><textarea rows="2" aria-label="Wallet" spellcheck="false">GBR7vwX5Thj7GzMLYHDUS21rnyTFhGciaz59Bm7jwMrJ</textarea></div>
+      <p class="ob-status" data-state="ok"><svg aria-hidden="true"><use href="#i-check"/></svg>That's a valid Solana address. We removed a space that came with the paste.</p></div>
+
+    <div class="ob-state"><span class="tz-overline">Photo · can't read it</span>
+      <div class="ob-photo" data-state="error"><button class="ob-photo__btn" type="button" aria-label="Choose a photo"><span class="tz-avatar tz-creator" style="--creator-accent:#7C3AED"><span>M</span></span><span class="ob-photo__cam"><svg aria-hidden="true"><use href="#i-camera"/></svg></span></button>
+        <div class="ob-photo__txt"><b>Add a photo</b><span>Square works best. JPG or PNG.</span></div></div>
+      <p class="ob-status" data-state="error"><svg aria-hidden="true"><use href="#i-x"/></svg><span>We couldn't open that photo. Try a JPG or PNG. On iPhone, a screenshot of the photo works too.</span></p></div>
+    <div class="ob-state"><span class="tz-overline">Photo · added</span>
+      <div class="ob-photo"><button class="ob-photo__btn" type="button" aria-label="Change photo"><span class="tz-avatar tz-creator" style="--creator-accent:#7C3AED"><img alt="" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 80'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23D1245A'/%3E%3Cstop offset='.5' stop-color='%23FFC23D'/%3E%3Cstop offset='1' stop-color='%231A9E8F'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='80' height='80' fill='url(%23g)'/%3E%3C/svg%3E"></span><span class="ob-photo__cam"><svg aria-hidden="true"><use href="#i-camera"/></svg></span></button>
+        <div class="ob-photo__txt"><b>Looking good</b><span>This is how it shows on your page.</span><div class="ob-photo__actions"><button class="tz-btn tz-btn--secondary" type="button">Change</button><button class="tz-btn tz-btn--ghost" type="button">Remove</button></div></div></div></div>
+
+    <div class="ob-state"><span class="tz-overline">Create · no connection</span>
+      <p class="tzs-error" role="alert" style="margin:0;color:var(--tz-failed-fg);background:var(--tz-failed-bg);border-radius:14px;padding:10px 12px;font-size:14px;display:flex;gap:8px"><svg style="width:18px;height:18px;flex:none"><use href="#i-x"/></svg><span>We couldn't reach Tezeo, so nothing was saved. Check your connection and try again.</span></p>
+      <button class="tz-btn tz-btn--primary tz-btn--lg tz-btn--block" type="button">Try again</button></div>
+    <div class="ob-state"><span class="tz-overline">Create · working</span>
+      <button class="tz-btn tz-btn--primary tz-btn--lg tz-btn--block" type="button" aria-disabled="true" style="opacity:.8">Weaving your page…</button>
+      <p class="ob-fine">This takes a second or two.</p></div>
+  </div>
+</section>
+
+<script>
+  (function () {
+    var q = new URLSearchParams(location.search), s = q.get('screen'), root = document.documentElement;
+    if (s) { document.getElementById('index').hidden = true; document.querySelectorAll('.fl-screen').forEach(function (el) { el.hidden = el.id !== s; }); }
+    var syncFlip = function () { document.querySelectorAll('[data-flip]').forEach(function (b) {
+      var d = root.dataset.theme === 'dark'; b.innerHTML = '<svg><use href="#i-' + (d ? 'sun' : 'moon') + '"/></svg>'; b.setAttribute('aria-label', d ? 'Switch to light mode' : 'Switch to dark mode'); }); };
+    document.querySelectorAll('[data-flip]').forEach(function (b) { b.addEventListener('click', function () { root.dataset.theme = root.dataset.theme === 'dark' ? 'light' : 'dark'; syncFlip(); }); });
+    syncFlip();
+
+    // --- phone preview: the real page, in its own theme ---
+    var P = { name: 'Mateo Quispe', first: 'Mateo', handle: 'mateodraws', msg: 'I draw Andean folk tales live every Sunday. Tips keep the ink flowing.' };
+    function phone(theme) {
+      return '<div class="fl-phone ob-' + theme + '"><div class="fl-phone__url">tezeo.app/<b>@' + P.handle + '</b></div><div class="tz-weave"></div>' +
+        '<div class="fl-phone__body"><div class="fl-id"><div class="tz-avatar"><span>M</span></div><h1>' + P.name + '</h1><span class="fl-handle">@' + P.handle + '</span></div>' +
+        '<p class="fl-bubble">“' + P.msg + '”</p><span class="tz-overline">Send ' + P.first + ' a tip</span>' +
+        '<div class="tz-amounts"><span class="tz-amount-opt"><span class="tz-amount">$3</span><small>a cafecito</small></span><span class="tz-amount-opt" aria-pressed="true"><span class="tz-amount">$5</span><small>lunch</small></span><span class="tz-amount-opt"><span class="tz-amount">$15</span><small>big hug</small></span></div>' +
+        '<span class="tz-btn tz-btn--primary tz-btn--block">Send $5 to ' + P.first + '</span>' +
+        '<p class="fl-trust"><svg aria-hidden="true"><use href="#i-shield"/></svg>Pay from any wallet, any chain. ' + P.first + ' gets dollars.</p></div></div>';
+    }
+    document.querySelectorAll('[data-pv]').forEach(function (pv) {
+      var t = root.dataset.theme === 'dark' ? 'dark' : 'light';
+      pv.innerHTML = '<div class="fl-preview__head"><span class="tz-overline">How fans see it</span><div class="fl-seg" role="group" aria-label="Preview theme">' +
+        '<button type="button" data-pt="light" aria-pressed="' + (t === 'light') + '">Light</button><button type="button" data-pt="dark" aria-pressed="' + (t === 'dark') + '">Dark</button></div></div>' +
+        '<div data-ph>' + phone(t) + '</div><p class="ob-pv__foot"><span class="tz-rombo" aria-hidden="true"></span>Live preview. It changes as you type.</p>';
+      pv.querySelectorAll('[data-pt]').forEach(function (b) { b.addEventListener('click', function () {
+        pv.querySelectorAll('[data-pt]').forEach(function (x) { x.setAttribute('aria-pressed', x === b); });
+        pv.querySelector('[data-ph]').innerHTML = phone(b.dataset.pt); }); });
+    });
+    // --- light + dark mini cards ---
+    document.querySelectorAll('[data-duo]').forEach(function (d) {
+      d.innerHTML = ['light', 'dark'].map(function (t) { return '<div class="ob-' + t + '"><div class="tz-weave"></div><div class="ob-duo__body"><span class="tz-avatar"><span>M</span></span>' +
+        '<span class="tz-overline">' + (t === 'light' ? 'Light' : 'Dark') + '</span><span class="ob-duo__handle">@' + P.handle + '</span><span class="ob-duo__tile">$5</span></div></div>'; }).join('');
+    });
+    // --- swatches recolour the screen (prototype) ---
+    document.querySelectorAll('[data-swatches] .ob-swatch:not(.ob-swatch--custom)').forEach(function (b) { b.addEventListener('click', function () {
+      b.parentNode.querySelectorAll('.ob-swatch').forEach(function (x) { x.setAttribute('aria-pressed', x === b); });
+      b.closest('.fl-screen').style.setProperty('--creator-accent', b.style.getPropertyValue('--_c')); }); });
+    // --- address in groups of four ---
+    document.querySelectorAll('[data-chunks]').forEach(function (ul) {
+      var a = ul.dataset.chunks, parts = a.match(/.{1,4}/g);
+      ul.innerHTML = parts.map(function (p, i) { return '<li' + (i === 0 || i === parts.length - 1 ? ' class="is-key"' : '') + '>' + p + '</li>'; }).join('');
+    });
+    // --- help tabs ---
+    document.querySelectorAll('.ob-tabs').forEach(function (tl) { var tabs = tl.querySelectorAll('[role=tab]');
+      tabs.forEach(function (t) { t.addEventListener('click', function () { tabs.forEach(function (x) { var on = x === t; x.setAttribute('aria-selected', on); x.tabIndex = on ? 0 : -1;
+        document.getElementById(x.getAttribute('aria-controls')).hidden = !on; }); }); }); });
+    // --- the safeguard: any save action marks it; the tick unlocks the dashboard ---
+    var gate = document.querySelector('[data-gate]'), go = document.querySelector('[data-go]'), why = document.querySelector('[data-why]'), msg = document.querySelector('[data-saved-msg]');
+    var sync = function () { var ok = gate.checked; go.setAttribute('aria-disabled', !ok); go.style.opacity = ok ? '' : '.45'; go.style.pointerEvents = ok ? '' : 'none'; why.hidden = ok; };
+    if (gate) { gate.addEventListener('change', sync); sync();
+      document.querySelectorAll('[data-save]').forEach(function (b) { b.addEventListener('click', function () { b.dataset.done = 'true'; b.querySelector('small').textContent = 'Done ✓';
+        msg.dataset.state = 'ok'; msg.innerHTML = '<svg aria-hidden="true"><use href="#i-check"/></svg>Nice. Tick the box below once it\'s somewhere you\'ll find it again.'; }); }); }
+    if (q.get('saved')) { document.querySelectorAll('[data-save]')[0].click(); gate.checked = true; sync(); }
+    // decorative QR (not scannable)
+    document.querySelectorAll('canvas.ob-qr').forEach(function (c) {
+      var x = c.getContext('2d'), n = 25, s = c.width / n, seed = 7;
+      var r = function () { return (seed = (seed * 9301 + 49297) % 233280) / 233280; };
+      x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height); x.fillStyle = '#1C1424';
+      for (var i = 0; i < n; i++) for (var j = 0; j < n; j++) if (r() > 0.52) x.fillRect(i * s, j * s, Math.ceil(s), Math.ceil(s));
+      var eye = function (a, b) { x.fillStyle = '#1C1424'; x.fillRect(a*s, b*s, 7*s, 7*s); x.fillStyle = '#fff'; x.fillRect((a+1)*s, (b+1)*s, 5*s, 5*s); x.fillStyle = '#1C1424'; x.fillRect((a+2)*s, (b+2)*s, 3*s, 3*s); };
+      eye(0, 0); eye(n - 7, 0); eye(0, n - 7);
+    });
+  })();
+</script>
+</body>
+</html>
