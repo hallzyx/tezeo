@@ -1,7 +1,7 @@
 "use client";
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Icon, ThemeToggle } from "@/components/ui";
 import type { DashboardData } from "@/lib/dashboard";
 
@@ -27,6 +27,7 @@ export function DashboardShell({ token, initial, accent, children }: { token: st
   const seen = useRef(new Set(initial.tips.map((t) => t.id)));
   const known = useRef(new Map(initial.tips.map((t) => [t.id, t.status])));
   const pathname = usePathname();
+  const router = useRouter();
   const base = `/dashboard/${token}`;
   const here = pathname === base || pathname === base + "/" ? "" : pathname.slice(base.length + 1).split("/")[0];
 
@@ -66,6 +67,14 @@ export function DashboardShell({ token, initial, accent, children }: { token: st
     document.addEventListener("visibilitychange", vis);
     return () => { stop(); document.removeEventListener("visibilitychange", vis); };
   }, [refresh]);
+
+  // Old bookmarks used #tips / #passes / #stream on the Home URL. Only on first load (the shell mounts once),
+  // so a Home click never gets bounced by a leftover hash.
+  useEffect(() => {
+    const h = location.hash.replace("#", "");
+    if (location.pathname.replace(/\/$/, "") === base && ["tips", "passes", "stream"].includes(h)) router.replace(`${base}/${h}`);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // After a client navigation, focus moves to the page heading (not on first load).
   const first = useRef(true);

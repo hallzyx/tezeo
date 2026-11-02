@@ -1,6 +1,4 @@
 "use client";
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Icon } from "@/components/ui";
 import { useDashboard } from "./DashboardShell";
@@ -9,16 +7,9 @@ import { QrCanvas, TipsTable, money, useCopy, useOrigin } from "./shared";
 
 export function OverviewView() {
   const { token, data, fresh, share, shared } = useDashboard();
-  const router = useRouter();
   const copy = useCopy();
   const origin = useOrigin();
   const base = `/dashboard/${token}`;
-
-  // Old bookmarks used #tips / #passes / #stream on this page: send them to the real page.
-  useEffect(() => {
-    const h = location.hash.replace("#", "");
-    if (["tips", "passes", "stream"].includes(h)) router.replace(`${base}/${h}`);
-  }, [base, router]);
 
   const s = data.stats, first = data.creator.displayName.split(" ")[0];
   const firstRun = data.tips.length === 0 && s.receivedThisMonthUsdc === 0;
