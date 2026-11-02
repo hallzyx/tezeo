@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Icon } from "@/components/ui";
 import { useDashboard } from "./DashboardShell";
 import { BookmarkStrip, FirstRun } from "./FirstRun";
+import { HomeCharts } from "./Charts";
 import { QrCanvas, TipsTable, money, useCopy, useOrigin } from "./shared";
 
 export function OverviewView() {
@@ -46,6 +47,8 @@ export function OverviewView() {
             <small>{data.pass.enabled ? `$${data.pass.priceUsd} · 30 days` : "Your pass is off"}</small></Link>
         </div>
       )}
+
+      {!firstRun && <HomeCharts tips={data.tips} />}
 
       {firstRun && <FirstRun handle={data.creator.handle} hasGoal={data.goal.targetUsd > 0} hasTip={data.tips.length > 0} base={base} />}
 
