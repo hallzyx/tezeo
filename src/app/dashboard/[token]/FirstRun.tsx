@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import QRCode from "qrcode";
+import { useRouter } from "next/navigation";
 import { Icon } from "@/components/ui";
 
 type Flags = { saved?: boolean; shared?: boolean; obs?: boolean; hidden?: boolean };
@@ -14,7 +15,8 @@ const read = (h: string): Flags => {
 };
 
 /** The "Get your first tip" checklist. Every tick comes from real data or from a flag on this device. */
-export function FirstRun({ handle, hasGoal, hasTip }: { handle: string; hasGoal: boolean; hasTip: boolean }) {
+export function FirstRun({ handle, hasGoal, hasTip, base }: { handle: string; hasGoal: boolean; hasTip: boolean; base: string }) {
+  const router = useRouter();
   const [flags, setFlags] = useState<Flags>({});
   const [loaded, setLoaded] = useState(false);
   const [origin, setOrigin] = useState("");
@@ -35,14 +37,14 @@ export function FirstRun({ handle, hasGoal, hasTip }: { handle: string; hasGoal:
   ];
   const doneCount = tasks.filter((t) => t.done).length;
   const next = tasks.findIndex((t) => !t.done);
-  const goTo = (id: string, focus?: string) => { document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" }); if (focus) setTimeout(() => document.getElementById(focus)?.focus(), 450); };
+  const goTo = (page: string) => router.push(`${base}/${page}`);
   const copy = async () => { try { await navigator.clipboard.writeText(url); } catch { /* visible anyway */ } setCopied(true); set("shared"); setTimeout(() => setCopied(false), 1800); };
   const qrPng = async () => { const a = document.createElement("a"); a.href = await QRCode.toDataURL(url, { width: 1024, margin: 2 }); a.download = `tezeo-${handle}-qr.png`; a.click(); set("shared"); };
 
   const btns = (id: string) => {
     if (id === "saved" && !tasks[0].done) return <div className="fl-btnrow"><button type="button" className="tz-btn tz-btn--secondary" onClick={() => set("saved")}>I've saved it</button></div>;
     if (id === "test") return <div className="fl-btnrow"><a className="tz-btn tz-btn--secondary" href={`/@${handle}`}>Open my page</a></div>;
-    if (id === "goal") return <div className="fl-btnrow"><button type="button" className="tz-btn tz-btn--secondary" onClick={() => goTo("stream", "gt")}>Add a goal</button></div>;
+    if (id === "goal") return <div className="fl-btnrow"><button type="button" className="tz-btn tz-btn--secondary" onClick={() => goTo("stream")}>Add a goal</button></div>;
     if (id === "obs") return <div className="fl-btnrow"><button type="button" className="tz-btn tz-btn--secondary" onClick={() => goTo("stream")}>Set up alerts</button><button type="button" className="tz-btn tz-btn--ghost" onClick={() => set("obs")}>Mark as done</button></div>;
     return null;
   };

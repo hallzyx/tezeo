@@ -5,6 +5,7 @@ import "../styles/components.css";
 import "../styles/screens.css";
 import "../styles/flow.css";
 import "../styles/onboarding.css";
+import "../styles/dashboard.css";
 import "../styles/icons.css";
 import { Sprite } from "@/components/ui";
 
