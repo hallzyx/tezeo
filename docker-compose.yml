@@ -24,6 +24,10 @@ services:
       AURORA_API_KEY: ${AURORA_API_KEY:-}
       AURORA_API_BASE: ${AURORA_API_BASE:-https://intents-api.aurora.dev}
       TEZEO_FEE_BPS: ${TEZEO_FEE_BPS:-100}
+      # Optional. A Solana RPC for the new-wallet check (default: the public RPC; unreachable = the note is simply hidden).
+      SOLANA_RPC_URL: ${SOLANA_RPC_URL:-}
+      # Optional. Handle of the demo creator: enables /demo (the mock livestream). Empty = /demo returns 404.
+      DEMO_STAGE_HANDLE: ${DEMO_STAGE_HANDLE:-}
     expose:
       - "3000"        # internal only; Traefik routes to it
     healthcheck:
