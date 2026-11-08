@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import QRCode from "qrcode";
+import { demoHandle } from "@/lib/demo";
 import { env } from "@/lib/env";
 import { DEFAULT_ACCENT } from "@/lib/accent";
 import { getExtras, goalProgress } from "@/lib/extras";
@@ -12,7 +13,7 @@ export const metadata: Metadata = { title: "Demo stage", robots: { index: false,
 
 /** A mock livestream for the demo video. Only exists when DEMO_STAGE_HANDLE is set; it is not a product feature. */
 export default async function Page() {
-  const handle = process.env.DEMO_STAGE_HANDLE;
+  const handle = demoHandle();
   if (!handle) notFound();
   const c = await getCreatorByHandle(handle);
   if (!c) notFound();
