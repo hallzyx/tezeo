@@ -134,10 +134,14 @@ export function TipFlow({ creator, qrSvg, pageUrl, passMode = false, goal = null
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chain]);
 
+  // True once the fan chose a network or coin themselves: from then on, nothing may change their choice.
+  const chosenByFan = useRef(false);
   function onWalletConnected(c: Connected) {
     setConnected(c);
-    const slug = chainSlugById(c.chainId);   // the wallet is on a network we know: preselect it
-    if (slug && data?.assets.some((a) => a.chain === slug)) pickChain(slug);
+    // Only a suggestion: preselect the wallet's network when the fan hasn't picked one. (A wallet that sits on
+    // another network is fine: one-tap pay asks it to switch.)
+    const slug = chainSlugById(c.chainId);
+    if (!chosenByFan.current && slug && data?.assets.some((a) => a.chain === slug)) pickChain(slug);
   }
 
   // Why the main button is disabled (shown under it, so the fan knows what is missing).
@@ -318,7 +322,7 @@ export function TipFlow({ creator, qrSvg, pageUrl, passMode = false, goal = null
         <div className="tz-stack" style={{ ["--tz-stack-gap" as string]: "10px" }}>
           <span className="tz-overline" id="net-l">Network</span>
           <div className="tz-chips tzs-pickgroup" role="group" aria-labelledby="net-l">
-            {topChains.map((c) => <Chip key={c.id} on={chain === c.id} color={CHAIN_COLOR[c.id]} glyph={c.label.slice(0, 3).toUpperCase()} icon={chainIcon(c.id)} label={c.label} onClick={() => pickChain(c.id)} />)}
+            {topChains.map((c) => <Chip key={c.id} on={chain === c.id} color={CHAIN_COLOR[c.id]} glyph={c.label.slice(0, 3).toUpperCase()} icon={chainIcon(c.id)} label={c.label} onClick={() => { chosenByFan.current = true; pickChain(c.id); }} />)}
             {chain && !topChains.some((c) => c.id === chain) && cur && <Chip on color={CHAIN_COLOR[chain]} glyph={cur.label.slice(0, 3).toUpperCase()} icon={chainIcon(chain)} label={cur.label} onClick={() => {}} />}
             {moreChains.length > 0 && <Chip color="#5E5266" glyph={`+${moreChains.length}`} label="More" onClick={() => setSheet("chain")} />}
           </div>
@@ -326,7 +330,7 @@ export function TipFlow({ creator, qrSvg, pageUrl, passMode = false, goal = null
         <div className="tz-stack" style={{ ["--tz-stack-gap" as string]: "10px" }}>
           <span className="tz-overline" id="coin-l">Coin</span>
           <div className="tz-chips tzs-pickgroup" role="group" aria-labelledby="coin-l">
-            {topCoins.map((c) => <Chip key={c.assetId} on={assetId === c.assetId} color={c.stable ? "#2775CA" : CHAIN_COLOR[c.chain] ?? "#5E5266"} glyph={c.symbol.slice(0, 3)} icon={coinIcon(c.symbol)} label={c.symbol} onClick={() => setAssetId(c.assetId)} />)}
+            {topCoins.map((c) => <Chip key={c.assetId} on={assetId === c.assetId} color={c.stable ? "#2775CA" : CHAIN_COLOR[c.chain] ?? "#5E5266"} glyph={c.symbol.slice(0, 3)} icon={coinIcon(c.symbol)} label={c.symbol} onClick={() => { chosenByFan.current = true; setAssetId(c.assetId); }} />)}
             {assetId && !topCoins.some((c) => c.assetId === assetId) && <Chip on color="#5E5266" glyph="•" icon={coinIcon(coins.find((c) => c.assetId === assetId)?.symbol ?? "")} label={coins.find((c) => c.assetId === assetId)?.symbol ?? ""} onClick={() => {}} />}
             {moreCoins.length > 0 && <Chip color="#5E5266" glyph={`+${moreCoins.length}`} label="More" onClick={() => setSheet("coin")} />}
           </div>
@@ -447,8 +451,8 @@ export function TipFlow({ creator, qrSvg, pageUrl, passMode = false, goal = null
           <CopyBox value={pageUrl} label="Copy page link" toast="Link copied" />
         </Sheet>
       )}
-      {sheet === "chain" && <PickerSheet title="All networks" items={chains.map((c) => ({ id: c.id, label: c.label, icon: chainIcon(c.id) }))} onPick={(id) => { pickChain(id); setSheet(null); }} onClose={() => setSheet(null)} />}
-      {sheet === "coin" && <PickerSheet title={`Coins on ${chains.find((c) => c.id === chain)?.label ?? ""}`} items={coins.map((c) => ({ id: c.assetId, label: c.symbol, icon: coinIcon(c.symbol) }))} onPick={(id) => { setAssetId(id); setSheet(null); }} onClose={() => setSheet(null)} />}
+      {sheet === "chain" && <PickerSheet title="All networks" items={chains.map((c) => ({ id: c.id, label: c.label, icon: chainIcon(c.id) }))} onPick={(id) => { chosenByFan.current = true; pickChain(id); setSheet(null); }} onClose={() => setSheet(null)} />}
+      {sheet === "coin" && <PickerSheet title={`Coins on ${chains.find((c) => c.id === chain)?.label ?? ""}`} items={coins.map((c) => ({ id: c.assetId, label: c.symbol, icon: coinIcon(c.symbol) }))} onPick={(id) => { chosenByFan.current = true; setAssetId(id); setSheet(null); }} onClose={() => setSheet(null)} />}
     </div>
   );
 }
