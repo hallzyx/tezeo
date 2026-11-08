@@ -104,3 +104,7 @@ Simulator tricks (simulated mode only): a tip whose smallest-unit amount ends in
 * OBS alerts poll every 4s (no websockets), so an alert can lag a confirmed tip by a few seconds.
 * The dashboard, OBS and pass links are bearer secrets (shown once, no recovery). Schema changes are additive `CREATE … IF NOT EXISTS` run at start-up; there is no migration tool yet.
 * **Docker image not built in CI yet.** The Docker daemon was not available where this was developed, so the image itself was never built. What *was* verified: `docker compose config` is valid, and the exact standalone bundle the Dockerfile ships ran against a real PostgreSQL 16 server (health check, full browser flows, concurrency).
+
+## Demo stage (optional, for the demo video)
+
+Set `DEMO_STAGE_HANDLE=<handle>` and open `/demo`: a clearly labelled mock livestream (not a real stream, no third-party branding) with a pinned "Send a tip" card that opens the real `/@handle` flow in a panel. When a tip is delivered, the creator's real OBS-style alert pops over the video, the goal bar moves and the chat reacts. It reads the creator's alert feed server-side (`/api/demo/alerts`, so no token reaches the browser). `/demo?rehearse=1` plays a sample alert with no payment. Without the env var the route returns 404. Wallets inside the panel are unverified: if one cannot reach it, the page offers a full-screen fallback.
