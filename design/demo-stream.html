@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tezeo · Demo stage (mock livestream) prototype</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="logo-mark.svg" type="image/svg+xml">
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="components.css">
+<link rel="stylesheet" href="flow.css">
+<link rel="stylesheet" href="demo-stream.css">
+<script>
+  /* Prototype switches (spec: DEMO-STREAM.md §5)
+     ?state=idle|press|loading|sheet|quote|track|blocked|away|delivered|chat
+     &view=phone   (390×844 frame on a big screen; default is responsive)
+     &theme=dark|light   (Tezeo parts only; the stream chrome is dark-only. Default dark.)
+     &mode=live|sim|rehearse   (demo strip copy)                                   */
+  (function () { var q = new URLSearchParams(location.search), d = document.documentElement;
+    var t = q.get('theme'); d.dataset.theme = t === 'light' ? 'light' : 'dark'; })();
+</script>
+</head>
+<body class="tz-app">
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="tz-mark" viewBox="0 0 64 64"><rect width="64" height="64" rx="16" fill="#D1245A"/><path d="M9.5 19H22c9 0 15.5 6 15.5 14v19.5" fill="none" stroke="#FFC23D" stroke-width="7.5" stroke-linecap="round"/><path d="M42 19c-9 0-15.5 6-15.5 14" fill="none" stroke="#D1245A" stroke-width="13.5"/><path d="M54.5 19H42c-9 0-15.5 6-15.5 14v19.5" fill="none" stroke="#FFF7EC" stroke-width="7.5" stroke-linecap="round"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M9 3h6l-1 6 4 4H6l4-4-1-6Zm3 10v8" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20s-7.5-4.4-7.5-10.1A4.4 4.4 0 0 1 12 7a4.4 4.4 0 0 1 7.5 2.9C19.5 15.6 12 20 12 20Z" fill="currentColor"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></symbol>
+  <symbol id="i-open" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M18 14v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 4.5 6v5.5c0 4.6 3.2 8.3 7.5 9.5 4.3-1.2 7.5-4.9 7.5-9.5V6L12 3Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="m8.5 12 2.5 2.5 4.5-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 11v6M12 7.5v.01" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></symbol>
+  <symbol id="i-stage" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="m10 9 5 3-5 3z" fill="currentColor"/></symbol>
+  <symbol id="i-wallet" viewBox="0 0 24 24"><path d="M4 7a2 2 0 0 1 2-2h11v4M4 7v10a2 2 0 0 0 2 2h14V9H6a2 2 0 0 1-2-2Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M16.5 14h.01" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><path d="M7 5v14l11-7z" fill="currentColor"/></symbol>
+  <symbol id="i-vol" viewBox="0 0 24 24"><path d="M4 10v4h4l5 4V6L8 10H4Zm12-1a4 4 0 0 1 0 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></symbol>
+  <symbol id="i-full" viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7.5V12l3 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+</svg>
+
+<div id="frame">
+<div class="ds-stage tz-creator" id="stage" style="--creator-accent:#1A9E8F; position:relative">
+
+  <!-- 0. Demo strip: always visible, always honest -->
+  <p class="ds-strip" id="strip" role="note" data-mode="live">
+    <svg aria-hidden="true"><use href="#i-info"/></svg>
+    <span id="strip-text"><b>Demo stage.</b> Not a real stream. Tips sent here are real.</span>
+  </p>
+
+  <!-- Desktop top bar: original glyph, no platform name -->
+  <header class="ds-top">
+    <span class="ds-top__brand"><span class="ds-top__glyph" aria-hidden="true"><svg><use href="#i-stage"/></svg></span>Demo stage</span>
+    <span class="ds-top__tag">Mock livestream · sample viewers and chat</span>
+    <span class="tz-spacer"></span>
+    <a class="ds-top__link" href="#" id="real-page">Open Valentina's real tip page <svg aria-hidden="true"><use href="#i-open"/></svg></a>
+  </header>
+
+  <div class="ds-main">
+    <!-- PLAYER COLUMN -->
+    <section class="ds-watch" aria-label="Mock stream">
+      <div class="ds-player" id="player">
+        <div class="ds-canvas" id="canvas" aria-hidden="true">
+          <!-- the fake camera feed -->
+          <div class="ds-scene"></div>
+          <div class="ds-editor">
+            <div class="ds-editor__bar"><i></i><i></i><i></i><span>tip-jar/src/route.ts</span></div>
+            <div class="ds-code">
+              <i class="k" style="--w:22%"></i><i style="--w:58%;--x:6%"></i><i class="s" style="--w:40%;--x:6%"></i>
+              <i style="--w:66%;--x:12%"></i><i class="n" style="--w:30%;--x:12%"></i><i style="--w:48%;--x:12%"></i>
+              <i class="p" style="--w:18%;--x:6%"></i><i style="--w:0"></i><i class="k" style="--w:26%"></i>
+              <i style="--w:72%;--x:6%"></i><i class="s" style="--w:52%;--x:12%"></i><i style="--w:38%;--x:12%"></i>
+              <i class="n" style="--w:44%;--x:6%"></i><i style="--w:60%;--x:6%"></i><i class="p" style="--w:14%"></i>
+            </div>
+          </div>
+          <div class="ds-cam"><span>V</span><small>camera placeholder</small></div>
+
+          <!-- OBS overlay: goal widget (real goal from goalProgress) -->
+          <div class="ds-ov-goal">
+            <div class="ds-ov-goal__row"><span>Goal · new microphone</span><b id="goal-pct">22%</b></div>
+            <div class="ds-ov-goal__bar"><i id="goal-bar" style="--pct:22%"></i></div>
+            <small id="goal-text">$66.76 of $300</small>
+          </div>
+          <!-- OBS overlay: scan-to-tip tag (real QR from APP_BASE_URL in the build) -->
+          <div class="ds-ov-tag">
+            <span class="ds-qrmini"><svg viewBox="0 0 25 25" shape-rendering="crispEdges"><path fill="#FFFFFF" d="M0 0h25v25H0z"/><path stroke="#1C1424" d="M0 0.5h7m2 0h1m2 0h1m1 0h1m3 0h7M0 1.5h1m5 0h1m1 0h1m3 0h2m1 0h2m1 0h1m5 0h1M0 2.5h1m1 0h3m1 0h1m2 0h1m1 0h1m2 0h3m1 0h1m1 0h3m1 0h1M0 3.5h1m1 0h3m1 0h1m5 0h3m3 0h1m1 0h3m1 0h1M0 4.5h1m1 0h3m1 0h1m1 0h1m3 0h1m2 0h1m2 0h1m1 0h3m1 0h1M0 5.5h1m5 0h1m3 0h6m2 0h1m5 0h1M0 6.5h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7M9 7.5h2m1 0h2m1 0h1M0 8.5h1m1 0h1m1 0h1m1 0h1m4 0h1m2 0h1m5 0h1m2 0h1M1 9.5h2m2 0h1m1 0h1m5 0h1m1 0h2m1 0h2m4 0h1M0 10.5h1m2 0h6m1 0h4m1 0h2m1 0h1m3 0h3M1 11.5h1m3 0h1m7 0h3m7 0h1M0 12.5h1m1 0h1m1 0h4m2 0h2m1 0h1m3 0h3m1 0h1m1 0h2M1 13.5h1m2 0h1m3 0h1m2 0h1m1 0h1m1 0h2m3 0h2m2 0h1M0 14.5h1m1 0h1m3 0h1m1 0h1m4 0h1m1 0h1m3 0h1m2 0h3M1 15.5h1m1 0h2m2 0h2m2 0h1m1 0h1m2 0h3m4 0h1M0 16.5h1m2 0h2m1 0h2m1 0h2m1 0h1m1 0h1m1 0h6M8 17.5h1m1 0h5m1 0h1m3 0h2m1 0h2M0 18.5h7m4 0h3m2 0h1m1 0h1m1 0h2m1 0h2M0 19.5h1m5 0h1m3 0h1m1 0h1m2 0h2m3 0h2M0 20.5h1m1 0h3m1 0h1m1 0h5m3 0h5m2 0h2M0 21.5h1m1 0h3m1 0h1m2 0h3m1 0h1m1 0h2m2 0h3m1 0h1M0 22.5h1m1 0h3m1 0h1m1 0h1m1 0h1m1 0h2m1 0h3m1 0h1m2 0h1m1 0h1M0 23.5h1m5 0h1m4 0h1m1 0h1m1 0h2m3 0h1m2 0h1M0 24.5h7m1 0h1m1 0h1m5 0h1m1 0h2m1 0h1m1 0h2"/></svg></span>
+            <span><b>Tip me in any crypto</b><span>tezeo.app/@vale</span></span>
+          </div>
+
+          <!-- OBS overlay: the alert Browser Source. Markup = Alerts.tsx, unchanged. -->
+          <div class="ds-ov-alert" id="alert" hidden>
+            <div class="tz-card tz-card--raised tz-rise is-playing" style="--d:0ms">
+              <div class="tz-row"><svg width="28" height="28" aria-hidden="true"><use href="#tz-mark"/></svg><span class="tz-overline">New tip for Valentina</span><span class="tz-badge" id="alert-sample" hidden>Sample</span></div>
+              <p class="tz-display" style="font-size:var(--tz-text-2xl);margin:0" id="alert-line">Ana · 4.72 USDC</p>
+              <p style="margin:0;font-size:var(--tz-text-lg)" id="alert-msg">“Your Solana course got me my first dev job. ¡Gracias!”</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- generic player chrome: decorative -->
+        <div class="ds-chrome" aria-hidden="true">
+          <div class="ds-live"><b>LIVE</b><span>1.2K · sample</span></div>
+          <div class="ds-controls"><svg><use href="#i-play"/></svg><svg><use href="#i-vol"/></svg><span class="tz-spacer"></span><svg><use href="#i-full"/></svg></div>
+        </div>
+      </div>
+
+      <div class="ds-channel">
+        <span class="ds-avatar" aria-hidden="true">V</span>
+        <p class="ds-channel__name">Vale's Workshop <span>Valentina · @vale</span></p>
+        <p class="ds-channel__title">Building a tip jar on Solana, live · day 12</p>
+        <p class="ds-channel__meta">Software &amp; dev · 1,204 watching (sample numbers)</p>
+      </div>
+
+      <!-- Desktop only: About panels (Option A, nice-to-have) -->
+      <div class="ds-panels">
+        <div class="ds-panel"><h3>About this stage</h3><p>A mock stream made to show Tezeo. The video, viewers and chat are samples. The tip page and the alert are real.</p></div>
+        <div class="ds-panel"><h3>What's on the video</h3><p>The goal bar, the "Tip me" tag and the tip alert are the overlays a streamer adds in OBS with Tezeo.</p></div>
+        <div class="ds-panel"><h3>Tip from another device</h3><p>Scan the tag on the video. Your alert still pops here.</p></div>
+      </div>
+    </section>
+
+    <!-- CHAT COLUMN (phone: everything under the player) -->
+    <aside class="ds-side" id="side" aria-label="Chat">
+      <div class="ds-pin ds-nudge" id="pin">
+        <p class="ds-pin__label"><svg aria-hidden="true"><use href="#i-pin"/></svg>Pinned by Valentina</p>
+        <div class="ds-pincard" id="pincard">
+          <span class="tz-weave tz-weave--slim" aria-hidden="true"></span>
+          <svg class="ds-pincard__mark" aria-hidden="true"><use href="#tz-mark"/></svg>
+          <div>
+            <p class="ds-pincard__t">Tip Vale in any crypto</p>
+            <p class="ds-pincard__s">Any coin, any chain. Vale gets dollars.</p>
+          </div>
+          <button type="button" class="tz-btn tz-btn--primary" id="tip-btn" aria-haspopup="dialog" aria-controls="sheet"><svg aria-hidden="true"><use href="#i-heart"/></svg>Send a tip</button>
+          <div class="ds-pincard__away" id="away" hidden>
+            <span class="tz-pill" data-status="pending">Waiting for your tip</span>
+            <span class="tz-small tz-muted">Paying in another tab. Your alert pops here when it lands.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="ds-chat__head">Chat <span>Sample messages</span></div>
+      <ol class="ds-chat" id="chat" aria-label="Chat messages (sample)">
+        <li class="ds-msg"><b style="--ds-u:#F2B880">pixel_moth</b> day 12 already?</li>
+        <li class="ds-msg"><b style="--ds-u:#A9C1FF">lucho.dev</b> which RPC are you on</li>
+        <li class="ds-msg"><b style="--ds-u:#E6A3C8">nina_k</b> the tip jar looks so clean</li>
+        <li class="ds-msg"><b style="--ds-u:#B7E07A">sol_sprout</b> <code>!tip</code></li>
+        <li class="ds-msg"><span class="ds-bot">Bot</span><b style="--ds-u:#ECEDEF">stagebot</b> Tip Vale in any coin: tap <b style="--ds-u:#ECEDEF">Send a tip</b> in the pinned card.</li>
+      </ol>
+      <div class="ds-chatbar">
+        <label class="tz-sr-only" for="chat-in">Chat (sample, disabled)</label>
+        <input id="chat-in" disabled placeholder="Chat is a sample on this demo stage">
+      </div>
+
+      <!-- THE SHEET: the existing /@vale flow, embedded -->
+      <div class="ds-sheet" id="sheet" role="dialog" aria-modal="false" aria-labelledby="sheet-title" hidden>
+        <div class="ds-sheet__head">
+          <svg class="ds-mk" aria-hidden="true"><use href="#tz-mark"/></svg>
+          <div>
+            <h2 class="ds-sheet__title" id="sheet-title" tabindex="-1">Tip Valentina</h2>
+            <p class="ds-sheet__sub"><svg aria-hidden="true"><use href="#i-shield"/></svg><span>Tezeo's real tip page · tezeo.app/@vale</span></p>
+          </div>
+          <a class="ds-iconbtn" id="sheet-open" href="#" target="_blank" rel="noopener" aria-label="Open the tip page full screen, in a new tab" title="Open full screen"><svg aria-hidden="true"><use href="#i-open"/></svg></a>
+          <button type="button" class="ds-iconbtn" id="sheet-close" aria-label="Close and go back to the stream" title="Back to the stream"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
+          <div class="ds-sheet__done" id="sheet-done" hidden>
+            <span class="tz-pill" data-status="received">Delivered · it's on stream</span>
+            <button type="button" class="tz-btn tz-btn--secondary" id="sheet-back">Back to the stream</button>
+          </div>
+        </div>
+        <p class="ds-hint" id="hint" hidden><svg aria-hidden="true"><use href="#i-wallet"/></svg><span>Your wallet can't reach this panel. <a href="#" id="hint-open" target="_blank" rel="noopener">Open full screen</a> or pay by hand below.</span></p>
+        <div class="ds-sheet__body">
+          <iframe class="ds-frame" id="frame-flow" title="Tip Valentina with Tezeo" allow="clipboard-write; web-share" loading="eager"></iframe>
+          <div class="ds-loading" id="loading" hidden>
+            <div class="ds-loading__dots" aria-hidden="true"><i class="tz-rombo"></i><i class="tz-rombo"></i><i class="tz-rombo"></i></div>
+            <p role="status">Opening Valentina's tip page…</p>
+            <p id="slow" hidden>Slow connection? <a href="#" target="_blank" rel="noopener">Open it full screen</a></p>
+          </div>
+          <div class="ds-fallback" id="fallback" hidden>
+            <div class="tz-card">
+              <span class="ds-fallback__icon" aria-hidden="true"><svg><use href="#i-wallet"/></svg></span>
+              <h3 class="tz-h2">Your wallet works best full screen</h3>
+              <p>Some wallets can't reach a page inside a panel. Open Valentina's tip page on its own, pay there, then come back. The alert will still pop on this stream.</p>
+              <ol>
+                <li>Open the tip page and pay as usual.</li>
+                <li>Come back to this tab when you see "You just made Vale's day."</li>
+                <li>Watch your tip land on stream.</li>
+              </ol>
+              <a class="tz-btn tz-btn--primary tz-btn--lg tz-btn--block" href="#" target="_blank" rel="noopener" id="fallback-open"><svg aria-hidden="true"><use href="#i-open"/></svg>Open the tip page</a>
+              <button type="button" class="tz-btn tz-btn--ghost tz-btn--block" id="fallback-stay">Stay here and pay by hand (QR)</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <p class="ds-announcer" aria-live="polite" id="announcer"></p>
+</div>
+</div>
+
+<script>
+(function () {
+  var q = new URLSearchParams(location.search);
+  var state = q.get('state') || 'idle', view = q.get('view'), mode = q.get('mode') || 'live';
+  var theme = document.documentElement.dataset.theme;
+  var $ = function (id) { return document.getElementById(id); };
+  var stage = $('stage'), sheet = $('sheet'), side = $('side');
+
+  // ?view=phone on a big screen: show the same page inside a 390×844 device frame (media queries need a real 390px viewport).
+  if (view === 'phone' && window.innerWidth > 500) {
+    q.delete('view'); document.body.innerHTML = '<div class="ds-protoframe"><iframe class="ds-protophone" title="Demo stage at 390 by 844" src="?' + q.toString() + '"></iframe></div>';
+    return;
+  }
+
+  // Demo strip copy per mode
+  var strip = { live: '<b>Demo stage.</b> Not a real stream. Tips sent here are real.',
+                sim: '<b>Demo stage.</b> Not a real stream. Payments are simulated, no real money moves.',
+                rehearse: '<b>Rehearsal.</b> Not a real stream. The alert is a sample, no payment.' };
+  $('strip').dataset.mode = mode; $('strip-text').innerHTML = strip[mode] || strip.live;
+
+  // OBS-style canvas scaling: playerWidth / 640
+  var player = $('player');
+  var fit = function () { player.style.setProperty('--ds-k', player.clientWidth / 640); };
+  new ResizeObserver(fit).observe(player); fit();
+
+  // In the prototype the "real" flow is the existing flow prototype.
+  var flow = function (screen) { return 'flow.html?screen=' + screen + '&clean=1&theme=' + theme; };
+  ['real-page', 'sheet-open', 'hint-open', 'fallback-open'].forEach(function (id) { $(id).href = flow('amount'); });
+
+  var open = function (screen) {
+    sheet.hidden = false; side.querySelector('.ds-pin').setAttribute('inert', ''); side.querySelector('.ds-chat').setAttribute('inert', '');
+    $('frame-flow').src = flow(screen);
+  };
+  var close = function () {
+    sheet.hidden = true; side.querySelectorAll('[inert]').forEach(function (n) { n.removeAttribute('inert'); });
+    $('tip-btn').focus();
+  };
+  var deliver = function (sample) {
+    $('alert').hidden = false; $('alert-sample').hidden = !sample;
+    $('goal-bar').style.setProperty('--pct', '24%'); $('goal-pct').textContent = '24%'; $('goal-text').textContent = '$71.48 of $300';
+    var row = document.createElement('li'); row.className = 'ds-tiprow';
+    row.innerHTML = '<span class="ds-tiprow__head"><svg aria-hidden="true"><use href="#tz-mark"/></svg><span><strong>Ana</strong> tipped <span class="ds-tiprow__amt">4.72 USDC</span> with Tezeo</span>' + (sample ? '<span class="tz-badge">Sample</span>' : '') + '</span><q>Your Solana course got me my first dev job. ¡Gracias!</q>';
+    var chat = $('chat'); chat.appendChild(row);
+    [['nina_k', '#E6A3C8', 'wait, that went from Base to Solana already?'], ['lucho.dev', '#A9C1FF', 'ok I need this for my stream'], ['pixel_moth', '#F2B880', 'GG Ana']]
+      .forEach(function (m) { var li = document.createElement('li'); li.className = 'ds-msg'; li.innerHTML = '<b style="--ds-u:' + m[1] + '">' + m[0] + '</b> ' + m[2]; chat.appendChild(li); });
+    chat.scrollTop = chat.scrollHeight;
+    $('announcer').textContent = 'Ana\'s tip of 4.72 USDC is on stream now.';
+  };
+
+  $('tip-btn').addEventListener('click', function () { open('amount'); $('sheet-title').focus(); });
+  $('sheet-close').addEventListener('click', close);
+  $('sheet-back').addEventListener('click', close);
+  $('fallback-stay').addEventListener('click', function () { $('fallback').hidden = true; });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !sheet.hidden) close(); });
+
+  // Static states for review and screenshots
+  if (state !== 'idle') $('pin').classList.remove('ds-nudge');
+  if (state === 'press') $('tip-btn').classList.add('is-pressed');
+  if (state === 'loading') { open('amount'); $('loading').hidden = false; $('slow').hidden = false; $('frame-flow').removeAttribute('src'); }
+  if (state === 'sheet') open('amount');
+  if (state === 'quote') { open('quote'); }
+  if (state === 'track') open('track');
+  if (state === 'blocked') { open('quote'); $('fallback').hidden = false; }
+  if (state === 'hint') { open('quote'); $('hint').hidden = false; }
+  if (state === 'away') { $('tip-btn').hidden = true; $('away').hidden = false; $('pincard').dataset.state = 'away'; }
+  if (state === 'delivered') { open('thanks'); $('sheet-done').hidden = false; deliver(mode === 'rehearse'); }
+  if (state === 'chat') deliver(mode === 'rehearse');
+})();
+</script>
+</body>
+</html>
