@@ -11,7 +11,8 @@ export function mapStatus(p: ProviderStatus): TipStatus {
     case "PROCESSING": return "converting";
     case "SUCCESS": return "received";
     case "REFUNDED": return "refunded";
-    case "INCOMPLETE_DEPOSIT":
+    // Not final: Aurora waits until the refund deadline for the rest (or refunds), so the tip stays open.
+    case "INCOMPLETE_DEPOSIT": return "pending";
     case "FAILED": return "failed";
   }
 }

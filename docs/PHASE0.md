@@ -35,6 +35,7 @@ Limits of this evidence: it comes from the owner's report. The transaction hash 
 
 ## Still not verified live
 
+- **Underpayments.** Per Aurora's docs `INCOMPLETE_DEPOSIT` is not final: the rest may arrive until the refund deadline, after which the deposit is refunded (`REFUNDED`). The app keeps such a tip open (pending + underpaid) and never expires it. For `FAILED` the docs say not to assume a refund, so the app does not promise one.
 - **`REFUNDED` and `FAILED` transitions.** The failure and refund screens have only been exercised against the simulator. No real refund has been observed.
 - **Why the first tip to a new wallet costs ~$0.25.** Measured with dry quotes (0.2549 USDC to brand-new wallets vs 0.0100 to active ones) and explained by Solana's USDC token-account creation, but that explanation is a hypothesis: where the money goes was not checked (look at the delivery transaction on Solscan), and it has not been confirmed that the *next* tip to the same wallet drops to ~0.01.
 - **Other origin coins and chains** (anything besides the one used in the payment above), non-EVM origins, and the pass flow with a real payment.

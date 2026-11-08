@@ -19,7 +19,7 @@ interface Asset { assetId: string; chain: string; chainLabel: string; symbol: st
 interface Tip {
   id: string; status: "pending" | "converting" | "received" | "failed" | "refunded" | "expired";
   originAssetId: string; originSymbol: string; originChain: string; amountIn: string;
-  depositAddress: string; depositMemo: string | null; refundTo: string; createdAt: string; settlementTx: string | null;
+  depositAddress: string; depositMemo: string | null; refundTo: string; deadline: string; createdAt: string; settlementTx: string | null;
   fanMessage: string; fanName: string; failReason: "underpaid" | "other" | null; refundDetail: string | null;
   isPass: boolean; passToken: string | null; passExpiresAt: string | null;
 }
@@ -535,7 +535,7 @@ function QuoteStep({ tip, asset, name, now, bar, mini, demo, busy, mode, walletI
   const start = useMemo(() => Date.now(), [tip.id]); // eslint-disable-line react-hooks/exhaustive-deps
   const left = start + QUOTE_HOLD_MS - now;
   // While the wallet is asking the fan to confirm, never pull the screen out from under them.
-  const expired = left <= 0 && wallet === "idle";
+  const expired = left <= 0 && wallet === "idle" && tip.failReason !== "underpaid";
 
   const sendAmt = coin(tip.amountIn, asset.decimals, 8, asset.stable ? 2 : 0);
   // One-tap wallet payment: EVM coins on supported chains, real deposit addresses only (never the simulator's).
@@ -583,6 +583,8 @@ function QuoteStep({ tip, asset, name, now, bar, mini, demo, busy, mode, walletI
           <span className="tzs-tag"><Icon name="clock" size={14} />Price held for <b className="tz-timer">{clock(left)}</b></span>
         </div>
       </section>
+
+      <UnderpaidNote tip={tip} asset={asset} />
 
       {tx ? (
         <>
@@ -674,6 +676,7 @@ function TrackStep({ tip, asset, creator, name, pageUrl, demo, bar, onAgain, onH
         {bar(4)}
         <div className="tz-row"><span className="tz-pill" data-status={s}>{conv ? "Converting" : "Waiting"}</span><span className="tz-spacer" /><span className="tz-small tz-muted">{conv ? "usually under a minute" : "usually a minute or two"}</span></div>
         <h1 className="tz-h1">{conv ? `We're weaving your ${asset.symbol} into dollars for ${name}` : "Waiting for your payment"}</h1>
+        <UnderpaidNote tip={tip} asset={asset} />
         <Loom from={asset.chainLabel} />
         <ol className="tz-steps" data-status={s}>
           <Step state={conv ? "done" : "active"} title={conv ? `Got your ${sendAmt} ${asset.symbol}` : `Waiting for your ${sendAmt} ${asset.symbol}`} desc={conv ? undefined : "It shows up once the network confirms it."} />
@@ -696,7 +699,7 @@ function TrackStep({ tip, asset, creator, name, pageUrl, demo, bar, onAgain, onH
           <svg viewBox="0 0 112 112" width="112" height="112" aria-hidden="true"><circle cx="56" cy="56" r="52" fill="var(--tz-refunded-bg)" /><path d="M10 44 H70 C90 44 90 74 70 74 H38" fill="none" stroke="#FFC23D" strokeWidth="7" strokeLinecap="round" /><path d="M44 64 34 74 44 84" fill="none" stroke="var(--tz-refunded-line)" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" /></svg>
           <span className="tz-pill" data-status="refunded">Refunded</span>
           <h1 className="tz-h1">Your money is back home.</h1>
-          <p className="tz-muted" style={{ margin: 0, maxWidth: "32ch" }}>We sent your {asset.symbol} back to the wallet it came from. The network may keep a small fee that we can't get back.</p>
+          <p className="tz-muted" style={{ margin: 0, maxWidth: "32ch" }}>{tip.failReason === "underpaid" ? "What arrived was below the quote, so it was returned. " : ""}We sent your {asset.symbol} back to the wallet it came from. A small refund fee may be taken, so the amount can be a little lower.</p>
         </div>
         <div className="tz-card tz-card--sunken" style={{ padding: "var(--tz-space-4)" }}>
           <dl className="tz-quote">
@@ -719,8 +722,7 @@ function TrackStep({ tip, asset, creator, name, pageUrl, demo, bar, onAgain, onH
     );
   }
 
-  // failed
-  const under = tip.failReason === "underpaid";
+  // failed: Aurora reports FAILED. Its docs say not to assume a refund happened, so we don't promise one.
   return (
     <>
       <div className="tzs-moment">
@@ -734,22 +736,34 @@ function TrackStep({ tip, asset, creator, name, pageUrl, demo, bar, onAgain, onH
           </g>
         </svg>
         <span className="tz-pill" data-status="failed">Didn't go through</span>
-        <h1 className="tz-h1" role="alert">The thread snapped — but your money is safe.</h1>
-        <p className="tz-muted" style={{ margin: 0, maxWidth: "32ch" }}>
-          {under ? "We got a bit less than the quote needed, so we couldn't convert it. We're sending it back automatically."
-            : "No route could deliver it right now. Nothing was converted, and it's on its way back."}
+        <h1 className="tz-h1" role="alert">The thread snapped.</h1>
+        <p className="tz-muted" style={{ margin: 0, maxWidth: "34ch" }}>
+          It couldn't be converted, and we can't confirm yet where your money is. Nothing reached {name}. Keep the reference below and get in touch, so it can be looked into.
         </p>
       </div>
       <ol className="tz-steps" data-status="failed">
         <Step state="done" title={`Got your ${asset.symbol}`} />
-        <Step state="failed" title="Couldn't convert" desc={under ? "The amount was below the quote." : "No route was available."} />
-        <Step state="refund" title="Sending it back to you" desc={`To ${shortAddr(tip.refundTo)} · usually a few minutes`} />
+        <Step state="failed" title="Couldn't convert" />
+        <Step state="todo" title="Needs a look" desc="We can't promise a refund yet. Use the reference below." />
       </ol>
       <div className="tz-stack" style={{ ["--tz-stack-gap" as string]: "10px" }}>
         <button className="tz-btn tz-btn--primary tz-btn--lg tz-btn--block" onClick={onAgain}>Try again with a fresh quote</button>
       </div>
       {ref}
     </>
+  );
+}
+
+/** A deposit arrived but was below the quote. Aurora waits for the rest until the refund deadline, then refunds. */
+function UnderpaidNote({ tip, asset }: { tip: Tip; asset: Asset }) {
+  if (tip.status !== "pending" || tip.failReason !== "underpaid") return null;
+  const by = new Date(tip.deadline).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+  return (
+    <div className="tz-card tz-card--sunken tz-stack" style={{ ["--tz-stack-gap" as string]: "8px" }} role="status" data-testid="underpaid-note">
+      <span className="tz-overline">We got less than the quote needed</span>
+      <p className="tz-small" style={{ margin: 0 }}>Your {asset.symbol} arrived, but it was below the amount in this quote. You can send the missing amount to the same address before {by}. If it doesn't complete, it is returned to {shortAddr(tip.refundTo)}. That can take a while.</p>
+      <CopyBox value={tip.depositAddress} label="Copy deposit address" toast="Address copied" />
+    </div>
   );
 }
 

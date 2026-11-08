@@ -47,7 +47,8 @@ describe("domain", () => {
     expect(mapStatus("PROCESSING")).toBe("converting");
     expect(mapStatus("SUCCESS")).toBe("received");
     expect(mapStatus("REFUNDED")).toBe("refunded");
-    expect(mapStatus("INCOMPLETE_DEPOSIT")).toBe("failed");
+    // Not final: Aurora refunds only after the deadline, so we keep tracking until REFUNDED.
+    expect(mapStatus("INCOMPLETE_DEPOSIT")).toBe("pending");
   });
 });
 

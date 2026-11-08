@@ -11,7 +11,7 @@ import type { AuroraProvider, OriginAsset, Quote, QuoteRequest, StatusResult } f
  *   0-8s    PENDING_DEPOSIT
  *   8-20s   PROCESSING
  *   >20s    SUCCESS
- * Magic amounts (smallest units ending in ...13 / ...14) force REFUNDED / FAILED
+ * Magic amounts (smallest units ending in ...13 / ...14 / ...15) force REFUNDED / FAILED / underpaid-then-REFUNDED
  * so the error screens can be exercised on demand.
  */
 
@@ -52,7 +52,7 @@ export const simulatedAurora: AuroraProvider = {
     const out = Math.floor(net * 1e6);
     const ts = Date.now();
     // Keep the magic suffix in the address so status() can stay stateless.
-    const flag = req.amountIn.endsWith("13") ? "r" : req.amountIn.endsWith("14") ? "f" : "s";
+    const flag = req.amountIn.endsWith("13") ? "r" : req.amountIn.endsWith("14") ? "f" : req.amountIn.endsWith("15") ? "u" : "s";
     return {
       depositAddress: addr(ts, req.recipient) + "_" + flag,
       amountIn: req.amountIn,
@@ -69,6 +69,8 @@ export const simulatedAurora: AuroraProvider = {
   async status(depositAddress: string): Promise<StatusResult> {
     const age = ageMs(depositAddress);
     const flag = depositAddress.split("_")[3];
+    // "u": a deposit below the quote. It stays INCOMPLETE_DEPOSIT until the refund lands (simulated at 60s).
+    if (flag === "u") return age < 60_000 ? { status: "INCOMPLETE_DEPOSIT" } : { status: "REFUNDED", detail: "Simulated refund of an underpayment" };
     if (age < T_PROCESSING) return { status: "PENDING_DEPOSIT" };
     if (age < T_SUCCESS) return { status: "PROCESSING" };
     if (flag === "r") return { status: "REFUNDED", detail: "Simulated refund" };

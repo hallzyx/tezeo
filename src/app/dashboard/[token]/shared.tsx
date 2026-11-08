@@ -89,7 +89,11 @@ function TipDetail({ t }: { t: Tip }) {
   if (t.status !== "received") {
     return (
       <div className="db-detail">{noteHtml}
-        <p className="db-why"><b>{t.status === "failed" ? "This one didn’t go through." : "This one was refunded."}</b> {t.fanName || "The fan"}’s money went back to the wallet it came from, automatically. Nothing reached you and nothing was taken from you.</p>
+        {t.status === "failed" ? (
+          <p className="db-why"><b>This one didn’t go through.</b> The payment couldn’t be converted and nothing reached your wallet. We can’t confirm what happened to {t.fanName || "the fan"}’s money yet, so it needs a look. Nothing was taken from you.</p>
+        ) : (
+          <p className="db-why"><b>This one was refunded.</b> {t.fanName || "The fan"}’s money was returned to the wallet it came from. Nothing reached you and nothing was taken from you.</p>
+        )}
       </div>
     );
   }

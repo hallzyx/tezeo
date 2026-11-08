@@ -45,6 +45,19 @@ describe("tip lifecycle (simulated provider)", () => {
     expect((await refreshTip(f)).status).toBe("failed");
   });
 
+  it("keeps an underpaid deposit open until Aurora refunds it, and remembers why", async () => {
+    const t = await createTip(await mk(), { originAssetId: "eth:usdc", amountIn: "10000015", refundTo: "0xabc0000000" });
+    vi.advanceTimersByTime(30_000);
+    const open = await refreshTip(t);
+    expect(open.status).toBe("pending"); // INCOMPLETE_DEPOSIT is not final
+    expect(open.detail).toBe("underpaid");
+    // Even past our own deadline it must not be marked expired: money is held and will be refunded.
+    vi.advanceTimersByTime(40_000);
+    expect((await refreshTip((await getTip(t.id))!)).status).toBe("refunded");
+    const done = (await getTip(t.id))!;
+    expect(done.detail).toBe("underpaid");
+  });
+
   it("expires a never-funded tip after its deadline", async () => {
     const t = await createTip(await mk(), { originAssetId: "eth:usdc", amountIn: "10000000", refundTo: "0xabc0000000" });
     vi.advanceTimersByTime(31 * 60_000);

@@ -51,7 +51,7 @@ reach Postgres, and both services have health checks.
 npm ci
 cp .env.example .env.local      # set DATABASE_URL=postgres://user:pass@localhost:5432/tezeo
 npm run dev                     # http://localhost:3000
-npm run typecheck && npm test   # 80 tests, run on an embedded Postgres (PGlite): no server needed
+npm run typecheck && npm test   # 81 tests, run on an embedded Postgres (PGlite): no server needed
 npm run build && npm start
 ```
 
@@ -67,7 +67,7 @@ npm run build && npm start
 | `DATABASE_POOL_MAX` | Optional, default 10. |
 | `SOLANA_RPC_URL` | Optional. Solana RPC used to check whether a creator's wallet already has a USDC account. Defaults to the public mainnet endpoint, which is rate-limited: use your own (Helius, QuickNode, etc.) in production. |
 
-Simulator tricks (simulated mode only): a tip whose smallest-unit amount ends in `…13` ends **refunded**, `…14` **failed**.
+Simulator tricks (simulated mode only): a tip whose smallest-unit amount ends in `…13` ends **refunded**, `…14` **failed**, `…15` is **underpaid** (stays open, then refunded).
 
 ## What's in the box
 

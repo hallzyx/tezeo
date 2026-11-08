@@ -142,12 +142,14 @@ export async function refreshTip(tip: TipRow): Promise<TipRow> {
 
   const res = await getAurora().status(tip.deposit_address);
   const next = mapStatus(res.status);
-  if (next === tip.status && !res.settlementTx) return tip;
+  const underpaidNow = res.status === "INCOMPLETE_DEPOSIT";
+  if (next === tip.status && !res.settlementTx && !(underpaidNow && tip.detail !== "underpaid")) return tip;
 
   const patch: Partial<TipRow> = { status: next };
-  if (next === "failed" || next === "refunded") {
-    patch.detail = res.status === "INCOMPLETE_DEPOSIT" ? "underpaid" : (res.detail ?? null);
-  }
+  // INCOMPLETE_DEPOSIT is not final: the tip stays open ("pending") and is only flagged as underpaid.
+  if (underpaidNow) patch.detail = "underpaid";
+  else if (next === "failed") patch.detail = res.detail ?? null;
+  else if (next === "refunded") patch.detail = tip.detail === "underpaid" ? "underpaid" : (res.detail ?? null);
   if (next === "received") {
     patch.settlement_tx = res.settlementTx ?? null;
     patch.final_out_usdc = res.amountOutUsdc ?? tip.amount_out_usdc;
