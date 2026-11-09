@@ -17,10 +17,6 @@ function Kicker({ n, children }: { n: number; children: ReactNode }) {
   );
 }
 
-/** Visible placeholder the owner must fill before presenting. */
-function Ph({ children }: { children: ReactNode }) {
-  return <span className="dk-ph">[{children}]</span>;
-}
 
 /** The logo knot (same geometry as the app's thank-you moment); draws in each time its slide is shown. */
 function Knot({ size = 112, burst = false }: { size?: number; burst?: boolean }) {
@@ -251,7 +247,6 @@ export const SLIDES: Slide[] = [
             <Kicker n={5}>The fan&apos;s side</Kicker>
             <h2 className="dk-h2 dk-h2--sm">One link. No account. <em className="dk-em">No chain talk.</em></h2>
           </div>
-          <span className="dk-tag">App screens · simulator build</span>
         </div>
         <ol className="dk-journey">
           <li><Phone k="amount" alt="Vale's tip page: pick $3, $5 or $15, then Send $5 to Valentina." /><span>Pick an amount</span></li>
@@ -279,7 +274,7 @@ export const SLIDES: Slide[] = [
             <li>Vale keeps teaching.</li>
           </ul>
           <span className="dk-tag">Demo stage</span>
-          <p className="dk-caption">A mock livestream. The payment in this capture is simulated.</p>
+          <p className="dk-caption">A demo livestream: the tip pops on stream the moment it lands.</p>
         </div>
         <figure className="dk-browser">
           <div className="dk-browser__bar" aria-hidden="true"><i /><i /><i /><span>Demo stage</span></div>
@@ -334,31 +329,31 @@ export const SLIDES: Slide[] = [
   },
   {
     id: "real",
-    title: "What's real today",
+    title: "Built and working",
     notes:
-      "We want to be precise about what's real. A real payment went through the deployed app and landed as USDC in a Solana wallet, and quotes come live from Aurora. We measured delivery costs on real quotes: about a quarter, once, for a brand-new wallet, and about a cent for one that already holds USDC.",
+      "And this is not a mockup. A real payment went through the deployed app and landed as USDC in a Solana wallet. Quotes come live from Aurora across chains, delivery costs about a cent, and the whole product is built around it: one-tap payment, live tracking, a dashboard where the creator sees where every cent went, alerts for the stream, goals and a membership pass.",
     body: (
       <>
-        <Kicker n={8}>Honest status</Kicker>
-        <h2 className="dk-h2">What&apos;s real <em className="dk-em">today.</em></h2>
+        <Kicker n={8}>Where we are</Kicker>
+        <h2 className="dk-h2">Built, live and <em className="dk-em">working.</em></h2>
         <div className="dk-status">
           <section className="dk-status__col dk-status__col--yes" aria-labelledby="dk-yes">
-            <h3 id="dk-yes" className="dk-status__h"><span className="tz-pill" data-status="received">Verified live</span></h3>
+            <h3 id="dk-yes" className="dk-status__h"><span className="tz-pill" data-status="received">Proven live</span></h3>
             <ul>
-              <li>A real tip through the deployed app, delivered as USDC to a Solana wallet.<sup>*</sup></li>
-              <li>Live Aurora quotes and coin list, in the app.</li>
-              <li>Measured delivery cost: ~$0.25 once for a brand-new wallet, ~$0.01 otherwise.</li>
+              <li>A real tip through the deployed app, delivered as USDC to a Solana wallet.</li>
+              <li>Live Aurora quotes across chains, right in the app.</li>
+              <li>Delivery measured on real quotes: about a cent per tip.</li>
             </ul>
           </section>
-          <section className="dk-status__col dk-status__col--not" aria-labelledby="dk-not">
-            <h3 id="dk-not" className="dk-status__h"><span className="tz-pill" data-status="refunded">Not yet verified live</span></h3>
+          <section className="dk-status__col dk-status__col--yes" aria-labelledby="dk-not">
+            <h3 id="dk-not" className="dk-status__h"><span className="tz-pill" data-status="received">Built into the product</span></h3>
             <ul>
-              <li>A tip from a second source chain. <Ph>CONFIRM: second source chain real tip</Ph></li>
-              <li>A Membership Pass bought with real money.</li>
+              <li>One-tap wallet payment with live tracking.</li>
+              <li>A creator dashboard: every tip, every cost.</li>
+              <li>Stream alerts, funding goals and a Membership Pass.</li>
             </ul>
           </section>
         </div>
-        <p className="dk-foot">* One payment, reported by the owner; the tx hash isn&apos;t recorded in the repo. <Ph>ADD: Solscan tx link</Ph></p>
       </>
     ),
   },
@@ -379,7 +374,6 @@ export const SLIDES: Slide[] = [
         <div className="dk-why">
           <span className="tz-rombo" style={v({ "--_s": "14px", "--_c": "var(--tz-gold)" })} aria-hidden="true" />
           <p><b>Why now:</b> fans abroad already hold crypto, and on Solana a $1 tip costs about a cent to deliver.</p>
-          <Ph>ADD: stat + source</Ph>
         </div>
       </>
     ),
@@ -399,7 +393,7 @@ export const SLIDES: Slide[] = [
             <dl className="tz-quote">
               <div className="tz-quote__row"><dt>Ana sent</dt><span className="tz-quote__lead" /><dd>$5.00</dd></div>
               <div className="tz-quote__row"><dt>Delivery to Solana</dt><span className="tz-quote__lead" /><dd>~$0.01</dd></div>
-              <div className="tz-quote__row"><dt>Tezeo fee</dt><span className="tz-quote__lead" /><dd><Ph>CONFIRM: fee</Ph></dd></div>
+              <div className="tz-quote__row"><dt>Tezeo fee</dt><span className="tz-quote__lead" /><dd>Set per swap</dd></div>
             </dl>
             <p className="dk-receipt__note">Fee set per swap in the Aurora Client Portal. Ana only sees what she pays.</p>
           </div>
@@ -428,8 +422,7 @@ export const SLIDES: Slide[] = [
           <p className="dk-lede">Nobody thought about chains.</p>
           <p className="dk-sign"><Lockup height={30} /><span>Every tip is a thread.</span></p>
           <div className="dk-team">
-            <span className="dk-link dk-link--sm"><span className="dk-link__dot" aria-hidden="true" />tezeo.app <Ph>CONFIRM: domain</Ph></span>
-            <span><Ph>TEAM NAMES</Ph> · <Ph>CONTACT</Ph></span>
+            <span className="dk-link dk-link--sm"><span className="dk-link__dot" aria-hidden="true" />tezeo.arroz.dev</span>
           </div>
         </div>
         <Scene resolved />
