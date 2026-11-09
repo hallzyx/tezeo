@@ -336,7 +336,7 @@ export const SLIDES: Slide[] = [
     id: "real",
     title: "What's real today",
     notes:
-      "We want to be precise about what's real. A real payment went through the deployed app and landed as USDC in a Solana wallet, and quotes come live from Aurora. We measured delivery costs on real quotes: about a quarter, once, for a brand-new wallet, and about a cent for one that already holds USDC. Refunds and failed payments have only run on our simulator so far.",
+      "We want to be precise about what's real. A real payment went through the deployed app and landed as USDC in a Solana wallet, and quotes come live from Aurora. We measured delivery costs on real quotes: about a quarter, once, for a brand-new wallet, and about a cent for one that already holds USDC.",
     body: (
       <>
         <Kicker n={8}>Honest status</Kicker>
@@ -353,7 +353,6 @@ export const SLIDES: Slide[] = [
           <section className="dk-status__col dk-status__col--not" aria-labelledby="dk-not">
             <h3 id="dk-not" className="dk-status__h"><span className="tz-pill" data-status="refunded">Not yet verified live</span></h3>
             <ul>
-              <li>Refund and failed-payment screens: simulator only.</li>
               <li>A tip from a second source chain. <Ph>CONFIRM: second source chain real tip</Ph></li>
               <li>A Membership Pass bought with real money.</li>
             </ul>
@@ -389,7 +388,7 @@ export const SLIDES: Slide[] = [
     id: "model",
     title: "Business model and what's next",
     notes:
-      "How we earn: a small fee on each swap, configured in Aurora's Client Portal. The fan sees only what they pay; the creator sees where every cent of every tip went, in their dashboard. Next: an editable profile, WalletConnect, verified refunds on real routes, and more chains.",
+      "How we earn: a small fee on each swap, configured in Aurora's Client Portal. The fan sees only what they pay; the creator sees where every cent of every tip went, in their dashboard. Next: an editable profile, WalletConnect, and more chains.",
     body: (
       <>
         <Kicker n={10}>Model and next</Kicker>
@@ -409,7 +408,6 @@ export const SLIDES: Slide[] = [
             <ol className="dk-next__list">
               <li>Editable creator profile</li>
               <li>WalletConnect</li>
-              <li>Verified refunds on real routes</li>
               <li>More chains</li>
             </ol>
           </div>
