@@ -1,0 +1,383 @@
+/* =====================================================================
+   TEZEO — Pitch deck (/deck). Every new class is dk-; the rest is tz-.
+   A fixed 1280×720 canvas, scaled to fit. Sizes below are canvas pixels.
+   ===================================================================== */
+
+/* ---------------------------------------------------------------------
+   1. FRAME: viewport, stage, canvas, chrome
+   --------------------------------------------------------------------- */
+.dk-app { position: fixed; inset: 0; display: flex; flex-direction: column; background: var(--tz-bg-sunken); color: var(--tz-text); }
+.dk-stage { position: relative; flex: 1; min-height: 0; overflow: hidden; cursor: pointer; touch-action: pan-y; -webkit-tap-highlight-color: transparent; }
+.dk-canvas {
+  position: absolute; left: 50%; top: 50%;
+  width: 1280px; height: 720px;
+  transform: translate(-50%, -50%) scale(var(--dk-scale, 1));
+  transform-origin: center;
+  box-shadow: 0 0 0 1px var(--tz-border), var(--tz-shadow-3);
+  overflow: hidden;
+}
+
+/* Running-stitch progress + counter, inside the canvas */
+.dk-progress { position: absolute; left: 0; right: 0; bottom: 0; height: 40px; pointer-events: none; z-index: 5; }
+.dk-progress__track { position: absolute; left: 0; right: 0; bottom: 0; height: 5px; background: repeating-linear-gradient(90deg, var(--tz-border-strong) 0 10px, transparent 10px 16px); }
+.dk-progress__fill { display: block; height: 100%; background: repeating-linear-gradient(90deg, var(--tz-brand) 0 10px, color-mix(in srgb, var(--tz-brand) 45%, transparent) 10px 16px); transition: width var(--tz-dur-slow) var(--tz-ease-out); }
+.dk-progress__count { position: absolute; right: 28px; bottom: 14px; font: 600 16px/1 var(--tz-font-mono); color: var(--tz-text-muted); font-variant-numeric: tabular-nums; }
+
+/* Controls: hidden until you move the mouse over the deck (always visible on touch) */
+.dk-tools {
+  position: fixed; top: 10px; right: 10px; z-index: 20;
+  display: flex; align-items: center; gap: 4px; padding: 4px;
+  background: color-mix(in srgb, var(--tz-surface) 88%, transparent);
+  border: 1px solid var(--tz-border); border-radius: var(--tz-radius-md);
+  box-shadow: var(--tz-shadow-2);
+  transition: opacity var(--tz-dur-base) var(--tz-ease-out);
+}
+.dk-app.is-idle .dk-tools:not(:focus-within):not(:hover) { opacity: 0; }
+.dk-app.is-idle .dk-stage { cursor: none; }
+@media (hover: none) {
+  .dk-tools { top: auto; bottom: 10px; }
+  .dk-app.is-idle .dk-tools:not(:focus-within):not(:hover) { opacity: 0.85; }
+}
+.dk-tools button {
+  display: grid; place-items: center; width: 40px; height: 40px; padding: 0;
+  border: 0; border-radius: var(--tz-radius-sm); background: transparent; color: var(--tz-text);
+  font: 700 16px/1 var(--tz-font-body); cursor: pointer;
+}
+.dk-tools button:hover { background: var(--tz-surface-2); }
+.dk-tools button[aria-pressed="true"] { background: var(--tz-brand-soft); color: var(--tz-brand-text); }
+.dk-tools button:disabled { opacity: 0.35; cursor: default; }
+.dk-tools svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.dk-tools__count { padding: 0 6px; font: 600 14px/1 var(--tz-font-mono); color: var(--tz-text-muted); font-variant-numeric: tabular-nums; }
+
+/* Speaker notes (N) */
+.dk-notes {
+  flex: none; height: min(34vh, 280px); overflow: auto;
+  padding: 16px 24px 20px; background: var(--tz-surface);
+  border-top: 2px dashed var(--tz-border-strong);
+}
+.dk-notes__head { display: flex; align-items: baseline; gap: 14px; margin-bottom: 8px; }
+.dk-notes__n { font: 600 14px/1 var(--tz-font-mono); color: var(--tz-text-muted); }
+.dk-notes__head b { font: 700 18px/1.2 var(--tz-font-display); }
+.dk-notes__next { margin-left: auto; font-size: 15px; color: var(--tz-text-muted); }
+.dk-notes__text { margin: 0; max-width: 72ch; font-size: clamp(17px, 1.6vw, 22px); line-height: 1.5; }
+
+/* Key help (? / H) */
+.dk-help {
+  position: fixed; left: 50%; top: 50%; translate: -50% -50%; z-index: 30;
+  width: min(440px, calc(100vw - 32px)); max-height: calc(100vh - 32px); overflow: auto;
+  padding: 24px; background: var(--tz-surface); color: var(--tz-text);
+  border: 1.5px solid var(--tz-border-strong); border-radius: var(--tz-radius-lg); box-shadow: var(--tz-shadow-3);
+}
+.dk-help h2 { margin: 0 0 12px; font: 800 24px/1.1 var(--tz-font-display); }
+.dk-help dl { margin: 0 0 12px; display: grid; gap: 8px; }
+.dk-help dl div { display: flex; justify-content: space-between; gap: 16px; }
+.dk-help dt { font: 600 14px/1.6 var(--tz-font-mono); padding: 0 8px; border: 1px solid var(--tz-border-strong); border-radius: 6px; background: var(--tz-bg-sunken); }
+.dk-help dd { margin: 0; color: var(--tz-text-muted); font-size: 15px; }
+.dk-help p { margin: 0 0 16px; font-size: 15px; color: var(--tz-text-muted); }
+
+/* Portrait phone: a polite hint, the deck still works */
+.dk-rotate { display: none; }
+@media (orientation: portrait) and (max-width: 820px) {
+  .dk-rotate { display: block; flex: none; margin: 0; padding: 10px 16px; text-align: center; font: 600 15px/1.35 var(--tz-font-body); background: var(--tz-pending-bg); color: var(--tz-pending-fg); }
+}
+
+/* ---------------------------------------------------------------------
+   2. SLIDE BASE + TYPE
+   --------------------------------------------------------------------- */
+.dk-slide {
+  position: absolute; inset: 0; width: 1280px; height: 720px;
+  display: flex; flex-direction: column;
+  padding: 56px 80px 64px;
+  background: var(--tz-bg); color: var(--tz-text);
+  font: 400 24px/1.35 var(--tz-font-body);
+  overflow: hidden; isolation: isolate; outline: none;
+}
+.dk-slide:focus-visible { box-shadow: none; }
+.dk-slide[hidden] { display: none; }
+/* faint warp threads, like a loom before weaving */
+.dk-slide::before {
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background: repeating-linear-gradient(90deg, transparent 0 63px, color-mix(in srgb, var(--tz-border) 60%, transparent) 63px 64px);
+  -webkit-mask: linear-gradient(to bottom, #000, transparent 75%); mask: linear-gradient(to bottom, #000, transparent 75%);
+}
+.dk-selvedge { position: absolute; left: 0; right: 0; top: 0; }
+.dk-slide--weave { padding-top: 100px; }
+
+.dk-slide[data-active] { animation: dk-in 360ms var(--tz-ease-out) both; }
+.dk-slide[data-active][data-dir="back"] { animation-name: dk-in-back; }
+
+.dk-kicker { display: flex; align-items: center; gap: 14px; margin: 0 0 18px; font: 700 18px/1 var(--tz-font-body); letter-spacing: var(--tz-tracking-overline); text-transform: uppercase; color: var(--tz-brand-text); }
+.dk-kicker__knot { position: relative; isolation: isolate; display: grid; place-items: center; width: 40px; height: 40px; flex: none; font: 800 16px/1 var(--tz-font-mono); letter-spacing: 0; color: var(--tz-on-brand); }
+.dk-kicker__knot::before { content: ""; position: absolute; width: 28px; height: 28px; background: var(--tz-brand); transform: rotate(45deg); border-radius: 5px; z-index: -1; }
+.dk-kicker::after { content: ""; width: 56px; height: 2px; background: repeating-linear-gradient(90deg, currentColor 0 6px, transparent 6px 10px); opacity: 0.6; }
+
+.dk-h1, .dk-h2 { margin: 0; font-family: var(--tz-font-display); font-weight: 800; font-variation-settings: "opsz" 96; letter-spacing: -0.035em; text-wrap: balance; }
+.dk-h1 { font-size: 66px; line-height: 1.02; margin-bottom: 24px; }
+.dk-h2 { font-size: 60px; line-height: 1.04; margin-bottom: 18px; }
+.dk-h2--sm { font-size: 52px; margin-bottom: 0; }
+.dk-em { font-style: normal; color: var(--tz-brand-text); text-decoration: underline dashed var(--tz-gold); text-decoration-thickness: 4px; text-underline-offset: 0.14em; text-decoration-skip-ink: none; }
+.dk-lede { margin: 0; font-size: 30px; line-height: 1.35; color: var(--tz-text-muted); max-width: 26ch; }
+.dk-lede--narrow { max-width: 34ch; }
+.dk-tag { align-self: flex-start; display: inline-block; margin-top: 28px; padding: 8px 12px; font: 700 16px/1 var(--tz-font-body); letter-spacing: 0.08em; text-transform: uppercase; color: var(--tz-text-muted); border: 1.5px dashed var(--tz-border-strong); border-radius: 8px; white-space: nowrap; }
+.dk-tag--sm { margin: 0; }
+/* placeholders the owner must fill: impossible to miss */
+.dk-ph { display: inline-block; padding: 0 0.35em; font: 600 0.8em/1.5 var(--tz-font-mono); color: var(--tz-pending-fg); background: var(--tz-pending-bg); border: 1.5px dashed var(--tz-pending-line); border-radius: 6px; letter-spacing: -0.01em; white-space: nowrap; }
+
+.dk-logo { width: 28px; height: 28px; border-radius: 50%; flex: none; display: block; }
+.dk-logo--txt { display: grid; place-items: center; background: var(--tz-surface-2); font: 700 13px/1 var(--tz-font-body); }
+.dk-letters { display: block; color: var(--tz-text); --tz-t: var(--tz-brand); }
+.dk-knot { margin: 0; flex: none; }
+
+/* threads (SVG) */
+.dk-thread--gold, .dk-thread--usdc, .dk-thread--guide, .dk-t, .dk-fibre { fill: none; stroke-linecap: round; }
+.dk-thread--gold { stroke: var(--tz-maiz-400); stroke-width: 8; }
+.dk-thread--usdc { stroke: var(--tz-brand); stroke-width: 8; }
+.dk-thread--thick { stroke-width: 12; }
+.dk-thread--guide { stroke: var(--tz-border-strong); stroke-width: 4; stroke-dasharray: 3 11; }
+.dk-fibre { stroke: var(--tz-maiz-400); stroke-width: 3; animation: dk-fade 400ms var(--tz-ease-out) 1100ms both; }
+.dk-draw { stroke-dasharray: 1 1; animation: dk-draw var(--dur, 1000ms) var(--tz-ease-in-out) var(--d, 250ms) both; }
+
+/* ---------------------------------------------------------------------
+   3. SLIDES 1 + 11 — the scene (Ana's phone, Vale's class, a thread)
+   --------------------------------------------------------------------- */
+.dk-split { display: grid; grid-template-columns: 1fr 560px; gap: 40px; align-items: center; height: 100%; }
+.dk-split__copy { display: flex; flex-direction: column; }
+.dk-corner-brand { position: absolute; top: 36px; right: 80px; display: flex; align-items: center; gap: 12px; }
+
+.dk-scene { position: relative; width: 560px; height: 470px; }
+.dk-screen { position: absolute; right: 0; top: 0; width: 420px; height: 280px; display: flex; flex-direction: column; background: var(--tz-surface); border: 1.5px solid var(--tz-border); border-radius: var(--tz-radius-lg); box-shadow: var(--tz-shadow-3); overflow: hidden; }
+.dk-screen__body { position: relative; flex: 1; padding: 16px 20px; }
+.dk-live { display: inline-block; padding: 5px 10px; border-radius: 6px; background: var(--tz-cochinilla-500); color: #fff; font: 800 16px/1 var(--tz-font-body); letter-spacing: 0.08em; }
+.dk-code { margin-top: 18px; display: grid; gap: 12px; width: 230px; }
+.dk-code i { display: block; height: 10px; width: var(--w); margin-left: var(--x, 0); border-radius: 5px; background: var(--c); }
+.dk-screen__cam { --_s: 112px; position: absolute; right: 22px; bottom: 22px; }
+.dk-screen__top { display: flex; align-items: center; gap: 12px; }
+.dk-screen__cap { margin: 0; font: 600 18px/1.2 var(--tz-font-body); color: var(--tz-text-muted); }
+.dk-alert { position: absolute; left: 66px; top: 44px; width: 236px; display: grid; gap: 6px; justify-items: start; padding: 14px 16px; background: var(--tz-surface-2); border: 2px solid var(--creator-accent-fill); border-radius: var(--tz-radius-md); box-shadow: var(--tz-shadow-3); animation: dk-pop 520ms var(--tz-ease-spring) 1500ms both; }
+.dk-alert b { font: 800 24px/1.1 var(--tz-font-display); letter-spacing: -0.02em; }
+.dk-alert small { font-size: 16px; color: var(--tz-text-muted); }
+.dk-slide .tz-pill { height: 32px; font-size: 16px; padding: 0 12px 0 10px; }
+.dk-slide .tz-pill::before { width: 9px; height: 9px; }
+
+.dk-mini { position: absolute; left: 0; bottom: 0; width: 196px; height: 330px; display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 14px 16px 24px; background: var(--tz-surface); border: 2px solid var(--tz-border-strong); border-radius: 32px; box-shadow: var(--tz-shadow-3); }
+.dk-mini__notch { width: 60px; height: 6px; border-radius: 3px; background: var(--tz-border-strong); margin-bottom: 18px; }
+.dk-mini .tz-avatar { --_s: 64px; }
+.dk-mini__name { font: 700 24px/1.1 var(--tz-font-display); }
+.dk-mini__heart { width: 56px; height: 56px; margin-top: 10px; color: var(--tz-brand); }
+.dk-mini__amt { font: 800 52px/1 var(--tz-font-display); letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+
+.dk-scene__thread { position: absolute; inset: 0; width: 560px; height: 470px; overflow: visible; pointer-events: none; }
+.dk-scene__knot { position: absolute; left: 252px; top: 270px; }
+.dk-scene--done .dk-mini { border-color: var(--tz-brand); }
+.dk-scene--done .dk-screen__cam { --_s: 80px; right: 16px; bottom: 14px; }
+
+.dk-sign { display: flex; align-items: center; gap: 16px; margin: 28px 0 0; font: 700 26px/1.2 var(--tz-font-display); }
+.dk-team { margin-top: 28px; display: grid; gap: 14px; justify-items: start; font-size: 22px; color: var(--tz-text-muted); }
+
+/* ---------------------------------------------------------------------
+   4. SLIDE 2 — the wall
+   --------------------------------------------------------------------- */
+.dk-wall { margin: auto 0; display: flex; align-items: center; min-height: 260px; }
+.dk-wall__who { display: grid; justify-items: center; gap: 10px; flex: none; width: 110px; }
+.dk-wall__who b { font: 700 24px/1 var(--tz-font-display); }
+.dk-wall__who--far { opacity: 0.45; margin-left: auto; }
+.dk-wall__thread { width: 170px; height: 40px; flex: none; overflow: visible; }
+.dk-wall__chips { list-style: none; margin: 0 0 0 28px; padding: 0; display: grid; grid-template-columns: auto auto; gap: 18px 16px; }
+.dk-wall__chips li {
+  display: inline-flex; align-items: center; gap: 14px; justify-self: start;
+  padding: 16px 24px; background: var(--tz-surface);
+  border: 2px dashed var(--tz-border-strong); border-radius: var(--tz-radius-pill);
+  font: 600 26px/1.1 var(--tz-font-body); white-space: nowrap;
+  rotate: var(--r); box-shadow: var(--tz-shadow-2);
+  animation: dk-drop 520ms var(--tz-ease-spring) var(--d) both;
+}
+.dk-fray { width: 16px; height: 3px; border-radius: 2px; background: var(--tz-text-muted); box-shadow: 0 -6px 0 var(--tz-text-muted), 0 6px 0 var(--tz-text-muted); flex: none; }
+
+/* ---------------------------------------------------------------------
+   5. SLIDE 3 — many threads in, one out
+   --------------------------------------------------------------------- */
+.dk-loom { margin-top: auto; margin-bottom: 16px; display: grid; grid-template-columns: 200px 520px 1fr; align-items: center; }
+.dk-loom__in { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.dk-loom__in li { display: flex; align-items: center; gap: 10px; height: 44px; padding: 0 16px 0 8px; background: var(--tz-surface); border: 1.5px solid var(--tz-border); border-radius: var(--tz-radius-pill); font: 600 20px/1 var(--tz-font-body); }
+.dk-loom__svg { width: 520px; height: 330px; overflow: visible; }
+.dk-t { stroke-width: 5; opacity: 0.95; }
+.dk-t--1 { stroke: var(--tz-maiz-400); }
+.dk-t--2 { stroke: var(--tz-anil-500); }
+.dk-t--3 { stroke: var(--tz-cochinilla-300); }
+.dk-t--4 { stroke: var(--tz-hierba-500); }
+.dk-t--5 { stroke: var(--tz-piedra-500); }
+.dk-t--6 { stroke: var(--tz-maiz-500); }
+.dk-eye { fill: var(--tz-surface); stroke: var(--tz-text); stroke-width: 4; }
+.dk-eye-rombo { fill: var(--tz-gold); }
+.dk-dest { display: grid; gap: 8px; padding: 24px 26px; background: var(--tz-brand-soft); border: 2px solid var(--tz-brand); border-radius: var(--tz-radius-lg); animation: dk-pop 520ms var(--tz-ease-spring) 1400ms both; }
+.dk-dest__logos { display: flex; gap: 6px; margin-bottom: 4px; }
+.dk-dest__logos .dk-logo { width: 40px; height: 40px; }
+.dk-dest b { font: 800 30px/1.05 var(--tz-font-display); letter-spacing: -0.02em; }
+.dk-dest span { font-size: 20px; color: var(--tz-text-muted); }
+
+/* ---------------------------------------------------------------------
+   6. SLIDE 4 — meet Tezeo
+   --------------------------------------------------------------------- */
+.dk-meet { display: flex; flex-direction: column; height: 100%; }
+.dk-meet__row { display: flex; align-items: center; gap: 44px; margin: 0 0 30px; }
+.dk-meet__name { display: grid; gap: 22px; justify-items: start; }
+.dk-link { display: inline-flex; align-items: center; gap: 12px; padding: 12px 22px; font: 500 30px/1 var(--tz-font-mono); letter-spacing: -0.02em; background: var(--tz-brand-soft); border: 2px dashed var(--tz-brand); border-radius: var(--tz-radius-pill); color: var(--tz-text); }
+.dk-link b { color: var(--tz-brand-text); font-weight: 700; }
+.dk-link__dot { width: 12px; height: 12px; background: var(--tz-brand); transform: rotate(45deg); border-radius: 2px; flex: none; }
+.dk-link--sm { font-size: 22px; padding: 10px 18px; }
+.dk-meet__h { font-size: 54px; max-width: 22ch; }
+.dk-etym { margin: 0 0 0 auto; width: 420px; display: grid; gap: 14px; padding: 26px 30px; }
+.dk-etym div { display: grid; gap: 2px; }
+.dk-etym dt { font: 800 30px/1.1 var(--tz-font-display); letter-spacing: -0.02em; }
+.dk-etym div:last-child dt { color: var(--tz-brand-text); }
+.dk-etym dd { margin: 0; font-size: 22px; line-height: 1.3; color: var(--tz-text-muted); }
+
+/* ---------------------------------------------------------------------
+   7. SLIDE 5 — the fan's journey (phones)
+   --------------------------------------------------------------------- */
+.dk-head-row { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; }
+.dk-head-row .dk-tag { margin: 0 0 8px; align-self: auto; }
+.dk-journey { position: relative; list-style: none; margin: 28px 0 0; padding: 0; display: grid; grid-template-columns: repeat(5, 196px); justify-content: space-between; }
+/* the thread that strings the screens together */
+.dk-journey::before { content: ""; position: absolute; left: 0; right: 0; top: 212px; height: 6px; border-radius: 3px; background: repeating-linear-gradient(90deg, var(--tz-maiz-400) 0 14px, transparent 14px 22px); transform-origin: left; animation: dk-grow 1400ms var(--tz-ease-in-out) 200ms both; }
+.dk-journey li { position: relative; display: grid; justify-items: center; gap: 14px; animation: dk-rise 480ms var(--tz-ease-out) var(--d, 0ms) both; }
+.dk-journey li:nth-child(2) { --d: 120ms; } .dk-journey li:nth-child(3) { --d: 240ms; } .dk-journey li:nth-child(4) { --d: 360ms; } .dk-journey li:nth-child(5) { --d: 480ms; }
+.dk-journey li > span { display: inline-flex; align-items: center; gap: 10px; font: 600 21px/1.1 var(--tz-font-body); white-space: nowrap; }
+.dk-journey li > span::before { content: ""; width: 10px; height: 10px; background: var(--tz-brand); transform: rotate(45deg); border-radius: 2px; flex: none; }
+.dk-journey li:last-child > span { color: var(--tz-received-fg); }
+.dk-journey li:last-child > span::before { background: var(--tz-received-line); }
+.dk-phone { position: relative; width: 196px; height: 424px; padding: 6px; border-radius: 30px; background: var(--tz-obsidiana-700); border: 1.5px solid var(--tz-border-strong); box-shadow: var(--tz-shadow-3); }
+.dk-phone img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top; border-radius: 24px; }
+
+/* light / dark captures follow the deck theme */
+:root[data-theme="light"] .dk-only-dark { display: none; }
+:root:not([data-theme="light"]) .dk-only-light { display: none; }
+
+/* ---------------------------------------------------------------------
+   8. SLIDE 6 — the stream
+   --------------------------------------------------------------------- */
+.dk-stream { display: grid; grid-template-columns: 340px 1fr; gap: 40px; align-items: center; height: 100%; }
+.dk-stream__copy { display: flex; flex-direction: column; }
+.dk-caption { margin: 12px 0 0; font-size: 18px; line-height: 1.4; color: var(--tz-text-muted); max-width: 30ch; }
+.dk-bullets { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 14px; }
+.dk-bullets li { position: relative; padding-left: 30px; font-size: 28px; line-height: 1.25; }
+.dk-bullets li::before { content: ""; position: absolute; left: 4px; top: 0.42em; width: 12px; height: 12px; background: var(--creator-accent-fill); transform: rotate(45deg); border-radius: 2px; }
+.dk-browser { margin: 0; border-radius: var(--tz-radius-lg); overflow: hidden; border: 1.5px solid var(--tz-border-strong); box-shadow: var(--tz-shadow-3); background: var(--tz-surface); animation: dk-rise 520ms var(--tz-ease-out) 150ms both; }
+.dk-browser__bar { display: flex; align-items: center; gap: 8px; height: 36px; padding: 0 14px; background: var(--tz-surface-2); border-bottom: 1px solid var(--tz-border); }
+.dk-browser__bar i { width: 11px; height: 11px; border-radius: 50%; background: var(--tz-border-strong); }
+.dk-browser__bar span { margin-left: 10px; font: 600 16px/1 var(--tz-font-mono); color: var(--tz-text-muted); }
+.dk-browser img { display: block; width: 100%; height: auto; }
+
+/* ---------------------------------------------------------------------
+   9. SLIDE 7 — under the hood
+   --------------------------------------------------------------------- */
+.dk-flow { position: relative; display: grid; grid-template-columns: repeat(3, 310px); justify-content: space-between; margin-top: auto; }
+.dk-flow__thread { position: absolute; left: 0; top: calc(50% - 20px); width: 100%; height: 40px; overflow: visible; }
+.dk-stop { position: relative; z-index: 1; display: grid; justify-items: center; align-content: start; gap: 12px; padding: 32px 22px 24px; text-align: center; background: var(--tz-surface); border: 1.5px solid var(--tz-border); border-radius: var(--tz-radius-lg); box-shadow: var(--tz-shadow-2); animation: dk-rise 480ms var(--tz-ease-out) var(--d, 0ms) both; }
+.dk-stop:nth-child(3) { --d: 500ms; } .dk-stop:nth-child(4) { --d: 1000ms; }
+.dk-stop b { font: 800 30px/1.1 var(--tz-font-display); letter-spacing: -0.02em; }
+.dk-stop > span:last-child { font-size: 22px; line-height: 1.3; color: var(--tz-text-muted); }
+.dk-stop__n { position: absolute; top: -18px; left: calc(50% - 18px); display: grid; place-items: center; width: 36px; height: 36px; font: 800 16px/1 var(--tz-font-mono); color: var(--tz-on-brand); isolation: isolate; }
+.dk-stop__n::before { content: ""; position: absolute; inset: 5px; background: var(--tz-brand); transform: rotate(45deg); border-radius: 5px; z-index: -1; }
+.dk-stop__logos { display: flex; gap: 8px; min-height: 52px; align-items: center; }
+.dk-stop__logos .dk-logo { width: 44px; height: 44px; }
+.dk-stop--loom { background: var(--tz-converting-bg); border-color: var(--tz-converting-line); }
+.dk-stop__eye { width: 52px; height: 52px; }
+.dk-stop__eye circle { fill: var(--tz-surface); stroke: var(--tz-text); stroke-width: 3; }
+.dk-stop__eye rect { fill: var(--tz-gold); }
+.dk-promise { margin: 44px 0 auto; display: flex; align-items: center; gap: 18px; padding: 20px 28px; background: var(--tz-brand-soft); border: 2px dashed var(--tz-brand); border-radius: var(--tz-radius-lg); font-size: 26px; line-height: 1.3; animation: dk-rise 480ms var(--tz-ease-out) 1500ms both; }
+.dk-promise svg { width: 40px; height: 40px; flex: none; color: var(--tz-brand-text); }
+.dk-promise b { font-weight: 700; }
+
+/* ---------------------------------------------------------------------
+   10. SLIDE 8 — what's real
+   --------------------------------------------------------------------- */
+.dk-status { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-top: 8px; }
+.dk-status__col { padding: 22px 28px 26px; background: var(--tz-surface); border: 1.5px solid var(--tz-border); border-radius: var(--tz-radius-lg); box-shadow: var(--tz-shadow-1); }
+.dk-status__col--yes { border-top: 6px solid var(--tz-received-line); }
+.dk-status__col--not { border-top: 6px solid var(--tz-refunded-line); }
+.dk-status__h { margin: 0 0 16px; }
+.dk-status__h .tz-pill { height: 36px; font-size: 18px; }
+.dk-status ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 16px; }
+.dk-status li { position: relative; padding-left: 30px; font-size: 24px; line-height: 1.3; }
+.dk-status li::before { content: ""; position: absolute; left: 3px; top: 0.4em; width: 12px; height: 12px; transform: rotate(45deg); border-radius: 2px; }
+.dk-status__col--yes li::before { background: var(--tz-received-line); }
+.dk-status__col--not li::before { border: 2.5px solid var(--tz-refunded-line); }
+.dk-status sup { font-size: 0.7em; color: var(--tz-text-muted); }
+.dk-foot { margin: auto 0 0; font-size: 18px; color: var(--tz-text-muted); }
+
+/* ---------------------------------------------------------------------
+   11. SLIDE 9 — for whom
+   --------------------------------------------------------------------- */
+.dk-who { list-style: none; margin: auto 0 0; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+.dk-who li { display: grid; gap: 8px; padding: 26px 28px; background: var(--tz-surface); border: 1.5px solid var(--tz-border); border-radius: var(--tz-radius-lg); box-shadow: var(--tz-shadow-1); animation: dk-rise 480ms var(--tz-ease-out) var(--d, 0ms) both; }
+.dk-who li:nth-child(2) { --d: 120ms; } .dk-who li:nth-child(3) { --d: 240ms; }
+.dk-who svg { width: 44px; height: 44px; color: var(--tz-brand-text); }
+.dk-who b { font: 800 32px/1.1 var(--tz-font-display); letter-spacing: -0.02em; }
+.dk-who span { font-size: 24px; color: var(--tz-text-muted); }
+.dk-why { margin: 28px 0 auto; display: flex; align-items: center; gap: 18px; padding: 22px 28px; background: var(--tz-surface); border: 1.5px solid var(--tz-border); border-left: 6px solid var(--tz-gold); border-radius: var(--tz-radius-lg); }
+.dk-why p { margin: 0; flex: 1; font-size: 26px; line-height: 1.3; }
+.dk-why .dk-ph { font-size: 20px; }
+
+/* ---------------------------------------------------------------------
+   12. SLIDE 10 — model and next
+   --------------------------------------------------------------------- */
+.dk-model { display: grid; grid-template-columns: 1.2fr 1fr; gap: 48px; margin: auto 0; align-items: center; }
+.dk-receipt { padding: 26px 30px; border-radius: var(--tz-radius-lg); }
+.dk-receipt__head { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 18px; }
+.dk-receipt__head b { font: 700 24px/1.2 var(--tz-font-display); }
+.dk-receipt .tz-quote { gap: 14px; }
+.dk-receipt .tz-quote__row { font-size: 24px; }
+.dk-receipt .tz-quote__row dd .dk-ph { font-size: 18px; }
+.dk-receipt__note { margin: 18px 0 0; padding-top: 14px; border-top: 2px dashed var(--tz-border); font-size: 20px; line-height: 1.35; color: var(--tz-text-muted); }
+.dk-next__h { margin: 0 0 14px; font: 800 30px/1.1 var(--tz-font-display); }
+.dk-next__list { list-style: none; margin: 0; padding: 0; }
+.dk-next__list li { position: relative; padding: 4px 0 24px 46px; font-size: 26px; line-height: 1.25; }
+.dk-next__list li:last-child { padding-bottom: 0; }
+.dk-next__list li::before { content: ""; position: absolute; left: 6px; top: 6px; width: 18px; height: 18px; border: 2.5px dashed var(--tz-text-muted); transform: rotate(45deg); border-radius: 3px; background: var(--tz-bg); z-index: 1; }
+.dk-next__list li:not(:last-child)::after { content: ""; position: absolute; left: 14px; top: 34px; bottom: 2px; width: 3px; background: repeating-linear-gradient(to bottom, var(--tz-border-strong) 0 5px, transparent 5px 10px); }
+
+/* ---------------------------------------------------------------------
+   13. KEYFRAMES + REDUCED MOTION
+   --------------------------------------------------------------------- */
+@keyframes dk-in      { from { opacity: 0; transform: translateX(28px); } }
+@keyframes dk-in-back { from { opacity: 0; transform: translateX(-28px); } }
+@keyframes dk-draw    { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+@keyframes dk-fade    { from { opacity: 0; } }
+@keyframes dk-rise    { from { opacity: 0; transform: translateY(14px); } }
+@keyframes dk-pop     { from { opacity: 0; transform: scale(0.9) translateY(8px); } }
+@keyframes dk-drop    { from { opacity: 0; translate: 0 -18px; } }
+@keyframes dk-grow    { from { transform: scaleX(0); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .dk-app *, .dk-app *::before, .dk-app *::after { animation: none !important; transition: none !important; }
+}
+
+/* ---------------------------------------------------------------------
+   14. PRINT / PDF — /deck?print=1, or Ctrl+P from the deck.
+   One slide per 1280×720 page (the @page rule is injected by Deck).
+   --------------------------------------------------------------------- */
+.dk-print { position: static; display: block; width: 1280px; margin: 0 auto; background: none; }
+.dk-print .dk-slide { position: relative; inset: auto; }
+@media screen { .dk-print .dk-slide + .dk-slide { margin-top: 24px; } }
+/* static render: everything in its final state */
+.dk-print *, .dk-print *::before, .dk-print *::after { animation: none !important; transition: none !important; }
+.dk-print .tz-knot__tile { transform: none; opacity: 1; }
+.dk-print .tz-knot__thread { stroke-dashoffset: 0; }
+.dk-print .tz-burst { display: none; }
+
+@media print {
+  html, body { margin: 0 !important; padding: 0 !important; background: var(--tz-bg) !important; }
+  .dk-app { position: static; display: block; background: none; }
+  .dk-stage { overflow: visible; cursor: auto; }
+  .dk-canvas { position: static; width: auto; height: auto; transform: none !important; box-shadow: none; overflow: visible; visibility: visible !important; }
+  .dk-slide, .dk-slide[hidden] { display: flex !important; position: relative; inset: auto; break-inside: avoid; page-break-inside: avoid; }
+  .dk-slide:not(:last-of-type) { break-after: page; page-break-after: always; }
+  .dk-print .dk-slide + .dk-slide { margin-top: 0; }
+  .dk-progress, .dk-tools, .dk-notes, .dk-help, .dk-rotate, .dk-app > .tz-sr-only { display: none !important; }
+  .dk-app *, .dk-app *::before, .dk-app *::after { animation: none !important; transition: none !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .dk-slide { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .dk-app .tz-knot__tile { transform: none; opacity: 1; }
+  .dk-app .tz-knot__thread { stroke-dashoffset: 0; }
+  .dk-app .tz-burst { display: none; }
+}
